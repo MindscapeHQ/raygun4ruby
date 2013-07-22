@@ -7,9 +7,9 @@ Gem::Specification.new do |spec|
   spec.name          = "raygun4ruby"
   spec.version       = Raygun4ruby::VERSION
   spec.authors       = ["Nik Wakelin"]
-  spec.email         = ["nik@codetocustomer.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.email         = ["me@nikwakelin.com"]
+  spec.description   = %q{Ruby Adapter for Raygun.io}
+  spec.summary       = %q{Ruby Adapter for Raygun.io}
   spec.homepage      = ""
   spec.license       = "MIT"
 

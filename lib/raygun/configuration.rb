@@ -13,6 +13,15 @@ module Raygun
     # Custom Data to send with each exception
     attr_accessor :custom_data
 
+    # Logger to use when if we find an exception :)
+    attr_accessor :logger
+
+    # Should we silence exception reporting (e.g in Development environments)
+    attr_accessor :silence_reporting
+
+    # Failsafe logger (for exceptions that happen when we're attempting to report exceptions)
+    attr_accessor :failsafe_logger
+
     # Exception classes to ignore by default
     IGNORE_DEFAULT = ['ActiveRecord::RecordNotFound',
                       'ActionController::RoutingError',

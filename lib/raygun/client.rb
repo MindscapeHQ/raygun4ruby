@@ -13,7 +13,10 @@ module Raygun
     end
 
     def track_exception(exception_instance, env = {})
-      create_entry(build_payload_hash(exception_instance, env))
+      unless Raygun.configuration.silence_reporting
+        Raygun.log("[Raygun] Tracking Exception...")
+        create_entry(build_payload_hash(exception_instance, env))
+      end
     end
 
     private
@@ -52,6 +55,35 @@ module Raygun
         Raygun.configuration.version
       end
 
+      def request_information(env)
+        return {} if env.blank?
+
+        {
+          hostName:    env["SERVER_NAME"],
+          url:         env["PATH_INFO"],
+          httpMethod:  env["REQUEST_METHOD"],
+          ipAddress:   env["REMOTE_ADDR"],
+          queryString: Rack::Utils.parse_nested_query(env["QUERY_STRING"]),
+          form:        form_data(env),
+          headers:     headers(env),
+          rawData:     []
+        }
+      end
+
+      def headers(rack_env)
+        rack_env.select do |k, v|
+          k.starts_with?("HTTP_")
+        end
+      end
+
+      def form_data(rack_env)
+        request = Rack::Request.new(rack_env)
+
+        if request.form_data?
+          request.body
+        end
+      end
+
       # see http://raygun.io/raygun-providers/rest-json-api?v=1
       def build_payload_hash(exception_instance, env)
         {
@@ -65,10 +97,6 @@ module Raygun
             request:        request_information(env)
           }
         }
-      end
-
-      def request_information(env)
-        return {} if env.blank?
       end
 
       def create_entry(payload_hash)

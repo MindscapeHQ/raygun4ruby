@@ -6,6 +6,7 @@ require "httparty"
 require "logger"
 require "json"
 require "socket"
+require "rack"
 require "active_support/core_ext"
 
 require "raygun/version"
@@ -35,12 +36,22 @@ module Raygun
 
     def track_exception(*args)
       Client.new.track_exception(*args)
+    rescue Exception => e
+      failsafe_log("Problem reporting exception to Raygun: #{e.class}: #{e.message}\n\n#{e.backrace.join("\n")}")
     end
 
     def track_exceptions
       yield
     rescue => e
       track_exception(e)
+    end
+
+    def log(message)
+      configuration.logger.info(message) if configuration.logger
+    end
+
+    def failsafe_log(message)
+      configuration.failsafe_logger.info(message) if configuration.failsafe_logger
     end
 
   end

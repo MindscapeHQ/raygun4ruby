@@ -1,5 +1,20 @@
 class Raygun::Railtie < Rails::Railtie
-  initializer "raygun.insert_exception_middleware" do |app|
-    app.middleware.insert_before ActionDispatch::ShowExceptions, Raygun::RackExceptionInterceptor
+  initializer "raygun.configure_rails_initialization" do |app|
+
+      # Thanks Airbrake: See https://github.com/rails/rails/pull/8624
+      middleware = if defined?(ActionDispatch::DebugExceptions)
+        # Rails >= 3.2.0
+        "ActionDispatch::DebugExceptions"
+      else
+        # Rails < 3.2.0
+        "ActionDispatch::ShowExceptions"
+      end
+
+      app.config.middleware.insert_after middleware, "Raygun::RackExceptionInterceptor"
+  end
+
+  config.to_prepare do
+    Raygun.configuration.logger            ||= Rails.logger
+    Raygun.configuration.silence_reporting ||= Rails.env.development?
   end
 end

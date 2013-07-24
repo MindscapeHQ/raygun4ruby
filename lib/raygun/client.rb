@@ -28,8 +28,6 @@ module Raygun
 
       def error_details(exception)
         {
-          #innerError: "What is this I don't even",
-         # data:       { test: "test" },
           className:  exception.class.to_s,
           message:    exception.message,
           stackTrace: exception.backtrace.map { |line| stack_trace_for(line) }
@@ -42,23 +40,38 @@ module Raygun
         {
           lineNumber: line_number,
           fileName:   file_name,
-          methodName: method
+          methodName: method.gsub(/^in `(.*?)'$/, "\\1")
         }
+      end
+
+      def hostname
+        Socket.gethostname
+      end
+
+      def version
+        Raygun.configuration.version
       end
 
       # see http://raygun.io/raygun-providers/rest-json-api?v=1
       def build_payload_hash(exception_instance, env)
         {
-          occuredOn: Time.now.utc.iso8601,
+          occurredOn: Time.now.utc.iso8601,
           details: {
-            client: client_details,
-            error:  error_details(exception_instance)
+            machineName:    hostname,
+            version:        version,
+            client:         client_details,
+            error:          error_details(exception_instance),
+            userCustomData: Raygun.configuration.custom_data,
+            request:        request_information(env)
           }
         }
       end
 
+      def request_information(env)
+        return {} if env.blank?
+      end
+
       def create_entry(payload_hash)
-        puts JSON.generate(payload_hash)
         self.class.post("/entries", headers: @headers, body: JSON.generate(payload_hash))
       end
 

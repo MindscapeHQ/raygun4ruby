@@ -13,11 +13,7 @@ class ClientTest < Raygun::IntegrationTest
       raise InnocentTestException.new
     rescue InnocentTestException => e
       response = Raygun.track_exception(e)
-
-      require 'pp'
-      pp response.request
-
-      assert_equal 200, response.code, "Raygun Request Failed: #{response.inspect}"
+      assert_equal 202, response.code, "Raygun Request Failed: #{response.inspect}"
     end
   end
 

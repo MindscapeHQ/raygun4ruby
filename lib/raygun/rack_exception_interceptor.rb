@@ -1,5 +1,5 @@
 module Raygun
-  class ExceptionMiddleware
+  class RackExceptionInterceptor
 
     def initialize(app)
       @app = app
@@ -8,7 +8,7 @@ module Raygun
     def call(env)
       @app.call(env)
     rescue Exception => exception
-      Raygun::Client.track_exception(exception, env)
+      Raygun.track_exception(exception, env)
       raise exception
     end
 

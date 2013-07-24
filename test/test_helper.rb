@@ -1,6 +1,9 @@
 require "minitest"
 require "minitest/pride"
+require "fakeweb"
+require "timecop"
 require_relative "../lib/raygun.rb"
+
 
 class NoApiKey < StandardError; end
 
@@ -9,6 +12,7 @@ class Raygun::IntegrationTest < Minitest::Test
   def setup
     Raygun.setup do |config|
       config.api_key = File.open(File.expand_path("~/.raygun4ruby-test-key"), "rb").read
+      config.version = Raygun::VERSION
     end
 
   rescue Errno::ENOENT
@@ -16,6 +20,25 @@ class Raygun::IntegrationTest < Minitest::Test
   end
 
   def teardown
+  end
+
+end
+
+class Raygun::UnitTest < MiniTest::Test
+
+  def setup
+    FakeWeb.allow_net_connect = false
+    Raygun.configuration.api_key = "test api key"
+  end
+
+  def fake_successful_entry
+    FakeWeb.register_uri(:post, "https://api.raygun.io/entries", body: "", status: 202)
+  end
+
+  def teardown
+    FakeWeb.clean_registry
+    FakeWeb.allow_net_connect = true
+    Raygun.configuration.api_key = nil
   end
 
 end

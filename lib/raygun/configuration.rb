@@ -7,6 +7,12 @@ module Raygun
     # Array of exception classes to ignore
     attr_accessor :ignore
 
+    # Version to use
+    attr_accessor :version
+
+    # Custom Data to send with each exception
+    attr_accessor :custom_data
+
     # Exception classes to ignore by default
     IGNORE_DEFAULT = ['ActiveRecord::RecordNotFound',
                       'ActionController::RoutingError',
@@ -18,7 +24,8 @@ module Raygun
 
     def initialize
       # set default attribute values
-      @ignore = IGNORE_DEFAULT
+      @ignore      = IGNORE_DEFAULT
+      @custom_data = {}
     end
 
     def [](key)

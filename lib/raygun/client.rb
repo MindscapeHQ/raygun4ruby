@@ -13,10 +13,7 @@ module Raygun
     end
 
     def track_exception(exception_instance, env = {})
-      unless Raygun.configuration.silence_reporting
-        Raygun.log("[Raygun] Tracking Exception...")
-        create_entry(build_payload_hash(exception_instance, env))
-      end
+      create_entry(build_payload_hash(exception_instance, env))
     end
 
     private

@@ -34,8 +34,11 @@ module Raygun
       @configuration ||= Configuration.new
     end
 
-    def track_exception(*args)
-      Client.new.track_exception(*args)
+    def track_exception(exception_instance, env = {})
+      if should_report?(exception_instance)
+        Raygun.log("[Raygun] Tracking Exception...")
+        Client.new.track_exception(exception_instance, env)
+      end
     rescue Exception => e
       if configuration.failsafe_logger
         failsafe_log("Problem reporting exception to Raygun: #{e.class}: #{e.message}\n\n#{e.backrace.join("\n")}")
@@ -57,6 +60,14 @@ module Raygun
     def failsafe_log(message)
       configuration.failsafe_logger.info(message)
     end
+
+    private
+
+      def should_report?(exception)
+        return false if configuration.silence_reporting
+        return false if configuration.ignore.include?(exception.class)
+        true
+      end
 
   end
 end

@@ -36,7 +36,7 @@ module Raygun
 
     def track_exception(exception_instance, env = {})
       if should_report?(exception_instance)
-        Raygun.log("[Raygun] Tracking Exception...")
+        log("[Raygun] Tracking Exception...")
         Client.new.track_exception(exception_instance, env)
       end
     rescue Exception => e
@@ -65,7 +65,7 @@ module Raygun
 
       def should_report?(exception)
         return false if configuration.silence_reporting
-        return false if configuration.ignore.include?(exception.class)
+        return false if configuration.ignore.include?(exception.class.to_s)
         true
       end
 

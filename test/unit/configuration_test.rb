@@ -28,7 +28,7 @@ class ConfigurationTest < Raygun::UnitTest
   end
 
   def test_ignoring_exceptions
-    Raygun.configuration.ignore << TestException
+    Raygun.configuration.ignore << TestException.to_s
 
     assert_nil Raygun.track_exception(TestException.new)
   end

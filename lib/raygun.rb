@@ -37,7 +37,11 @@ module Raygun
     def track_exception(*args)
       Client.new.track_exception(*args)
     rescue Exception => e
-      failsafe_log("Problem reporting exception to Raygun: #{e.class}: #{e.message}\n\n#{e.backrace.join("\n")}")
+      if configuration.failsafe_logger
+        failsafe_log("Problem reporting exception to Raygun: #{e.class}: #{e.message}\n\n#{e.backrace.join("\n")}")
+      else
+        raise e
+      end
     end
 
     def track_exceptions
@@ -51,7 +55,7 @@ module Raygun
     end
 
     def failsafe_log(message)
-      configuration.failsafe_logger.info(message) if configuration.failsafe_logger
+      configuration.failsafe_logger.info(message)
     end
 
   end

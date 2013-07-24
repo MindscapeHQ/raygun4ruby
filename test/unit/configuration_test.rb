@@ -2,6 +2,8 @@ require_relative "../test_helper.rb"
 
 class ConfigurationTest < Raygun::UnitTest
 
+  class TestException < StandardError; end
+
   def setup
     Raygun.setup do |config|
       config.api_key = "a test api key"
@@ -16,6 +18,13 @@ class ConfigurationTest < Raygun::UnitTest
 
   def test_hash_style_access
     assert_equal 9.9, Raygun.configuration[:version]
+  end
+
+  def test_silence_reporting
+    Raygun.configuration.silence_reporting = true
+
+    # nothing returned as there's no HTTP call
+    assert_nil Raygun.track_exception(TestException.new)
   end
 
 end

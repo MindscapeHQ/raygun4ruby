@@ -1,13 +1,12 @@
-require "minitest"
+require_relative "../lib/raygun.rb"
+require "minitest/autorun"
 require "minitest/pride"
 require "fakeweb"
 require "timecop"
-require_relative "../lib/raygun.rb"
-
 
 class NoApiKey < StandardError; end
 
-class Raygun::IntegrationTest < Minitest::Test
+class Raygun::IntegrationTest < Minitest::Unit::TestCase
 
   def setup
     Raygun.setup do |config|
@@ -24,7 +23,7 @@ class Raygun::IntegrationTest < Minitest::Test
 
 end
 
-class Raygun::UnitTest < MiniTest::Test
+class Raygun::UnitTest < MiniTest::Unit::TestCase
 
   def setup
     FakeWeb.allow_net_connect = false

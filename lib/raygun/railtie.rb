@@ -19,4 +19,8 @@ class Raygun::Railtie < Rails::Railtie
     Raygun.configuration.silence_reporting ||= Rails.env.development?
   end
 
+  rake_tasks do
+    load "tasks/raygun.tasks"
+  end
+
 end

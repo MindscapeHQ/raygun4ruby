@@ -1,0 +1,8 @@
+namespace :raygun do
+
+  desc "Test Raygun integration"
+  task :test => :environment do
+    Raygun.track_test_exception
+  end
+
+end

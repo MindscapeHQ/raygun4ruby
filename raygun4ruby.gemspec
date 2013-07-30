@@ -20,7 +20,9 @@ Gem::Specification.new do |spec|
                         "lib/raygun/railtie.rb",
                         "lib/raygun/version.rb",
                         "lib/raygun4ruby.rb",
-                        "lib/generators/raygun/install_generator.rb"]
+                        "lib/generators/raygun/install_generator.rb",
+                        "lib/raygun/testable.rb",
+                        "lib/tasks/raygun.tasks"]
 
   spec.executables   = []
   spec.require_paths = ["lib"]

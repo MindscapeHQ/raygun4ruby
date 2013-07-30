@@ -12,6 +12,7 @@ require "raygun/version"
 require "raygun/configuration"
 require "raygun/client"
 require "raygun/rack_exception_interceptor"
+require "raygun/testable"
 require "raygun/railtie" if defined?(Rails)
 
 module Raygun
@@ -21,6 +22,8 @@ module Raygun
   CLIENT_NAME = "Raygun4Ruby Gem"
 
   class << self
+
+    include Testable
 
     # Configuration Object (instance of Raygun::Configuration)
     attr_writer :configuration

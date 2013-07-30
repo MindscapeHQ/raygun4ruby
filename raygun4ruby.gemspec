@@ -6,11 +6,11 @@ require 'raygun/version'
 Gem::Specification.new do |spec|
   spec.name          = "raygun4ruby"
   spec.version       = Raygun::VERSION
-  spec.authors       = ["Nik Wakelin"]
-  spec.email         = ["me@nikwakelin.com"]
+  spec.authors       = ["Mindscape"]
+  spec.email         = ["hello@raygun.io"]
   spec.description   = %q{Ruby Adapter for Raygun.io}
-  spec.summary       = %q{Ruby Adapter for Raygun.io}
-  spec.homepage      = ""
+  spec.summary       = %q{This gem provides support for Ruby and Ruby on Rails for the Raygun.io error reporter}
+  spec.homepage      = "http://raygun.io"
   spec.license       = "MIT"
 
   spec.files         = ["lib/raygun.rb",

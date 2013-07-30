@@ -1,7 +1,8 @@
 module Raygun
-  module Testable
 
-    class ItWorksException < StandardError; end
+  class ItWorksException < StandardError; end
+
+  module Testable
 
     def track_test_exception
       Raygun.configuration.silence_reporting = false

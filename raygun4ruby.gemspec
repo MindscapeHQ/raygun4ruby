@@ -19,7 +19,8 @@ Gem::Specification.new do |spec|
                         "lib/raygun/rack_exception_interceptor.rb",
                         "lib/raygun/railtie.rb",
                         "lib/raygun/version.rb",
-                        "lib/raygun4ruby.rb"]
+                        "lib/raygun4ruby.rb",
+                        "lib/generators/raygun/install_generator.rb"]
 
   spec.executables   = []
   spec.require_paths = ["lib"]

@@ -33,6 +33,12 @@ You can then test your Raygun integration by running:
     
 You should see an "ItWorksException" appear in your Raygun dashboard. You're ready to zap those errors!
 
+NB: Raygun4Ruby currently requires Ruby >= 1.9
+
+### Rails 2
+
+Raygun4Ruby doesn't currently support Rails 2. If you'd like Rails 2 support, [drop us a line](http://raygun.io/forums).
+
 ###Standalone / Manual Exception Tracking
 
 ```ruby

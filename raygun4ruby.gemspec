@@ -6,7 +6,7 @@ require 'raygun/version'
 Gem::Specification.new do |spec|
   spec.name          = "raygun4ruby"
   spec.version       = Raygun::VERSION
-  spec.authors       = ["Mindscape"]
+  spec.authors       = ["Mindscape", "Nik Wakelin"]
   spec.email         = ["hello@raygun.io"]
   spec.description   = %q{Ruby Adapter for Raygun.io}
   spec.summary       = %q{This gem provides support for Ruby and Ruby on Rails for the Raygun.io error reporter}

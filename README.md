@@ -1,6 +1,7 @@
-# Raygun4ruby
+# Raygun 4 Ruby
 
-TODO: Write a gem description
+This is the Ruby adapter for the Raygun error reporter, http://raygun.io.
+
 
 ## Installation
 
@@ -18,7 +19,40 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+###Rails 3/4
+
+Run:
+
+    rails g raygun:install YOUR_API_KEY_HERE
+    
+You can find your API key on your [Raygun Dashboard](https://app.raygun.io/dashboard/)
+
+You can then test your Raygun integration by running:
+
+    rake raygun:test
+    
+You should see an "ItWorksException" appear in your Raygun dashboard. You're ready to zap those errors!
+
+###Standalone / Manual Exception Tracking
+
+```ruby
+
+require 'rubygems'
+require 'raygun4ruby'
+
+begin
+  # your lovely code here
+rescue Exception => e
+  Raygun.track_exception(e)
+end
+
+```
+
+(You can also pass a Hash as the second parameter to `track_exception`. It should look like a [Rack Env Hash](http://rack.rubyforge.org/doc/SPEC.html))
+
+## Found a bug?
+
+Oops! Just let us know by opening an Issue on Github.
 
 ## Contributing
 

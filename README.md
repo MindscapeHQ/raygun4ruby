@@ -61,12 +61,12 @@ end
 Raygun4Ruby also includes a Resque failure backend. You should include it inside your Resque initializer (usually something like `config/initializers/load_resque.rb`)
 
 ```ruby
-  require 'resque/failure/multiple'
-  require 'resque/failure/raygun'
-  require 'resque/failure/redis'
+require 'resque/failure/multiple'
+require 'resque/failure/raygun'
+require 'resque/failure/redis'
 
-  Resque::Failure::Multiple.classes = [Resque::Failure::Redis, Resque::Failure::Raygun]
-  Resque::Failure.backend = Resque::Failure::Multiple
+Resque::Failure::Multiple.classes = [Resque::Failure::Redis, Resque::Failure::Raygun]
+Resque::Failure.backend = Resque::Failure::Multiple
 ```
 
 ## Found a bug?

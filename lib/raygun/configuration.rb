@@ -33,8 +33,9 @@ module Raygun
 
     def initialize
       # set default attribute values
-      @ignore      = IGNORE_DEFAULT
-      @custom_data = {}
+      @ignore            = IGNORE_DEFAULT
+      @custom_data       = {}
+      @silence_reporting = false
     end
 
     def [](key)

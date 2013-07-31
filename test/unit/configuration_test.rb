@@ -33,4 +33,8 @@ class ConfigurationTest < Raygun::UnitTest
     assert_nil Raygun.track_exception(TestException.new)
   end
 
+  def test_default_values
+    assert_equal({}, Raygun.configuration.custom_data)
+  end
+
 end

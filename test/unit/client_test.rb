@@ -87,7 +87,7 @@ class ClientTest < Raygun::UnitTest
         }
       }
 
-      assert_equal expected_hash, @client.send(:build_payload_hash, e, nil)
+      assert_equal expected_hash, @client.send(:build_payload_hash, e)
     end
   end
 

@@ -37,7 +37,11 @@ class Raygun::UnitTest < MiniTest::Unit::TestCase
   def teardown
     FakeWeb.clean_registry
     FakeWeb.allow_net_connect = true
-    Raygun.configuration.api_key = nil
+    reset_configuration
+  end
+
+  def reset_configuration
+    Raygun.configuration = Raygun::Configuration.new
   end
 
 end

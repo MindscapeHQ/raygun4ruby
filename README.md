@@ -24,13 +24,13 @@ Or install it yourself as:
 Run:
 
     rails g raygun:install YOUR_API_KEY_HERE
-    
+
 You can find your API key on your [Raygun Dashboard](https://app.raygun.io/dashboard/)
 
 You can then test your Raygun integration by running:
 
     rake raygun:test
-    
+
 You should see an "ItWorksException" appear in your Raygun dashboard. You're ready to zap those errors!
 
 NB: Raygun4Ruby currently requires Ruby >= 1.9
@@ -55,6 +55,19 @@ end
 ```
 
 (You can also pass a Hash as the second parameter to `track_exception`. It should look like a [Rack Env Hash](http://rack.rubyforge.org/doc/SPEC.html))
+
+###Resque Error Tracking
+
+Raygun4Ruby also includes a Resque failure backend. You should include it inside your Resque initializer (usually something like `config/initializers/load_resque.rb`)
+
+```ruby
+  require 'resque/failure/multiple'
+  require 'resque/failure/raygun'
+  require 'resque/failure/redis'
+
+  Resque::Failure::Multiple.classes = [Resque::Failure::Redis, Resque::Failure::Raygun]
+  Resque::Failure.backend = Resque::Failure::Multiple
+```
 
 ## Found a bug?
 

@@ -30,7 +30,7 @@ module Raygun
         {
           className:  exception.class.to_s,
           message:    exception.message,
-          stackTrace: exception.backtrace.map { |line| stack_trace_for(line) }
+          stackTrace: (exception.backtrace || []).map { |line| stack_trace_for(line) }
         }
       end
 
@@ -69,7 +69,7 @@ module Raygun
 
       def headers(rack_env)
         rack_env.select do |k, v|
-          k.starts_with?("HTTP_")
+          k.to_s.starts_with?("HTTP_")
         end
       end
 
@@ -82,7 +82,9 @@ module Raygun
       end
 
       # see http://raygun.io/raygun-providers/rest-json-api?v=1
-      def build_payload_hash(exception_instance, env)
+      def build_payload_hash(exception_instance, env = {})
+        custom_data = env.delete(:custom_data) || {}
+
         {
           occurredOn: Time.now.utc.iso8601,
           details: {
@@ -90,7 +92,7 @@ module Raygun
             version:        version,
             client:         client_details,
             error:          error_details(exception_instance),
-            userCustomData: Raygun.configuration.custom_data,
+            userCustomData: Raygun.configuration.custom_data.merge(custom_data),
             request:        request_information(env)
           }
         }

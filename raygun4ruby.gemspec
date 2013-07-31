@@ -22,7 +22,8 @@ Gem::Specification.new do |spec|
                         "lib/raygun4ruby.rb",
                         "lib/generators/raygun/install_generator.rb",
                         "lib/raygun/testable.rb",
-                        "lib/tasks/raygun.tasks"]
+                        "lib/tasks/raygun.tasks",
+                        "lib/resque/failure/raygun.rb"]
 
   spec.executables   = []
   spec.require_paths = ["lib"]
@@ -37,4 +38,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "fakeweb", ["~> 1.3"]
   spec.add_development_dependency "timecop"
   spec.add_development_dependency "minitest", "~> 4.2"
+  spec.add_development_dependency "resque"
 end

@@ -53,7 +53,7 @@ module Raygun
       end
 
       def request_information(env)
-        return {} if env.blank?
+        return {} if env.nil? || env.empty?
 
         {
           hostName:    env["SERVER_NAME"],
@@ -69,7 +69,7 @@ module Raygun
 
       def headers(rack_env)
         rack_env.select do |k, v|
-          k.to_s.starts_with?("HTTP_")
+          k.to_s.start_with?("HTTP_")
         end
       end
 

@@ -31,7 +31,6 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency "httparty", "~> 0.11"
   spec.add_runtime_dependency "json"
-  spec.add_runtime_dependency "activesupport"
   spec.add_runtime_dependency "rack"
 
   spec.add_development_dependency "bundler", ">= 1.1"

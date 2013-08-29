@@ -53,7 +53,7 @@ module Raygun
       end
 
       def request_information(env)
-        return {} if env.empty?
+        return {} if env.nil? || env.empty?
 
         {
           hostName:    env["SERVER_NAME"],

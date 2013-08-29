@@ -23,7 +23,8 @@ Gem::Specification.new do |spec|
                         "lib/generators/raygun/install_generator.rb",
                         "lib/raygun/testable.rb",
                         "lib/tasks/raygun.tasks",
-                        "lib/resque/failure/raygun.rb"]
+                        "lib/resque/failure/raygun.rb",
+                        "README.md"]
 
   spec.executables   = []
   spec.require_paths = ["lib"]

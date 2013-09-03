@@ -129,4 +129,8 @@ class ClientTest < Raygun::UnitTest
     assert_equal expected_hash, @client.send(:request_information, sample_env_hash)
   end
 
+  def test_getting_request_information_with_nil_env
+    assert_equal({}, @client.send(:request_information, nil))
+  end
+
 end

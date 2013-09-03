@@ -6,7 +6,6 @@ require "logger"
 require "json"
 require "socket"
 require "rack"
-require "active_support/core_ext"
 
 require "raygun/version"
 require "raygun/configuration"

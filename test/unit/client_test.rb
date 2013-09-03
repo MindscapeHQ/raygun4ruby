@@ -10,6 +10,14 @@ class ClientTest < Raygun::UnitTest
     fake_successful_entry
   end
 
+  def test_api_key_required_exception
+    Raygun.configuration.api_key = nil
+
+    assert_raises Raygun::ApiKeyRequired do
+      second_client = Raygun::Client.new
+    end
+  end
+
   def test_track_exception
     response = Raygun.track_exceptions do
       raise TestException.new
@@ -44,6 +52,7 @@ class ClientTest < Raygun::UnitTest
 
     assert_equal expected_hash, @client.send(:client_details)
   end
+
 
   def test_version
     Raygun.setup do |config|

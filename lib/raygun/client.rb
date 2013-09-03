@@ -7,9 +7,15 @@ module Raygun
     base_uri "https://api.raygun.io/"
 
     def initialize
+      @api_key = require_api_key!
+
       @headers = {
-        "X-ApiKey" => Raygun.configuration.api_key
+        "X-ApiKey" => @api_key
       }
+    end
+
+    def require_api_key!
+      Raygun.configuration.api_key || raise(ApiKeyRequired.new("Please specify your Raygun API key using Raygun#setup (find yours at https://app.raygun.io)"))
     end
 
     def track_exception(exception_instance, env = {})

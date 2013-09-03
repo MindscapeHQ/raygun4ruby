@@ -35,6 +35,8 @@ You should see an "ItWorksException" appear in your Raygun dashboard. You're rea
 
 NB: Raygun4Ruby currently requires Ruby >= 1.9
 
+Note that the generator will create a file in `config/initializers` called "raygun.rb". If you need to do any further configuration or customization of Raygun, that's the place to do it!
+
 ### Rails 2
 
 Raygun4Ruby doesn't currently support Rails 2. If you'd like Rails 2 support, [drop us a line](http://raygun.io/forums).
@@ -46,6 +48,10 @@ Raygun4Ruby doesn't currently support Rails 2. If you'd like Rails 2 support, [d
 require 'rubygems'
 require 'raygun4ruby'
 
+Raygun.setup do |config|
+  config.api_key = "YOUR_RAYGUN_API_KEY"
+end
+
 begin
   # your lovely code here
 rescue Exception => e
@@ -55,6 +61,19 @@ end
 ```
 
 (You can also pass a Hash as the second parameter to `track_exception`. It should look like a [Rack Env Hash](http://rack.rubyforge.org/doc/SPEC.html))
+
+###Ignoring Some Errors
+
+You can ignore certain types of Exception using the `ignore` option in the setup block, like so:
+
+```ruby
+Raygun.setup do |config|
+  config.api_key = "MY_SWEET_API_KEY"
+  config.ignore  << [MyApp::AnExceptionIDontCareAbout]
+end
+```
+
+You can also check which [exceptions are ignored by default](https://github.com/MindscapeHQ/raygun4ruby/blob/master/lib/raygun/configuration.rb#L26)
 
 ###Resque Error Tracking
 

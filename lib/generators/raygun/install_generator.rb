@@ -9,6 +9,7 @@ module Raygun
         <<-EOS
 Raygun.setup do |config|
   config.api_key = "#{api_key}"
+  config.silence_reporting = !Rails.env.production?
 end
 EOS
       end

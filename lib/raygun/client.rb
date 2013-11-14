@@ -65,7 +65,7 @@ module Raygun
           hostName:    env["SERVER_NAME"],
           url:         env["PATH_INFO"],
           httpMethod:  env["REQUEST_METHOD"],
-          ipAddress:   env["REMOTE_ADDR"],
+          iPAddress:   env["REMOTE_ADDR"],
           queryString: Rack::Utils.parse_nested_query(env["QUERY_STRING"]),
           form:        form_data(env),
           headers:     headers(env),
@@ -74,9 +74,13 @@ module Raygun
       end
 
       def headers(rack_env)
-        rack_env.select do |k, v|
+        rack_env = rack_env.select do |k, v|
           k.to_s.start_with?("HTTP_")
         end
+
+        rack_env = Hash[rack_env.map { |k, v| [k.sub(/^HTTP_/, '')
+                                                .sub(/_/, ' ')
+                                                .titleize.sub(/ /, '-'), v] }]
       end
 
       def form_data(rack_env)

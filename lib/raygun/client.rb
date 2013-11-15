@@ -80,7 +80,8 @@ module Raygun
 
         rack_env = Hash[rack_env.map { |k, v| [k.sub(/^HTTP_/, '')
                                                 .sub(/_/, ' ')
-                                                .titleize.sub(/ /, '-'), v] }]
+                                                .split.map(&:capitalize).join(' ')
+                                                .sub(/ /, '-'), v] }]
       end
 
       def form_data(rack_env)

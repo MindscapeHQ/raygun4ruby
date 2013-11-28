@@ -74,14 +74,17 @@ module Raygun
       end
 
       def headers(rack_env)
-        rack_env = rack_env.select do |k, v|
-          k.to_s.start_with?("HTTP_")
+        rack_env.select { |k, v| k.to_s.start_with?("HTTP_") }.inject({}) do |hsh, (k, v)|
+          hsh[normalize_raygun_header_key(k)] = v
+          hsh
         end
+      end
 
-        rack_env = Hash[rack_env.map { |k, v| [k.sub(/^HTTP_/, '')
-                                                .sub(/_/, ' ')
-                                                .split.map(&:capitalize).join(' ')
-                                                .sub(/ /, '-'), v] }]
+      def normalize_raygun_header_key(key)
+        key.sub(/^HTTP_/, '')
+           .sub(/_/, ' ')
+           .split.map(&:capitalize).join(' ')
+           .sub(/ /, '-')
       end
 
       def form_data(rack_env)

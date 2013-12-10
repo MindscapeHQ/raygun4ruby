@@ -75,6 +75,19 @@ end
 
 You can also check which [exceptions are ignored by default](https://github.com/MindscapeHQ/raygun4ruby/blob/master/lib/raygun/configuration.rb#L26)
 
+###Affected User Tracking
+
+You can now track how many users have been affected by an error by adding their email address or user name in the setup block:
+
+```ruby
+Raygun.setup do |config|
+  config.api_key = "MY_SWEET_API_KEY"
+  config.user = "myuser@address.com"
+end
+```
+
+The count will appear on the error group in the Raygun dashboard. If you provide email addresses, and they have Gravatars associated with them, you will also see your user's avatars. If you wish to keep it anonymous, you could set config.user to a random ID or hash, for instance.
+
 ###Resque Error Tracking
 
 Raygun4Ruby also includes a Resque failure backend. You should include it inside your Resque initializer (usually something like `config/initializers/load_resque.rb`)

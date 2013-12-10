@@ -58,6 +58,12 @@ module Raygun
         Raygun.configuration.version
       end
 
+      def user
+        {
+          identifier: Raygun.configuration.user
+        }
+      end
+
       def request_information(env)
         return {} if env.nil? || env.empty?
 
@@ -107,7 +113,8 @@ module Raygun
             client:         client_details,
             error:          error_details(exception_instance),
             userCustomData: Raygun.configuration.custom_data.merge(custom_data),
-            request:        request_information(env)
+            request:        request_information(env),
+            user:           user
           }
         }
       end

@@ -13,6 +13,9 @@ module Raygun
     # Custom Data to send with each exception
     attr_accessor :custom_data
 
+    # Email address or user name to attach, used for affected user tracking
+    attr_accessor :user
+
     # Logger to use when if we find an exception :)
     attr_accessor :logger
 

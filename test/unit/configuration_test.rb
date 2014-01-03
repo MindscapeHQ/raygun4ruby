@@ -8,7 +8,6 @@ class ConfigurationTest < Raygun::UnitTest
     Raygun.setup do |config|
       config.api_key = "a test api key"
       config.version = 9.9
-      config.user = "test@email.com"
     end
   end
 
@@ -36,10 +35,6 @@ class ConfigurationTest < Raygun::UnitTest
 
   def test_default_values
     assert_equal({}, Raygun.configuration.custom_data)
-  end
-
-  def test_user
-    assert_equal "test@email.com",  Raygun.configuration.user
   end
 
 end

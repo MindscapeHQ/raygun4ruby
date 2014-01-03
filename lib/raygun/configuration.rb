@@ -13,9 +13,6 @@ module Raygun
     # Custom Data to send with each exception
     attr_accessor :custom_data
 
-    # Email address or user name to attach, used for affected user tracking
-    attr_accessor :user
-
     # Logger to use when if we find an exception :)
     attr_accessor :logger
 
@@ -24,6 +21,12 @@ module Raygun
 
     # Failsafe logger (for exceptions that happen when we're attempting to report exceptions)
     attr_accessor :failsafe_logger
+
+    # Which controller method should we call to find out the affected user?
+    attr_accessor :affected_user_method
+
+    # Which methods should we try on the affected user object in order to get an identifier
+    attr_accessor :affected_user_identifier_methods
 
     # Exception classes to ignore by default
     IGNORE_DEFAULT = ['ActiveRecord::RecordNotFound',
@@ -36,9 +39,11 @@ module Raygun
 
     def initialize
       # set default attribute values
-      @ignore            = IGNORE_DEFAULT
-      @custom_data       = {}
-      @silence_reporting = false
+      @ignore                           = IGNORE_DEFAULT
+      @custom_data                      = {}
+      @silence_reporting                = false
+      @affected_user_method             = :current_user
+      @affected_user_identifier_methods = [ :email, :username, :id ]
     end
 
     def [](key)

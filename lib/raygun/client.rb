@@ -58,10 +58,12 @@ module Raygun
         Raygun.configuration.version
       end
 
-      def user
-        {
-          identifier: Raygun.configuration.user
-        }
+      def user_information(env)
+        env["raygun.affected_user"]
+      end
+
+      def affected_user_present?(env)
+        !!env["raygun.affected_user"]
       end
 
       def request_information(env)
@@ -105,17 +107,20 @@ module Raygun
       def build_payload_hash(exception_instance, env = {})
         custom_data = env.delete(:custom_data) || {}
 
-        {
-          occurredOn: Time.now.utc.iso8601,
-          details: {
+        error_details = {
             machineName:    hostname,
             version:        version,
             client:         client_details,
             error:          error_details(exception_instance),
             userCustomData: Raygun.configuration.custom_data.merge(custom_data),
-            request:        request_information(env),
-            user:           user
-          }
+            request:        request_information(env)
+        }
+
+        error_details.merge!(user: user_information(env)) if affected_user_present?(env)
+
+        {
+          occurredOn: Time.now.utc.iso8601,
+          details:    error_details
         }
       end
 

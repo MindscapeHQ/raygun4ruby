@@ -10,7 +10,7 @@ require "rack"
 require "raygun/version"
 require "raygun/configuration"
 require "raygun/client"
-require "raygun/rack_exception_interceptor"
+require "raygun/middleware/rack_exception_interceptor"
 require "raygun/testable"
 require "raygun/railtie" if defined?(Rails)
 

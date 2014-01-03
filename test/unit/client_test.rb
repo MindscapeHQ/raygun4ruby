@@ -62,6 +62,14 @@ class ClientTest < Raygun::UnitTest
     assert_equal 123, @client.send(:version)
   end
 
+  def test_affected_user
+    e             = TestException.new("A test message")
+    test_env      = { "raygun.affected_user" => { :identifier => "somepooruser@yourapp.com" } }
+    expected_hash = test_env["raygun.affected_user"]
+
+    assert_equal expected_hash, @client.send(:build_payload_hash, e, test_env)[:details][:user]
+  end
+
   def test_hostname
     assert_equal Socket.gethostname, @client.send(:hostname)
   end

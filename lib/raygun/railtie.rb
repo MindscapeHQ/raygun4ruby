@@ -11,7 +11,11 @@ class Raygun::Railtie < Rails::Railtie
       "ActionDispatch::ShowExceptions"
     end
 
-    app.config.middleware.insert_after middleware, "Raygun::RackExceptionInterceptor"
+    app.config.middleware.insert_after middleware, "Raygun::Middleware::RackExceptionInterceptor"
+
+    # Affected User tracking
+    require "raygun/middleware/rails_insert_affected_user"
+    app.config.middleware.insert_after Raygun::Middleware::RackExceptionInterceptor, "Raygun::Middleware::RailsInsertAffectedUser"
   end
 
   config.to_prepare do

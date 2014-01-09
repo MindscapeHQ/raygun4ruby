@@ -62,6 +62,19 @@ end
 
 (You can also pass a Hash as the second parameter to `track_exception`. It should look like a [Rack Env Hash](http://rack.rubyforge.org/doc/SPEC.html))
 
+###Custom User Data
+Custom data can be added to `track_exception` by passing a custom_data key in the second parameter hash.
+
+```ruby
+
+begin
+  # more lovely code
+rescue Exception => e
+  Raygun.track_exception(e, custom_data: {my: 'custom data', goes: 'here'})
+end
+
+```
+
 ###Ignoring Some Errors
 
 You can ignore certain types of Exception using the `ignore` option in the setup block, like so:

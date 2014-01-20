@@ -3,6 +3,7 @@ require_relative "../test_helper.rb"
 class ConfigurationTest < Raygun::UnitTest
 
   class TestException < StandardError; end
+  class Test2Exception < StandardError; end
 
   def setup
     Raygun.setup do |config|
@@ -31,6 +32,13 @@ class ConfigurationTest < Raygun::UnitTest
     Raygun.configuration.ignore << TestException.to_s
 
     assert_nil Raygun.track_exception(TestException.new)
+  end
+
+  def test_ignoring_multiple_exceptions
+    Raygun.configuration.ignore << [TestException.to_s, Test2Exception.to_s]
+
+    assert_nil Raygun.track_exception(TestException.new)
+    assert_nil Raygun.track_exception(Test2Exception.new)
   end
 
   def test_default_values

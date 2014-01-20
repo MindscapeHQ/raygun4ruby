@@ -69,7 +69,7 @@ module Raygun
 
       def should_report?(exception)
         return false if configuration.silence_reporting
-        return false if configuration.ignore.include?(exception.class.to_s)
+        return false if configuration.ignore.flatten.include?(exception.class.to_s)
         true
       end
 

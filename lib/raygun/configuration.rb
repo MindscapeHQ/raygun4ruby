@@ -41,7 +41,7 @@ module Raygun
       # set default attribute values
       @ignore                           = IGNORE_DEFAULT
       @custom_data                      = {}
-      @silence_reporting                = false
+      @silence_reporting                = nil
       @affected_user_method             = :current_user
       @affected_user_identifier_methods = [ :email, :username, :id ]
     end

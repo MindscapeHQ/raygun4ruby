@@ -82,7 +82,7 @@ You can ignore certain types of Exception using the `ignore` option in the setup
 ```ruby
 Raygun.setup do |config|
   config.api_key = "MY_SWEET_API_KEY"
-  config.ignore  << [MyApp::AnExceptionIDontCareAbout]
+  config.ignore  << ['MyApp::AnExceptionIDontCareAbout']
 end
 ```
 

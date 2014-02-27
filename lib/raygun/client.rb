@@ -97,9 +97,8 @@ module Raygun
 
       def form_data(rack_env)
         request = Rack::Request.new(rack_env)
-
         if request.form_data?
-          request.body
+          filter_params(request.params, rack_env["action_dispatch.parameter_filter"])
         end
       end
 
@@ -126,6 +125,17 @@ module Raygun
 
       def create_entry(payload_hash)
         self.class.post("/entries", headers: @headers, body: JSON.generate(payload_hash))
+      end
+
+      def filter_params(params_hash, extra_filter_keys = nil)
+        filter_keys = (Array(extra_filter_keys) + Raygun.configuration.filter_parameters).map(&:to_s)
+
+        params_hash.inject({}) do |result, pair|
+          k, v = pair
+          filtered_value = (filter_keys.include?(k)) ? "[FILTERED]" : v
+          result[k] = filtered_value
+          result
+        end
       end
 
   end

@@ -28,6 +28,9 @@ module Raygun
     # Which methods should we try on the affected user object in order to get an identifier
     attr_accessor :affected_user_identifier_methods
 
+    # Which parameter keys should we filter out by default?
+    attr_accessor :filter_parameters
+
     # Exception classes to ignore by default
     IGNORE_DEFAULT = ['ActiveRecord::RecordNotFound',
                       'ActionController::RoutingError',
@@ -37,6 +40,8 @@ module Raygun
                       'AbstractController::ActionNotFound',
                       'Mongoid::Errors::DocumentNotFound']
 
+    DEFAULT_FILTER_PARAMETERS = [ :password, :card_number, :cvv ]
+
     def initialize
       # set default attribute values
       @ignore                           = IGNORE_DEFAULT
@@ -44,6 +49,7 @@ module Raygun
       @silence_reporting                = nil
       @affected_user_method             = :current_user
       @affected_user_identifier_methods = [ :email, :username, :id ]
+      @filter_parameters                = DEFAULT_FILTER_PARAMETERS
     end
 
     def [](key)

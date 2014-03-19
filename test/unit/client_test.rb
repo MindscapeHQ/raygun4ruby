@@ -181,4 +181,34 @@ class ClientTest < Raygun::UnitTest
     assert_equal expected_form_hash, @client.send(:request_information, post_body_env_hash)[:form]
   end
 
+  def test_filtering_nested_params
+    post_body_env_hash = {
+      "SERVER_NAME"=>"localhost",
+      "REQUEST_METHOD"=>"POST",
+      "REQUEST_PATH"=>"/",
+      "PATH_INFO"=>"/",
+      "QUERY_STRING"=>"",
+      "REQUEST_URI"=>"/",
+      "HTTP_VERSION"=>"HTTP/1.1",
+      "HTTP_HOST"=>"localhost:3000",
+      "HTTP_CONNECTION"=>"keep-alive",
+      "HTTP_CACHE_CONTROL"=>"max-age=0",
+      "HTTP_ACCEPT"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "HTTP_USER_AGENT"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36",
+      "HTTP_ACCEPT_ENCODING"=>"gzip,deflate,sdch",
+      "HTTP_ACCEPT_LANGUAGE"=>"en-US,en;q=0.8",
+      "HTTP_COOKIE"=>"cookieval",
+      "GATEWAY_INTERFACE"=>"CGI/1.2",
+      "SERVER_PORT"=>"3000",
+      "SERVER_PROTOCOL"=>"HTTP/1.1",
+      "SCRIPT_NAME"=>"",
+      "REMOTE_ADDR"=>"127.0.0.1",
+      "rack.input"=>StringIO.new("a=b&bank%5Bcredit_card%5D%5Bcard_number%5D=my_secret_bank_number&bank%5Bname%5D=something&c=123456&user%5Bpassword%5D=my_fancy_password")
+    }
+
+    expected_form_hash = { "a" => "b", "bank" => { "credit_card" => { "card_number" => "[FILTERED]" }, "name" => "something" }, "c" => "123456", "user" => { "password" => "[FILTERED]" } }
+
+    assert_equal expected_form_hash, @client.send(:request_information, post_body_env_hash)[:form]
+  end
+
 end

@@ -130,17 +130,14 @@ module Raygun
       def filter_params(params_hash, extra_filter_keys = nil)
         filter_keys = (Array(extra_filter_keys) + Raygun.configuration.filter_parameters).map(&:to_s)
 
-        traverse_params(params_hash) do |k, v|
-          filter_keys.include?(k) ? "[FILTERED]" : v
-        end
-      end
-
-      # Traverses a nested hash, applies &action and returns a modified copy of the original hash.
-      # The &action block takes arguments key and value and should return the modified value.
-      def traverse_params(params_hash, &action)
-        params_hash.inject({}) do |result, pair|
-          k, v = pair
-          result[k] = v.is_a?(Hash) ? traverse_params(v, &action) : action.call(k, v)
+        # Recursive filtering of (nested) hashes
+        params_hash.inject({}) do |result, (k, v)|
+          result[k] = case v
+          when Hash
+            filter_params(v, extra_filter_keys)
+          else 
+            filter_keys.include?(k) ? "[FILTERED]" : v
+          end
           result
         end
       end

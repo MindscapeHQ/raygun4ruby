@@ -130,10 +130,14 @@ module Raygun
       def filter_params(params_hash, extra_filter_keys = nil)
         filter_keys = (Array(extra_filter_keys) + Raygun.configuration.filter_parameters).map(&:to_s)
 
-        params_hash.inject({}) do |result, pair|
-          k, v = pair
-          filtered_value = (filter_keys.include?(k)) ? "[FILTERED]" : v
-          result[k] = filtered_value
+        # Recursive filtering of (nested) hashes
+        params_hash.inject({}) do |result, (k, v)|
+          result[k] = case v
+          when Hash
+            filter_params(v, extra_filter_keys)
+          else 
+            filter_keys.include?(k) ? "[FILTERED]" : v
+          end
           result
         end
       end

@@ -50,6 +50,7 @@ require 'raygun4ruby'
 
 Raygun.setup do |config|
   config.api_key = "YOUR_RAYGUN_API_KEY"
+  config.filter_parameters = [ :password, :card_number, :cvv ] # don't forget to filter out sensitive parameters
 end
 
 begin
@@ -92,7 +93,7 @@ You can also check which [exceptions are ignored by default](https://github.com/
 
 Raygun can now track how many users have been affected by an error.
 
-By default, Raygun looks for a method called `current_user` on your controller, and calls either `email`, `username` or `id` on the object returned by that method. 
+By default, Raygun looks for a method called `current_user` on your controller, and calls either `email`, `username` or `id` on the object returned by that method.
 
 You can customize those method names in your configuration block:
 
@@ -106,13 +107,13 @@ end
 
 If you're using Rails, most authentication systems will have this method set and you should be good to go.
 
-The count of unique affected users will appear on the error group in the Raygun dashboard. If your user has an `email` method, and that email has a Gravatars associated, you will also see your user's avatar. 
+The count of unique affected users will appear on the error group in the Raygun dashboard. If your user has an `email` method, and that email has a Gravatars associated, you will also see your user's avatar.
 
 If you wish to keep it anonymous, you could set this identifier to something like `SecureRandom.uuid` and store that in a cookie, like so:
 
 ```ruby
 class ApplicationController < ActionController::Base
- 
+
   def raygun_user
     cookies.permanent[:raygun_user_identifier] ||= SecureRandom.uuid
   end

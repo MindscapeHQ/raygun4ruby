@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require_relative "../test_helper.rb"
 require 'stringio'
 
@@ -73,6 +74,20 @@ class ClientTest < Raygun::UnitTest
 
   def test_hostname
     assert_equal Socket.gethostname, @client.send(:hostname)
+  end
+
+  def test_unicode
+    e = TestException.new('日本語のメッセージ')
+
+    assert_silent { @client.track_exception(e) }
+  end
+
+  def test_bad_encoding
+    bad_message   = (100..1000).to_a.pack('c*').force_encoding('utf-8')
+    bad_exception = TestException.new(bad_message)
+
+    assert !bad_message.valid_encoding?
+    assert_silent { @client.track_exception(bad_exception) }
   end
 
   def test_full_payload_hash

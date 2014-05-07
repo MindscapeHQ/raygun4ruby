@@ -35,7 +35,7 @@ module Raygun
       def error_details(exception)
         {
           className:  exception.class.to_s,
-          message:    exception.message,
+          message:    exception.message.encode('UTF-16', :undef => :replace, :invalid => :replace).encode('UTF-8'),
           stackTrace: (exception.backtrace || []).map { |line| stack_trace_for(line) }
         }
       end
@@ -135,7 +135,7 @@ module Raygun
           result[k] = case v
           when Hash
             filter_params(v, extra_filter_keys)
-          else 
+          else
             filter_keys.include?(k) ? "[FILTERED]" : v
           end
           result

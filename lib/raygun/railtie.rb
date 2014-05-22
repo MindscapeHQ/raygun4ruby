@@ -19,8 +19,8 @@ class Raygun::Railtie < Rails::Railtie
   end
 
   config.to_prepare do
-    Raygun.configuration.logger          ||= Rails.logger
-    Raygun.configuration.silence_reporting = (Rails.env.development? || Rails.env.test?) if Raygun.configuration.silence_reporting.nil?
+    Raygun.configuration.logger ||= Rails.logger
+    Raygun.configuration.set_default(:enable_reporting, Rails.env.production?)
   end
 
   rake_tasks do

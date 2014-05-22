@@ -1,35 +1,45 @@
 module Raygun
   class Configuration
 
+    def self.config_option(name)
+      define_method(name) do
+        read_value(name)
+      end
+
+      define_method("#{name}=") do |value|
+        set_value(name, value)
+      end
+    end
+
     # Your Raygun API Key - this can be found on your dashboard at Raygun.io
-    attr_accessor :api_key
+    config_option :api_key
 
     # Array of exception classes to ignore
-    attr_accessor :ignore
+    config_option :ignore
 
     # Version to use
-    attr_accessor :version
+    config_option :version
 
     # Custom Data to send with each exception
-    attr_accessor :custom_data
+    config_option :custom_data
 
     # Logger to use when if we find an exception :)
-    attr_accessor :logger
+    config_option :logger
 
-    # Should we silence exception reporting (e.g in Development environments)
-    attr_accessor :silence_reporting
+    # Should we actually report exceptions to Raygun? (Usually disabled in Development mode, for instance)
+    config_option :enable_reporting
 
     # Failsafe logger (for exceptions that happen when we're attempting to report exceptions)
-    attr_accessor :failsafe_logger
+    config_option :failsafe_logger
 
     # Which controller method should we call to find out the affected user?
-    attr_accessor :affected_user_method
+    config_option :affected_user_method
 
     # Which methods should we try on the affected user object in order to get an identifier
-    attr_accessor :affected_user_identifier_methods
+    config_option :affected_user_identifier_methods
 
     # Which parameter keys should we filter out by default?
-    attr_accessor :filter_parameters
+    config_option :filter_parameters
 
     # Exception classes to ignore by default
     IGNORE_DEFAULT = ['ActiveRecord::RecordNotFound',
@@ -43,18 +53,54 @@ module Raygun
     DEFAULT_FILTER_PARAMETERS = [ :password, :card_number, :cvv ]
 
     def initialize
+      @config_values = {}
+
       # set default attribute values
-      @ignore                           = IGNORE_DEFAULT
-      @custom_data                      = {}
-      @silence_reporting                = nil
-      @affected_user_method             = :current_user
-      @affected_user_identifier_methods = [ :email, :username, :id ]
-      @filter_parameters                = DEFAULT_FILTER_PARAMETERS
+      @defaults = {
+        ignore:                           IGNORE_DEFAULT,
+        custom_data:                      {},
+        enable_reporting:                 true,
+        affected_user_method:             :current_user,
+        affected_user_identifier_methods: [ :email, :username, :id ],
+        filter_parameters:                DEFAULT_FILTER_PARAMETERS
+      }
     end
 
     def [](key)
-      send(key)
+      read_value(key)
     end
+
+    def []=(key, value)
+      set_value(key, value)
+    end
+
+    def silence_reporting
+      !enable_reporting
+    end
+
+    def silence_reporting=(value)
+      self.enable_reporting = !value
+    end
+
+    # You can use this to set defaults for some environments
+    # e.g to set the default for error reporting in Rails
+    def set_default(name, value)
+      @defaults[name] = value
+    end
+
+    private
+
+      def read_value(name)
+        if @config_values.has_key?(name)
+          @config_values[name]
+        else
+          @defaults[name]
+        end
+      end
+
+      def set_value(name, value)
+        @config_values[name] = value
+      end
 
   end
 end

@@ -53,9 +53,9 @@ class ConfigurationTest < Raygun::UnitTest
   end
 
   def test_overriding_defaults
-    Raygun.configuration.set_default(:custom_data, { robby: "robot" })
+    Raygun.default_configuration.custom_data = { robby: "robot" }
     assert_equal({ robby: "robot" }, Raygun.configuration.custom_data)
-    
+
     Raygun.configuration.custom_data = { sally: "stegosaurus" }
     assert_equal({ sally: "stegosaurus" }, Raygun.configuration.custom_data)
   end

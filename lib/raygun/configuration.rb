@@ -52,18 +52,20 @@ module Raygun
 
     DEFAULT_FILTER_PARAMETERS = [ :password, :card_number, :cvv ]
 
+    attr_reader :defaults
+
     def initialize
       @config_values = {}
 
       # set default attribute values
-      @defaults = {
+      @defaults = OpenStruct.new({
         ignore:                           IGNORE_DEFAULT,
         custom_data:                      {},
         enable_reporting:                 true,
         affected_user_method:             :current_user,
         affected_user_identifier_methods: [ :email, :username, :id ],
         filter_parameters:                DEFAULT_FILTER_PARAMETERS
-      }
+      })
     end
 
     def [](key)
@@ -80,12 +82,6 @@ module Raygun
 
     def silence_reporting=(value)
       self.enable_reporting = !value
-    end
-
-    # You can use this to set defaults for some environments
-    # e.g to set the default for error reporting in Rails
-    def set_default(name, value)
-      @defaults[name] = value
     end
 
     private

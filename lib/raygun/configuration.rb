@@ -90,7 +90,7 @@ module Raygun
         if @config_values.has_key?(name)
           @config_values[name]
         else
-          @defaults[name]
+          @defaults.send(name)
         end
       end
 

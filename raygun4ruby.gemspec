@@ -39,5 +39,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "fakeweb", ["~> 1.3"]
   spec.add_development_dependency "timecop"
   spec.add_development_dependency "minitest", "~> 4.2"
+  spec.add_development_dependency "redis-namespace", ">= 1.3.1"
   spec.add_development_dependency "resque"
+  spec.add_development_dependency "sidekiq", "~> 3"
 end

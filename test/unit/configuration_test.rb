@@ -21,6 +21,13 @@ class ConfigurationTest < Raygun::UnitTest
     assert_equal 9.9, Raygun.configuration[:version]
   end
 
+  def test_enable_reporting
+    Raygun.configuration.enable_reporting = false
+
+    # should be no API call
+    assert_nil Raygun.track_exception(TestException.new)
+  end
+
   def test_silence_reporting
     Raygun.configuration.silence_reporting = true
 
@@ -43,6 +50,14 @@ class ConfigurationTest < Raygun::UnitTest
 
   def test_default_values
     assert_equal({}, Raygun.configuration.custom_data)
+  end
+
+  def test_overriding_defaults
+    Raygun.default_configuration.custom_data = { robby: "robot" }
+    assert_equal({ robby: "robot" }, Raygun.configuration.custom_data)
+
+    Raygun.configuration.custom_data = { sally: "stegosaurus" }
+    assert_equal({ sally: "stegosaurus" }, Raygun.configuration.custom_data)
   end
 
 end

@@ -6,6 +6,7 @@ require "logger"
 require "json"
 require "socket"
 require "rack"
+require "ostruct"
 
 require "raygun/version"
 require "raygun/configuration"
@@ -36,6 +37,10 @@ module Raygun
 
     def configuration
       @configuration ||= Configuration.new
+    end
+
+    def default_configuration
+      configuration.defaults
     end
 
     def track_exception(exception_instance, env = {})

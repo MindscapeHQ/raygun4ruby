@@ -136,6 +136,16 @@ Resque::Failure::Multiple.classes = [Resque::Failure::Redis, Resque::Failure::Ra
 Resque::Failure.backend = Resque::Failure::Multiple
 ```
 
+### Sidekiq Error Tracking
+
+Raygun4Ruby can track errors from Sidekiq (2.x or 3+). All you need to do is add the line:
+
+```ruby
+  require 'raygun/sidekiq'
+```
+
+Either in your Raygun initializer or wherever else takes your fancy :)
+
 ## Found a bug?
 
 Oops! Just let us know by opening an Issue on Github.

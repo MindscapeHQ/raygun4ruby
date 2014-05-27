@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
                         "lib/raygun4ruby.rb",
                         "lib/generators/raygun/install_generator.rb",
                         "lib/raygun/testable.rb",
+                        "lib/raygun/sidekiq.rb",
                         "lib/tasks/raygun.tasks",
                         "lib/resque/failure/raygun.rb",
                         "README.md"]

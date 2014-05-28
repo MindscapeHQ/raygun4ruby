@@ -13,20 +13,8 @@ Gem::Specification.new do |spec|
   spec.homepage      = "http://raygun.io"
   spec.license       = "MIT"
 
-  spec.files         = ["lib/raygun.rb",
-                        "lib/raygun/client.rb",
-                        "lib/raygun/configuration.rb",
-                        "lib/raygun/middleware/rack_exception_interceptor.rb",
-                        "lib/raygun/middleware/rails_insert_affected_user.rb",
-                        "lib/raygun/railtie.rb",
-                        "lib/raygun/version.rb",
-                        "lib/raygun4ruby.rb",
-                        "lib/generators/raygun/install_generator.rb",
-                        "lib/raygun/testable.rb",
-                        "lib/raygun/sidekiq.rb",
-                        "lib/tasks/raygun.tasks",
-                        "lib/resque/failure/raygun.rb",
-                        "README.md"]
+  spec.files         = `git ls-files | grep -Ev '^(test)'`.split("\n")
+  spec.test_files    = `git ls-files -- test/*`.split("\n")
 
   spec.executables   = []
   spec.require_paths = ["lib"]

@@ -2,6 +2,9 @@ module Raygun
   # client for the Raygun REST APIv1
   # as per http://raygun.io/raygun-providers/rest-json-api?v=1
   class Client
+
+    ENV_IP_ADDRESS_KEYS = %w(action_dispatch.remote_ip raygun.remote_ip REMOTE_ADDR)
+
     include HTTParty
 
     base_uri "https://api.raygun.io/"
@@ -73,7 +76,7 @@ module Raygun
           hostName:    env["SERVER_NAME"],
           url:         env["PATH_INFO"],
           httpMethod:  env["REQUEST_METHOD"],
-          iPAddress:   env["REMOTE_ADDR"],
+          iPAddress:   ip_address_from(env),
           queryString: Rack::Utils.parse_nested_query(env["QUERY_STRING"]),
           form:        form_data(env),
           headers:     headers(env),
@@ -139,6 +142,12 @@ module Raygun
             filter_keys.include?(k) ? "[FILTERED]" : v
           end
           result
+        end
+      end
+
+      def ip_address_from(env_hash)
+        ENV_IP_ADDRESS_KEYS.each do |key_to_try|
+          return env_hash[key_to_try] unless env_hash[key_to_try].nil? || env_hash[key_to_try] == ""
         end
       end
 

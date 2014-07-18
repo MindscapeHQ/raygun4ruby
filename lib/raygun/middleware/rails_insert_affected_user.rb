@@ -12,17 +12,7 @@ module Raygun
       rescue Exception => exception
         if (controller = env["action_controller.instance"]) && controller.respond_to?(Raygun.configuration.affected_user_method)
           user = controller.send(Raygun.configuration.affected_user_method)
-
-          if user
-            identifier = if (m = Raygun.configuration.affected_user_identifier_methods.detect { |m| user.respond_to?(m) })
-              user.send(m)
-            else
-              user
-            end
-
-            env["raygun.affected_user"] = { :identifier => identifier }
-          end
-          
+          env["raygun.affected_user"] = Raygun::AffectedUser.information_hash(user)
         end
         raise exception
       end

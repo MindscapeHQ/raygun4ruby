@@ -93,21 +93,23 @@ You can also check which [exceptions are ignored by default](https://github.com/
 
 Raygun can now track how many users have been affected by an error.
 
-By default, Raygun looks for a method called `current_user` on your controller, and calls either `email`, `username` or `id` on the object returned by that method.
+By default, Raygun looks for a method called `current_user` on your controller, and it will populate the user's information based on a default method name mapping.
 
-You can customize those method names in your configuration block:
+(e.g Raygun will call `email` to populate the user's email, and `first_name` for the user's first name)
+
+You can inspect and customize this mapping using `config.affected_user_method_mapping`, like so:
 
 ```ruby
 Raygun.setup do |config|
   config.api_key = "MY_SWEET_API_KEY"
   config.affected_user_method = :my_current_user # `current_user` by default
-  config.affected_user_identifier_methods << :login # `[ :email, :username, :id ]` by default - will use the first that works
+  config.affected_user_method_mapping.Email << :email_address # adds "email_address" to the list of methods that should be called
 end
 ```
 
 If you're using Rails, most authentication systems will have this method set and you should be good to go.
 
-The count of unique affected users will appear on the error group in the Raygun dashboard. If your user has an `email` method, and that email has a Gravatars associated, you will also see your user's avatar.
+The count of unique affected users will appear on the error group in the Raygun dashboard. If your user has an `Email` attribute, and that email has a Gravatar associated with that address, you will also see your user's avatar.
 
 If you wish to keep it anonymous, you could set this identifier to something like `SecureRandom.uuid` and store that in a cookie, like so:
 

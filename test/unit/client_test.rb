@@ -90,6 +90,18 @@ class ClientTest < Raygun::UnitTest
     assert_silent { @client.track_exception(bad_exception) }
   end
 
+  def test_backtrace_without_method_name
+
+    expected = {
+      lineNumber: "123",
+      fileName:   "/some/folder/some_file.rb",
+      methodName: "(none)"
+    }
+
+    # note lack of "in method name" in this stack trace line
+    assert_equal expected, @client.send(:stack_trace_for, "/some/folder/some_file.rb:123")
+  end
+
   def test_full_payload_hash
     Timecop.freeze do
       Raygun.configuration.version = 123

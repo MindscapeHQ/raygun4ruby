@@ -49,7 +49,7 @@ module Raygun
         {
           lineNumber: line_number,
           fileName:   file_name,
-          methodName: method.gsub(/^in `(.*?)'$/, "\\1")
+          methodName: method ? method.gsub(/^in `(.*?)'$/, "\\1") : "(none)"
         }
       end
 

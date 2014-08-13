@@ -33,6 +33,8 @@ module Raygun
 
     def setup
       yield(configuration)
+
+      json_bug_guard()
     end
 
     def configuration
@@ -76,6 +78,21 @@ module Raygun
         return false if configuration.silence_reporting
         return false if configuration.ignore.flatten.include?(exception.class.to_s)
         true
+      end
+
+      def json_bug_guard()
+        if defined?(ActiveSupport::JSON)
+          [Object, Array, FalseClass, Float, Hash, Integer, NilClass, String, TrueClass].each do |klass|
+            klass.class_eval do
+              def to_json(*args)
+                super(args)
+              end
+              def as_json(*args)
+                super(args)
+              end
+            end
+          end
+        end
       end
 
   end

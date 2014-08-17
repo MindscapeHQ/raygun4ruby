@@ -6,6 +6,16 @@ class ClientTest < Raygun::UnitTest
 
   class TestException < StandardError; end
 
+  class FakeActionDispatcherIp
+    attr_reader :ip
+    def initialize remote_ip
+      @ip = remote_ip
+    end
+    def to_s
+      return ip
+    end
+  end
+
   def setup
     super
     @client = Raygun::Client.new
@@ -254,10 +264,33 @@ class ClientTest < Raygun::UnitTest
       "SERVER_PROTOCOL"=>"HTTP/1.1",
       "SCRIPT_NAME"=>"",
       "REMOTE_ADDR"=>"127.0.0.1",
-      "action_dispatch.remote_ip"=>"123.456.789.012"
+      "action_dispatch.remote_ip"=> "123.456.789.012"
     }
 
     assert_equal "123.456.789.012", @client.send(:ip_address_from, sample_env_hash)
+    assert_equal "123.456.789.012", @client.send(:request_information, sample_env_hash)[:iPAddress]
+  end
+  def test_ip_address_from_old_action_dispatch
+    old_action_dispatch_ip = FakeActionDispatcherIp.new("123.456.789.012")
+    sample_env_hash = {
+      "HTTP_VERSION"=>"HTTP/1.1",
+      "HTTP_HOST"=>"localhost:3000",
+      "HTTP_CONNECTION"=>"keep-alive",
+      "HTTP_CACHE_CONTROL"=>"max-age=0",
+      "HTTP_ACCEPT"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "HTTP_USER_AGENT"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36",
+      "HTTP_ACCEPT_ENCODING"=>"gzip,deflate,sdch",
+      "HTTP_ACCEPT_LANGUAGE"=>"en-US,en;q=0.8",
+      "HTTP_COOKIE"=>"cookieval",
+      "GATEWAY_INTERFACE"=>"CGI/1.2",
+      "SERVER_PORT"=>"3000",
+      "SERVER_PROTOCOL"=>"HTTP/1.1",
+      "SCRIPT_NAME"=>"",
+      "REMOTE_ADDR"=>"127.0.0.1",
+      "action_dispatch.remote_ip"=> old_action_dispatch_ip
+    }
+
+    assert_equal old_action_dispatch_ip, @client.send(:ip_address_from, sample_env_hash)
     assert_equal "123.456.789.012", @client.send(:request_information, sample_env_hash)[:iPAddress]
   end
 

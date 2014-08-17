@@ -76,7 +76,7 @@ module Raygun
           hostName:    env["SERVER_NAME"],
           url:         env["PATH_INFO"],
           httpMethod:  env["REQUEST_METHOD"],
-          iPAddress:   ip_address_from(env),
+          iPAddress:   "#{ip_address_from(env)}",
           queryString: Rack::Utils.parse_nested_query(env["QUERY_STRING"]),
           form:        form_data(env),
           headers:     headers(env),

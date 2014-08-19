@@ -50,7 +50,7 @@ module Raygun
       end
     rescue Exception => e
       if configuration.failsafe_logger
-        failsafe_log("Problem reporting exception to Raygun: #{e.class}: #{e.message}\n\n#{e.backrace.join("\n")}")
+        failsafe_log("Problem reporting exception to Raygun: #{e.class}: #{e.message}\n\n#{e.backtrace.join("\n")}")
       else
         raise e
       end

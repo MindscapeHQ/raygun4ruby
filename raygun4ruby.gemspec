@@ -30,5 +30,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "minitest", "~> 4.2"
   spec.add_development_dependency "redis-namespace", ">= 1.3.1"
   spec.add_development_dependency "resque"
-  spec.add_development_dependency "sidekiq", "~> 3"
+  spec.add_development_dependency "sidekiq", [">= 3", "< 3.2.2"]
 end

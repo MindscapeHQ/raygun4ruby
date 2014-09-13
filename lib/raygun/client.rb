@@ -80,7 +80,7 @@ module Raygun
           queryString: Rack::Utils.parse_nested_query(env["QUERY_STRING"]),
           form:        form_data(env),
           headers:     headers(env),
-          rawData:     []
+          rawData:     filter_params(env["action_dispatch.request.parameters"], env["action_dispatch.parameter_filter"])
         }
       end
 
@@ -134,7 +134,7 @@ module Raygun
         filter_keys = (Array(extra_filter_keys) + Raygun.configuration.filter_parameters).map(&:to_s)
 
         # Recursive filtering of (nested) hashes
-        params_hash.inject({}) do |result, (k, v)|
+        (params_hash || {}).inject({}) do |result, (k, v)|
           result[k] = case v
           when Hash
             filter_params(v, extra_filter_keys)

@@ -178,7 +178,7 @@ class ClientTest < Raygun::UnitTest
       queryString: { "a" => "b", "c" => "4945438" },
       form:        nil,
       headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Connection"=>"keep-alive", "Cache-Control"=>"max-age=0", "Accept"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "User-Agent"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36", "Accept-Encoding"=>"gzip,deflate,sdch", "Accept-Language"=>"en-US,en;q=0.8", "Cookie"=>"cookieval" },
-      rawData:     []
+      rawData:     {}
     }
 
     assert_equal expected_hash, @client.send(:request_information, sample_env_hash)
@@ -186,6 +186,36 @@ class ClientTest < Raygun::UnitTest
 
   def test_getting_request_information_with_nil_env
     assert_equal({}, @client.send(:request_information, nil))
+  end
+
+  def test_non_form_parameters
+    put_body_env_hash = {
+      "SERVER_NAME"=>"localhost",
+      "REQUEST_METHOD"=>"PUT",
+      "REQUEST_PATH"=>"/",
+      "PATH_INFO"=>"/",
+      "QUERY_STRING"=>"",
+      "REQUEST_URI"=>"/",
+      "HTTP_VERSION"=>"HTTP/1.1",
+      "HTTP_HOST"=>"localhost:3000",
+      "HTTP_CONNECTION"=>"keep-alive",
+      "HTTP_CACHE_CONTROL"=>"max-age=0",
+      "HTTP_ACCEPT"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "HTTP_USER_AGENT"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36",
+      "HTTP_ACCEPT_ENCODING"=>"gzip,deflate,sdch",
+      "HTTP_ACCEPT_LANGUAGE"=>"en-US,en;q=0.8",
+      "HTTP_COOKIE"=>"cookieval",
+      "GATEWAY_INTERFACE"=>"CGI/1.2",
+      "SERVER_PORT"=>"3000",
+      "SERVER_PROTOCOL"=>"HTTP/1.1",
+      "SCRIPT_NAME"=>"",
+      "REMOTE_ADDR"=>"127.0.0.1",
+      "action_dispatch.request.parameters"=> { "a" => "b", "c" => "4945438", "password" => "swordfish" }
+    }
+
+    expected_form_hash = { "a" => "b", "c" => "4945438", "password" => "[FILTERED]" }
+
+    assert_equal expected_form_hash, @client.send(:request_information, put_body_env_hash)[:rawData]
   end
 
   def test_filtering_parameters

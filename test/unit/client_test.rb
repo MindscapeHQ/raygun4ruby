@@ -138,6 +138,7 @@ class ClientTest < Raygun::UnitTest
             ]
           },
           userCustomData: {},
+          tags:           ["test"],
           request:        {}
         }
       }

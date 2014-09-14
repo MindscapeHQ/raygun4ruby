@@ -80,7 +80,7 @@ module Raygun
           queryString: Rack::Utils.parse_nested_query(env["QUERY_STRING"]),
           form:        form_data(env),
           headers:     headers(env),
-          rawData:     filter_params(env["action_dispatch.request.parameters"], env["action_dispatch.parameter_filter"])
+          rawData:     raw_data(env)
         }
       end
 
@@ -102,6 +102,13 @@ module Raygun
         request = Rack::Request.new(rack_env)
         if request.form_data?
           filter_params(request.params, rack_env["action_dispatch.parameter_filter"])
+        end
+      end
+
+      def raw_data(rack_env)
+        request = Rack::Request.new(rack_env)
+        unless request.form_data?
+          filter_params(rack_env["action_dispatch.request.parameters"], rack_env["action_dispatch.parameter_filter"])
         end
       end
 

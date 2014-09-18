@@ -51,6 +51,7 @@ require 'raygun4ruby'
 Raygun.setup do |config|
   config.api_key = "YOUR_RAYGUN_API_KEY"
   config.filter_parameters = [ :password, :card_number, :cvv ] # don't forget to filter out sensitive parameters
+  config.enable_reporting = Rails.env.production? # true to send errors, false to not log
 end
 
 begin
@@ -87,7 +88,14 @@ Raygun.setup do |config|
 end
 ```
 
-You can also check which [exceptions are ignored by default](https://github.com/MindscapeHQ/raygun4ruby/blob/master/lib/raygun/configuration.rb#L26)
+You can also check which [exceptions are ignored by default](https://github.com/MindscapeHQ/raygun4ruby/blob/master/lib/raygun/configuration.rb#L26) and unignore them if needed by doing the following:
+
+```ruby
+Raygun.setup do |config|
+  config.api_key = "MY_SWEET_API_KEY"
+  config.ignore.delete('ActionController::InvalidAuthenticityToken')
+end
+```
 
 ###Affected User Tracking
 

@@ -69,6 +69,14 @@ module Raygun
         !!env["raygun.affected_user"]
       end
 
+      def error_tags
+        [ENV["RACK_ENV"]]
+      end
+
+      def error_tags_present?
+        !!ENV["RACK_ENV"]
+      end
+
       def request_information(env)
         return {} if env.nil? || env.empty?
 
@@ -118,6 +126,7 @@ module Raygun
             request:        request_information(env)
         }
 
+        error_details.merge!(tags: error_tags) if error_tags_present?
         error_details.merge!(user: user_information(env)) if affected_user_present?(env)
 
         {

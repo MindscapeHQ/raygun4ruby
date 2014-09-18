@@ -1,3 +1,4 @@
+ENV['RACK_ENV'] = 'test'
 require_relative "../lib/raygun.rb"
 require "minitest/autorun"
 require "minitest/pride"

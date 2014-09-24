@@ -35,6 +35,10 @@ class Raygun::UnitTest < MiniTest::Unit::TestCase
     FakeWeb.register_uri(:post, "https://api.raygun.io/entries", body: "", status: 202)
   end
 
+  def test_exception
+    StandardError.new("A test message")
+  end
+
   def teardown
     FakeWeb.clean_registry
     FakeWeb.allow_net_connect = true

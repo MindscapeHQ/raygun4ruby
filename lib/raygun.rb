@@ -11,6 +11,7 @@ require "ostruct"
 require "raygun/version"
 require "raygun/configuration"
 require "raygun/client"
+require "raygun/entry"
 require "raygun/middleware/rack_exception_interceptor"
 require "raygun/testable"
 require "raygun/railtie" if defined?(Rails)

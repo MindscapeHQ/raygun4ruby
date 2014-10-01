@@ -5,6 +5,11 @@ require 'stringio'
 class ClientTest < Raygun::UnitTest
 
   class TestException < StandardError; end
+  class NilMessageError < StandardError
+    def message
+      nil
+    end
+  end
 
   class FakeActionDispatcherIp
     attr_reader :ip
@@ -53,6 +58,12 @@ class ClientTest < Raygun::UnitTest
     }
 
     assert_equal expected_hash, @client.send(:error_details, e)
+  end
+
+  def test_error_details_with_nil_message
+    e = NilMessageError.new
+    expected_message = ""
+    assert_equal expected_message, @client.send(:error_details, e)[:message]
   end
 
   def test_client_details

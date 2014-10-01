@@ -38,7 +38,7 @@ module Raygun
       def error_details(exception)
         {
           className:  exception.class.to_s,
-          message:    exception.message.encode('UTF-16', :undef => :replace, :invalid => :replace).encode('UTF-8'),
+          message:    exception.message.to_s.encode('UTF-16', :undef => :replace, :invalid => :replace).encode('UTF-8'),
           stackTrace: (exception.backtrace || []).map { |line| stack_trace_for(line) }
         }
       end

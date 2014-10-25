@@ -41,6 +41,18 @@ Note that the generator will create a file in `config/initializers` called "rayg
 
 Raygun4Ruby doesn't currently support Rails 2. If you'd like Rails 2 support, [drop us a line](http://raygun.io/forums).
 
+### Sinatra
+
+To enable exception tracking in Sinatra, just add configure Raygun and use the Rack middleware in your app:
+
+```
+require 'raygun4ruby'
+Raygun.setup do |config|
+  config.api_key = "YOUR_API_KEY_HERE"
+end
+use Raygun::Middleware::RackExceptionInterceptor
+```
+
 ###Standalone / Manual Exception Tracking
 
 ```ruby

@@ -15,6 +15,8 @@ module Raygun
       @headers = {
         "X-ApiKey" => @api_key
       }
+
+      enable_http_proxy if Raygun.configuration.proxy_address
     end
 
     def require_api_key!
@@ -26,6 +28,10 @@ module Raygun
     end
 
     private
+
+      def enable_http_proxy
+        self.class.http_proxy(Raygun.configuration.proxy_address, Raygun.configuration.proxy_port || "80")
+      end
 
       def client_details
         {

@@ -350,14 +350,14 @@ class ClientTest < Raygun::UnitTest
 
   def test_setting_up_http_proxy
     begin
-      Raygun.configuration.proxy_address = "http://proxy.com"
-      Raygun::Client.expects(:http_proxy).with("http://proxy.com", "80")
+      Raygun.configuration.proxy_settings[:address] = "http://proxy.com"
+      Raygun::Client.expects(:http_proxy).with("http://proxy.com", "80", nil, nil)
 
       Raygun.track_exceptions do
         raise TestException.new
       end
     ensure
-      Raygun.configuration.proxy_address = nil
+      Raygun.configuration.proxy_settings = {}
     end
   end
 

@@ -41,9 +41,8 @@ module Raygun
     # Which parameter keys should we filter out by default?
     config_option :filter_parameters
 
-    # HTTP Proxy address and port
-    config_option :proxy_address
-    config_option :proxy_port
+    # Hash of proxy settings - :address, :port (defaults to 80), :username and :password (both default to nil)
+    config_option :proxy_settings
 
     # Exception classes to ignore by default
     IGNORE_DEFAULT = ['ActiveRecord::RecordNotFound',
@@ -68,7 +67,8 @@ module Raygun
         enable_reporting:                 true,
         affected_user_method:             :current_user,
         affected_user_identifier_methods: [ :email, :username, :id ],
-        filter_parameters:                DEFAULT_FILTER_PARAMETERS
+        filter_parameters:                DEFAULT_FILTER_PARAMETERS,
+        proxy_settings:                   {}
       })
     end
 

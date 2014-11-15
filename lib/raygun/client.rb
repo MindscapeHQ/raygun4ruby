@@ -79,15 +79,14 @@ module Raygun
 
       def request_information(env)
         return {} if env.nil? || env.empty?
-
         {
           hostName:    env["SERVER_NAME"],
           url:         env["PATH_INFO"],
           httpMethod:  env["REQUEST_METHOD"],
           iPAddress:   "#{ip_address_from(env)}",
           queryString: Rack::Utils.parse_nested_query(env["QUERY_STRING"]),
-          form:        form_data(env),
           headers:     headers(env),
+          form:        form_params(env),
           rawData:     raw_data(env)
         }
       end
@@ -106,17 +105,24 @@ module Raygun
            .sub(/ /, '-')
       end
 
-      def form_data(rack_env)
-        request = Rack::Request.new(rack_env)
-        if request.form_data?
-          filter_params(request.params, rack_env["action_dispatch.parameter_filter"])
-        end
+      def form_params(env)
+        params = action_dispatch_params(env) || rack_params(env) || {}
+        filter_params(params, env["action_dispatch.parameter_filter"])
+      end
+
+      def action_dispatch_params(env)
+        env["action_dispatch.request.parameters"]
+      end
+
+      def rack_params(env)
+        request = Rack::Request.new(env)
+        request.params if env["rack.input"]
       end
 
       def raw_data(rack_env)
         request = Rack::Request.new(rack_env)
         unless request.form_data?
-          filter_params(rack_env["action_dispatch.request.parameters"], rack_env["action_dispatch.parameter_filter"])
+          form_params(rack_env)  
         end
       end
 

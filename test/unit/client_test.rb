@@ -359,4 +359,17 @@ class ClientTest < Raygun::UnitTest
     assert_equal "123.456.789.012", @client.send(:request_information, sample_env_hash)[:iPAddress]
   end
 
+  def test_setting_up_http_proxy
+    begin
+      Raygun.configuration.proxy_settings[:address] = "http://proxy.com"
+      Raygun::Client.expects(:http_proxy).with("http://proxy.com", "80", nil, nil)
+
+      Raygun.track_exceptions do
+        raise TestException.new
+      end
+    ensure
+      Raygun.configuration.proxy_settings = {}
+    end
+  end
+
 end

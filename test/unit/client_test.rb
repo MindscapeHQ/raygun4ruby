@@ -231,29 +231,9 @@ class ClientTest < Raygun::UnitTest
   end
 
   def test_filtering_parameters
-    post_body_env_hash = {
-      "SERVER_NAME"=>"localhost",
-      "REQUEST_METHOD"=>"POST",
-      "REQUEST_PATH"=>"/",
-      "PATH_INFO"=>"/",
-      "QUERY_STRING"=>"",
-      "REQUEST_URI"=>"/",
-      "HTTP_VERSION"=>"HTTP/1.1",
-      "HTTP_HOST"=>"localhost:3000",
-      "HTTP_CONNECTION"=>"keep-alive",
-      "HTTP_CACHE_CONTROL"=>"max-age=0",
-      "HTTP_ACCEPT"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-      "HTTP_USER_AGENT"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36",
-      "HTTP_ACCEPT_ENCODING"=>"gzip,deflate,sdch",
-      "HTTP_ACCEPT_LANGUAGE"=>"en-US,en;q=0.8",
-      "HTTP_COOKIE"=>"cookieval",
-      "GATEWAY_INTERFACE"=>"CGI/1.2",
-      "SERVER_PORT"=>"3000",
-      "SERVER_PROTOCOL"=>"HTTP/1.1",
-      "SCRIPT_NAME"=>"",
-      "REMOTE_ADDR"=>"127.0.0.1",
+    post_body_env_hash = sample_env_hash.merge(
       "rack.input"=>StringIO.new("a=b&c=4945438&password=swordfish")
-    }
+    )
 
     expected_form_hash = { "a" => "b", "c" => "4945438", "password" => "[FILTERED]" }
 
@@ -261,33 +241,35 @@ class ClientTest < Raygun::UnitTest
   end
 
   def test_filtering_nested_params
-    post_body_env_hash = {
-      "SERVER_NAME"=>"localhost",
-      "REQUEST_METHOD"=>"POST",
-      "REQUEST_PATH"=>"/",
-      "PATH_INFO"=>"/",
-      "QUERY_STRING"=>"",
-      "REQUEST_URI"=>"/",
-      "HTTP_VERSION"=>"HTTP/1.1",
-      "HTTP_HOST"=>"localhost:3000",
-      "HTTP_CONNECTION"=>"keep-alive",
-      "HTTP_CACHE_CONTROL"=>"max-age=0",
-      "HTTP_ACCEPT"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-      "HTTP_USER_AGENT"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36",
-      "HTTP_ACCEPT_ENCODING"=>"gzip,deflate,sdch",
-      "HTTP_ACCEPT_LANGUAGE"=>"en-US,en;q=0.8",
-      "HTTP_COOKIE"=>"cookieval",
-      "GATEWAY_INTERFACE"=>"CGI/1.2",
-      "SERVER_PORT"=>"3000",
-      "SERVER_PROTOCOL"=>"HTTP/1.1",
-      "SCRIPT_NAME"=>"",
-      "REMOTE_ADDR"=>"127.0.0.1",
-      "rack.input"=>StringIO.new("a=b&bank%5Bcredit_card%5D%5Bcard_number%5D=my_secret_bank_number&bank%5Bname%5D=something&c=123456&user%5Bpassword%5D=my_fancy_password")
-    }
+    post_body_env_hash = sample_env_hash.merge(
+      "rack.input" => StringIO.new("a=b&bank%5Bcredit_card%5D%5Bcard_number%5D=my_secret_bank_number&bank%5Bname%5D=something&c=123456&user%5Bpassword%5D=my_fancy_password")
+    )
 
     expected_form_hash = { "a" => "b", "bank" => { "credit_card" => { "card_number" => "[FILTERED]" }, "name" => "something" }, "c" => "123456", "user" => { "password" => "[FILTERED]" } }
 
     assert_equal expected_form_hash, @client.send(:request_information, post_body_env_hash)[:form]
+  end
+
+  def test_filter_parameters_using_proc
+    # filter any parameters that start with "nsa_only"
+    Raygun.configuration.filter_parameters do |hash|
+      hash.inject({}) do |sanitized_hash, pair|
+        k, v = pair
+        v = "[OUREYESONLY]" if k[0...8] == "nsa_only"
+        sanitized_hash[k] = v
+        sanitized_hash
+      end
+    end
+
+    post_body_env_hash = sample_env_hash.merge(
+      "rack.input" => StringIO.new("nsa_only_info=123&nsa_only_metadata=seekrit&something_normal=hello")
+    )
+
+    expected_form_hash = { "nsa_only_info" => "[OUREYESONLY]", "nsa_only_metadata" => "[OUREYESONLY]", "something_normal" => "hello" }
+
+    assert_equal expected_form_hash, @client.send(:request_information, post_body_env_hash)[:form]
+  ensure
+    Raygun.configuration.filter_parameters = nil
   end
 
   def test_ip_address_from_action_dispatch
@@ -371,5 +353,32 @@ class ClientTest < Raygun::UnitTest
       Raygun.configuration.proxy_settings = {}
     end
   end
+
+  private
+
+    def sample_env_hash
+      { 
+        "SERVER_NAME"=>"localhost",
+        "REQUEST_METHOD"=>"POST",
+        "REQUEST_PATH"=>"/",
+        "PATH_INFO"=>"/",
+        "QUERY_STRING"=>"",
+        "REQUEST_URI"=>"/",
+        "HTTP_VERSION"=>"HTTP/1.1",
+        "HTTP_HOST"=>"localhost:3000",
+        "HTTP_CONNECTION"=>"keep-alive",
+        "HTTP_CACHE_CONTROL"=>"max-age=0",
+        "HTTP_ACCEPT"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "HTTP_USER_AGENT"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36",
+        "HTTP_ACCEPT_ENCODING"=>"gzip,deflate,sdch",
+        "HTTP_ACCEPT_LANGUAGE"=>"en-US,en;q=0.8",
+        "HTTP_COOKIE"=>"cookieval",
+        "GATEWAY_INTERFACE"=>"CGI/1.2",
+        "SERVER_PORT"=>"3000",
+        "SERVER_PROTOCOL"=>"HTTP/1.1",
+        "SCRIPT_NAME"=>"",
+        "REMOTE_ADDR"=>"127.0.0.1"
+      }
+    end
 
 end

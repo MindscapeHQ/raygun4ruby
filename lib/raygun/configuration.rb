@@ -88,6 +88,11 @@ module Raygun
       self.enable_reporting = !value
     end
 
+    def filter_parameters(&filter_proc)
+      set_value(:filter_parameters, filter_proc) if block_given?
+      read_value(:filter_parameters)
+    end
+
     private
 
       def read_value(name)

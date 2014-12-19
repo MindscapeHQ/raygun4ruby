@@ -1,6 +1,3 @@
-require "bundler"
-Bundler.setup(:default)
-
 require "httparty"
 require "logger"
 require "json"

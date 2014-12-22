@@ -180,6 +180,7 @@ module Raygun
         ENV_IP_ADDRESS_KEYS.each do |key_to_try|
           return env_hash[key_to_try] unless env_hash[key_to_try].nil? || env_hash[key_to_try] == ""
         end
+        "(Not Available)"
       end
 
   end

@@ -15,7 +15,7 @@ class Raygun::Railtie < Rails::Railtie
 
     # Affected User tracking
     require "raygun/middleware/rails_insert_affected_user"
-    app.config.middleware.insert_after Raygun::Middleware::RackExceptionInterceptor, "Raygun::Middleware::RailsInsertAffectedUser"
+    app.config.middleware.insert_before Raygun::Middleware::RackExceptionInterceptor, "Raygun::Middleware::RailsInsertAffectedUser"
   end
 
   config.to_prepare do

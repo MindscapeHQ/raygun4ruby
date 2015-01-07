@@ -76,7 +76,20 @@ end
 
 ```
 
-(You can also pass a Hash as the second parameter to `track_exception`. It should look like a [Rack Env Hash](http://rack.rubyforge.org/doc/SPEC.html))
+You can also pass a Hash as the second parameter to `track_exception`. It should look like a [Rack Env Hash](http://rack.rubyforge.org/doc/SPEC.html)
+
+### Customising Paremter Filtering
+
+If you'd like to customize how parameters are filtered, you can pass a `Proc` to `filter_parameters`. Raygun4Ruby will yield the params hash to the block, and the return value will be sent along with your error.
+
+```ruby
+Raygun.setup do |config|
+  config.api_key = "YOUR_RAYGUN_API_KEY"
+  config.filter_parameters do |params|
+    params.slice("only", "a", "few", "keys") # note that Hash#slice is in ActiveSupport
+  end
+end
+```
 
 ###Custom User Data
 Custom data can be added to `track_exception` by passing a custom_data key in the second parameter hash.
@@ -108,6 +121,17 @@ You can also check which [exceptions are ignored by default](https://github.com/
 Raygun.setup do |config|
   config.api_key = "MY_SWEET_API_KEY"
   config.ignore.delete('ActionController::InvalidAuthenticityToken')
+end
+```
+
+###Using a Proxy
+
+You can pass proxy settings using the `proxy_settings` config option.
+
+```ruby
+Raygun.setup do |config|
+  config.api_key = "MY_SWEET_API_KEY"
+  config.proxy_settings = { host: "localhost", port: 8888 }
 end
 ```
 

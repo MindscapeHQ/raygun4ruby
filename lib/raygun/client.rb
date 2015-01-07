@@ -162,13 +162,24 @@ module Raygun
       end
 
       def filter_params(params_hash, extra_filter_keys = nil)
-        filter_keys = (Array(extra_filter_keys) + Raygun.configuration.filter_parameters).map(&:to_s)
+        if Raygun.configuration.filter_parameters.is_a?(Proc)
+          filter_params_with_proc(params_hash, Raygun.configuration.filter_parameters)
+        else
+          filter_keys = (Array(extra_filter_keys) + Raygun.configuration.filter_parameters).map(&:to_s)
+          filter_params_with_array(params_hash, filter_keys)
+        end
+      end
 
+      def filter_params_with_proc(params_hash, proc)
+        proc.call(params_hash)
+      end
+
+      def filter_params_with_array(params_hash, filter_keys)
         # Recursive filtering of (nested) hashes
         (params_hash || {}).inject({}) do |result, (k, v)|
           result[k] = case v
           when Hash
-            filter_params(v, extra_filter_keys)
+            filter_params_with_array(v, filter_keys)
           else
             filter_keys.include?(k) ? "[FILTERED]" : v
           end

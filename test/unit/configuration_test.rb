@@ -60,4 +60,16 @@ class ConfigurationTest < Raygun::UnitTest
     assert_equal({ sally: "stegosaurus" }, Raygun.configuration.custom_data)
   end
 
+  def test_setting_filter_paramters_to_proc
+    Raygun.setup do |config|
+      config.filter_parameters do |hash|
+        # Don't need to do anything :)
+      end
+    end
+
+    assert Raygun.configuration.filter_parameters.is_a?(Proc)
+  ensure
+    Raygun.configuration.filter_parameters = nil
+  end
+
 end

@@ -19,7 +19,7 @@ Or install it yourself as:
 
 ## Usage
 
-###Rails 3/4
+### Rails 3/4
 
 Run:
 
@@ -55,7 +55,7 @@ end
 use Raygun::Middleware::RackExceptionInterceptor
 ```
 
-###Standalone / Manual Exception Tracking
+### Standalone / Manual Exception Tracking
 
 ```ruby
 
@@ -78,7 +78,7 @@ end
 
 You can also pass a Hash as the second parameter to `track_exception`. It should look like a [Rack Env Hash](http://rack.rubyforge.org/doc/SPEC.html)
 
-### Customising Paremter Filtering
+### Customizing The Parameter Filtering
 
 If you'd like to customize how parameters are filtered, you can pass a `Proc` to `filter_parameters`. Raygun4Ruby will yield the params hash to the block, and the return value will be sent along with your error.
 
@@ -91,7 +91,7 @@ Raygun.setup do |config|
 end
 ```
 
-###Custom User Data
+### Custom User Data
 Custom data can be added to `track_exception` by passing a custom_data key in the second parameter hash.
 
 ```ruby
@@ -104,7 +104,7 @@ end
 
 ```
 
-###Ignoring Some Errors
+### Ignoring Some Errors
 
 You can ignore certain types of Exception using the `ignore` option in the setup block, like so:
 
@@ -124,7 +124,7 @@ Raygun.setup do |config|
 end
 ```
 
-###Using a Proxy
+### Using a Proxy
 
 You can pass proxy settings using the `proxy_settings` config option.
 
@@ -135,7 +135,7 @@ Raygun.setup do |config|
 end
 ```
 
-###Affected User Tracking
+### Affected User Tracking
 
 Raygun can now track how many users have been affected by an error.
 
@@ -169,7 +169,7 @@ end
 
 (Remember to set `affected_user_method` to `:raygun_user` in your config block...)
 
-###Resque Error Tracking
+### Resque Error Tracking
 
 Raygun4Ruby also includes a Resque failure backend. You should include it inside your Resque initializer (usually something like `config/initializers/load_resque.rb`)
 

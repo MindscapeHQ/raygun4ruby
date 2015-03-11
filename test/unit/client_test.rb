@@ -27,12 +27,11 @@ class ClientTest < Raygun::UnitTest
     fake_successful_entry
   end
 
-  def test_api_key_required_exception
+  def test_api_key_required_message
     Raygun.configuration.api_key = nil
 
-    assert_raises Raygun::ApiKeyRequired do
-      second_client = Raygun::Client.new
-    end
+    $stderr.expects(:puts).with(Raygun::Client::NO_API_KEY_MESSAGE).once
+    second_client = Raygun::Client.new
   end
 
   def test_track_exception

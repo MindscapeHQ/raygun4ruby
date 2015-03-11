@@ -21,9 +21,6 @@ module Raygun
   CLIENT_URL  = "https://github.com/MindscapeHQ/raygun4ruby"
   CLIENT_NAME = "Raygun4Ruby Gem"
 
-  # Exceptions
-  class ApiKeyRequired < StandardError; end
-
   class << self
 
     include Testable

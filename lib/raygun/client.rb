@@ -4,14 +4,14 @@ module Raygun
   class Client
 
     ENV_IP_ADDRESS_KEYS = %w(action_dispatch.remote_ip raygun.remote_ip REMOTE_ADDR)
+    NO_API_KEY_MESSAGE  = "[RAYGUN] Just a note, you've got no API Key configured, which means we can't report exceptions. Specify your Raygun API key using Raygun#setup (find yours at https://app.raygun.io)"
 
     include HTTParty
 
     base_uri "https://api.raygun.io/"
 
     def initialize
-      @api_key = require_api_key!
-
+      @api_key = require_api_key
       @headers = {
         "X-ApiKey" => @api_key
       }
@@ -19,8 +19,8 @@ module Raygun
       enable_http_proxy if Raygun.configuration.proxy_settings[:address]
     end
 
-    def require_api_key!
-      Raygun.configuration.api_key || raise(ApiKeyRequired.new("Please specify your Raygun API key using Raygun#setup (find yours at https://app.raygun.io)"))
+    def require_api_key
+      Raygun.configuration.api_key || print_api_key_warning
     end
 
     def track_exception(exception_instance, env = {})
@@ -192,6 +192,10 @@ module Raygun
           return env_hash[key_to_try] unless env_hash[key_to_try].nil? || env_hash[key_to_try] == ""
         end
         "(Not Available)"
+      end
+
+      def print_api_key_warning
+        $stderr.puts(NO_API_KEY_MESSAGE)
       end
 
   end

@@ -10,7 +10,7 @@ module Raygun
       def call(env)
         response = @app.call(env)
       rescue Exception => exception
-        if (controller = env["action_controller.instance"]) && controller.respond_to?(Raygun.configuration.affected_user_method)
+        if (controller = env["action_controller.instance"]) && controller.respond_to?(Raygun.configuration.affected_user_method, true)
           user = controller.send(Raygun.configuration.affected_user_method)
 
           if user

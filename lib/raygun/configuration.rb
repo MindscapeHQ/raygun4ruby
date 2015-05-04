@@ -48,6 +48,7 @@ module Raygun
     IGNORE_DEFAULT = ['ActiveRecord::RecordNotFound',
                       'ActionController::RoutingError',
                       'ActionController::InvalidAuthenticityToken',
+                      'ActionDispatch::ParamsParser::ParseError',
                       'CGI::Session::CookieStore::TamperedWithCookie',
                       'ActionController::UnknownAction',
                       'AbstractController::ActionNotFound',

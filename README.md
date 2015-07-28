@@ -47,7 +47,7 @@ Raygun4Ruby doesn't currently support Rails 2. If you'd like Rails 2 support, [d
 
 To enable exception tracking in Sinatra, just add configure Raygun and use the Rack middleware in your app:
 
-```
+```ruby
 require 'raygun4ruby'
 Raygun.setup do |config|
   config.api_key = "YOUR_API_KEY_HERE"

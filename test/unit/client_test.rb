@@ -92,6 +92,14 @@ class ClientTest < Raygun::UnitTest
     assert_equal expected_hash, @client.send(:build_payload_hash, e, test_env)[:details][:user]
   end
 
+  def test_tags
+    e             = TestException.new("A test message")
+    test_env      = { tags: %w{one two three four} }
+    expected_hash = %w{one two three four test}
+
+    assert_equal expected_hash, @client.send(:build_payload_hash, e, test_env)[:details][:tags]
+  end
+
   def test_hostname
     assert_equal Socket.gethostname, @client.send(:hostname)
   end
@@ -377,7 +385,7 @@ class ClientTest < Raygun::UnitTest
   private
 
     def sample_env_hash
-      { 
+      {
         "SERVER_NAME"=>"localhost",
         "REQUEST_METHOD"=>"POST",
         "REQUEST_PATH"=>"/",

@@ -30,7 +30,7 @@ module Raygun
     private
 
       def enable_http_proxy
-        self.class.http_proxy(Raygun.configuration.proxy_settings[:address], 
+        self.class.http_proxy(Raygun.configuration.proxy_settings[:address],
                               Raygun.configuration.proxy_settings[:port] || "80",
                               Raygun.configuration.proxy_settings[:username],
                               Raygun.configuration.proxy_settings[:password])
@@ -78,11 +78,11 @@ module Raygun
         !!env["raygun.affected_user"]
       end
 
-      def error_tags
-        [ENV["RACK_ENV"]]
+      def rack_env
+        ENV["RACK_ENV"]
       end
 
-      def error_tags_present?
+      def rack_env_present?
         !!ENV["RACK_ENV"]
       end
 
@@ -131,13 +131,15 @@ module Raygun
       def raw_data(rack_env)
         request = Rack::Request.new(rack_env)
         unless request.form_data?
-          form_params(rack_env)  
+          form_params(rack_env)
         end
       end
 
       # see http://raygun.io/raygun-providers/rest-json-api?v=1
       def build_payload_hash(exception_instance, env = {})
         custom_data = env.delete(:custom_data) || {}
+        tags = env.delete(:tags) || []
+        tags << rack_env if rack_env_present?
 
         error_details = {
             machineName:    hostname,
@@ -148,7 +150,7 @@ module Raygun
             request:        request_information(env)
         }
 
-        error_details.merge!(tags: error_tags) if error_tags_present?
+        error_details.merge!(tags: tags)
         error_details.merge!(user: user_information(env)) if affected_user_present?(env)
 
         {

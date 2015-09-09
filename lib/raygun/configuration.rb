@@ -23,6 +23,9 @@ module Raygun
     # Custom Data to send with each exception
     config_option :custom_data
 
+    # Tags to send with each exception
+    config_option :tags
+
     # Logger to use when if we find an exception :)
     config_option :logger
 
@@ -65,6 +68,7 @@ module Raygun
       @defaults = OpenStruct.new({
         ignore:                           IGNORE_DEFAULT,
         custom_data:                      {},
+        tags:                             [],
         enable_reporting:                 true,
         affected_user_method:             :current_user,
         affected_user_identifier_methods: [ :email, :username, :id ],

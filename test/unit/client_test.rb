@@ -93,11 +93,19 @@ class ClientTest < Raygun::UnitTest
   end
 
   def test_tags
-    e             = TestException.new("A test message")
-    test_env      = { tags: %w{one two three four} }
-    expected_hash = %w{one two three four test}
+    configuration_tags = %w{alpha beta gaga}
+    explicit_env_tags  = %w{one two three four}
+    rack_env_tag       = %w{test}
 
-    assert_equal expected_hash, @client.send(:build_payload_hash, e, test_env)[:details][:tags]
+    Raygun.setup do |config|
+      config.tags = configuration_tags
+    end
+
+    e             = TestException.new("A test message")
+    test_env      = { tags: explicit_env_tags }
+    expected_tags =  configuration_tags + explicit_env_tags + rack_env_tag
+
+    assert_equal expected_tags, @client.send(:build_payload_hash, e, test_env)[:details][:tags]
   end
 
   def test_hostname

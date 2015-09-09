@@ -147,10 +147,10 @@ module Raygun
             client:         client_details,
             error:          error_details(exception_instance),
             userCustomData: Raygun.configuration.custom_data.merge(custom_data),
+            tags:           Raygun.configuration.tags.concat(tags).uniq,
             request:        request_information(env)
         }
 
-        error_details.merge!(tags: tags)
         error_details.merge!(user: user_information(env)) if affected_user_present?(env)
 
         {

@@ -173,9 +173,22 @@ end
 
 Raygun can attach the version of your application to its error reports. In your Raygun.setup block, set `version` to the current version of your app.
 
+```ruby
 Raygun.setup do |config|
   config.version = "1.0.0.4" # you could also pull this from ENV or however you want to set it.
 end
+```
+
+### Tags
+
+Raygun allows you to tag error reports with any number of tags. In your Raygun.setup block, set `tags` to an array of strings to have those
+set on any error reports sent by the gem.
+
+```ruby
+Raygun.setup do |config|
+  config.tags = ['heroku']
+end
+```
 
 ### Resque Error Tracking
 

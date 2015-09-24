@@ -179,6 +179,17 @@ Raygun.setup do |config|
 end
 ```
 
+### Tags
+
+Raygun allows you to tag error reports with any number of tags. In your Raygun.setup block, set `tags` to an array of strings to have those
+set on any error reports sent by the gem.
+
+```ruby
+Raygun.setup do |config|
+  config.tags = ['heroku']
+end
+```
+
 ### Resque Error Tracking
 
 Raygun4Ruby also includes a Resque failure backend. You should include it inside your Resque initializer (usually something like `config/initializers/load_resque.rb`)

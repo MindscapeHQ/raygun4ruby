@@ -224,3 +224,9 @@ Oops! Just let us know by opening an Issue on Github.
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+## Building
+
+1. Build the gem (`gem build raygun4ruby.gemspec`) - don't bother trying to build it on Windows,
+the resulting Gem won't work.
+2. Install the gem (`gem install raygun4ruby-VERSION.gem`)

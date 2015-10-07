@@ -173,6 +173,11 @@ class ClientTest < Raygun::UnitTest
     end
   end
 
+  def test_not_utf8
+    custom_data = {key: "R\xE9cup\xE9rez"}
+    assert_silent { @client.send(:create_entry, {custom_data: custom_data})}
+  end
+
   def test_getting_request_information
     sample_env_hash = {
       "SERVER_NAME"=>"localhost",

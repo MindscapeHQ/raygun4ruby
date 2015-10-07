@@ -160,7 +160,7 @@ module Raygun
       end
 
       def create_entry(payload_hash)
-        self.class.post("/entries", headers: @headers, body: JSON.generate(payload_hash))
+        self.class.post("/entries", headers: @headers, body: JSON.generate(hash_to_utf8(payload_hash)))
       end
 
       def filter_params(params_hash, extra_filter_keys = nil)
@@ -170,6 +170,20 @@ module Raygun
           filter_keys = (Array(extra_filter_keys) + Raygun.configuration.filter_parameters).map(&:to_s)
           filter_params_with_array(params_hash, filter_keys)
         end
+      end
+
+      def hash_to_utf8(hash)
+        Hash[
+            hash.collect do |k, v|
+              if v.is_a?(Hash)
+                [k, hash_to_utf8(v)]
+              elsif v.respond_to?(:encode)
+                [k, v.encode('UTF-8', :invalid => :replace, :undef => :replace)]
+              else
+                [k, v]
+              end
+            end
+        ]
       end
 
       def filter_params_with_proc(params_hash, proc)

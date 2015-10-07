@@ -14,8 +14,8 @@ module Raygun
         puts "Success! Now go check your Raygun.io Dashboard"
       else
         puts "Oh-oh, something went wrong - double check your API key"
-        puts "API Key - " <<  Raygun.configuration.api_key << ")"
-        puts "API Response - " <<  response
+        puts "API Key - " << Raygun.configuration.api_key << ")"
+        puts "API Response - " << sresponse
       end
     end
 

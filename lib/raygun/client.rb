@@ -160,7 +160,7 @@ module Raygun
       end
 
       def create_entry(payload_hash)
-        self.class.post("/entries", headers: @headers, body: JSON.generate(payload_hash))
+        self.class.post("/entries", verify_peer: true, verify: true, headers: @headers, body: JSON.generate(payload_hash))
       end
 
       def filter_params(params_hash, extra_filter_keys = nil)

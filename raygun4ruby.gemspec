@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.executables   = []
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency "httparty", "~> 0.11"
+  spec.add_runtime_dependency "httparty", "~> 0.13.7"
   spec.add_runtime_dependency "json"
   spec.add_runtime_dependency "rack"
 

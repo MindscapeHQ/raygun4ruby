@@ -141,6 +141,8 @@ module Raygun
         tags = env.delete(:tags) || []
         tags << rack_env if rack_env_present?
 
+        groupingKey = env.delete(:groupingKey)
+
         error_details = {
             machineName:    hostname,
             version:        version,
@@ -150,6 +152,8 @@ module Raygun
             tags:           Raygun.configuration.tags.concat(tags).uniq,
             request:        request_information(env)
         }
+
+        error_details.merge!(groupingKey: groupingKey) if groupingKey
 
         error_details.merge!(user: user_information(env)) if affected_user_present?(env)
 

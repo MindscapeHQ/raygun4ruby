@@ -145,6 +145,8 @@ class ClientTest < Raygun::UnitTest
       e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
                        "/another/path/foo.rb:1234:in `block (3 levels) run'"])
 
+      groupingKey = "my custom group"
+
       expected_hash = {
         occurredOn: Time.now.utc.iso8601,
         details: {
@@ -165,11 +167,12 @@ class ClientTest < Raygun::UnitTest
           },
           userCustomData: {},
           tags:           ["test"],
-          request:        {}
+          request:        {},
+          groupingKey: groupingKey
         }
       }
 
-      assert_equal expected_hash, @client.send(:build_payload_hash, e)
+      assert_equal expected_hash, @client.send(:build_payload_hash, e, { groupingKey: groupingKey })
     end
   end
 

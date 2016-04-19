@@ -168,7 +168,7 @@ class ClientTest < Raygun::UnitTest
           userCustomData: {},
           tags:           ["test"],
           request:        {},
-          groupingKey: groupingKey
+          groupingKey:    groupingKey
         }
       }
 

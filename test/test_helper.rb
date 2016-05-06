@@ -1,5 +1,6 @@
 ENV['RACK_ENV'] = 'test'
-require "sidekiq"
+Bundler.require(:development)
+
 require_relative "../lib/raygun.rb"
 require "minitest/autorun"
 require "minitest/pride"

@@ -37,6 +37,10 @@ module Raygun
       configuration.defaults
     end
 
+    def configured?
+      !!configuration.api_key
+    end
+
     def track_exception(exception_instance, env = {})
       if should_report?(exception_instance)
         log("[Raygun] Tracking Exception...")
@@ -65,6 +69,10 @@ module Raygun
     end
 
     private
+
+      def print_api_key_warning
+        $stderr.puts(NO_API_KEY_MESSAGE)
+      end
 
       def should_report?(exception)
         return false if configuration.silence_reporting

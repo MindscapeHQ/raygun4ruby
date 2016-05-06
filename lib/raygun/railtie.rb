@@ -1,21 +1,22 @@
 class Raygun::Railtie < Rails::Railtie
 
-  initializer "raygun.configure_rails_initialization" do |app|
+  after_initialize "raygun.configure_rails_initialization" do |app|
+    if Raygun.configured?
+      # Thanks Airbrake: See https://github.com/rails/rails/pull/8624
+      middleware = if defined?(ActionDispatch::DebugExceptions)
+        # Rails >= 3.2.0
+        "ActionDispatch::DebugExceptions"
+      else
+        # Rails < 3.2.0
+        "ActionDispatch::ShowExceptions"
+      end
 
-    # Thanks Airbrake: See https://github.com/rails/rails/pull/8624
-    middleware = if defined?(ActionDispatch::DebugExceptions)
-      # Rails >= 3.2.0
-      "ActionDispatch::DebugExceptions"
-    else
-      # Rails < 3.2.0
-      "ActionDispatch::ShowExceptions"
+      app.config.middleware.insert_after middleware, "Raygun::Middleware::RackExceptionInterceptor"
+
+      # Affected User tracking
+      require "raygun/middleware/rails_insert_affected_user"
+      app.config.middleware.insert_after Raygun::Middleware::RackExceptionInterceptor, "Raygun::Middleware::RailsInsertAffectedUser"
     end
-
-    app.config.middleware.insert_after middleware, "Raygun::Middleware::RackExceptionInterceptor"
-
-    # Affected User tracking
-    require "raygun/middleware/rails_insert_affected_user"
-    app.config.middleware.insert_after Raygun::Middleware::RackExceptionInterceptor, "Raygun::Middleware::RailsInsertAffectedUser"
   end
 
   config.to_prepare do

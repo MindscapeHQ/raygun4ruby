@@ -1,14 +1,5 @@
 require_relative "../test_helper.rb"
 
-require "sidekiq"
-# Convince Sidekiq it's on a server :)
-module Sidekiq
-  def self.server?
-    true
-  end
-end
-require "raygun/sidekiq"
-
 class SidekiqFailureTest < Raygun::UnitTest
 
   def setup

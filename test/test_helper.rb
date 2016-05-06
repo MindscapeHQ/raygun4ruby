@@ -1,10 +1,18 @@
 ENV['RACK_ENV'] = 'test'
+Bundler.require(:development)
+
 require_relative "../lib/raygun.rb"
 require "minitest/autorun"
 require "minitest/pride"
-require "fakeweb"
-require "timecop"
 require "mocha/mini_test"
+
+# Convince Sidekiq it's on a server :)
+module Sidekiq
+  def self.server?
+    true
+  end
+end
+require "raygun/sidekiq"
 
 class NoApiKey < StandardError; end
 

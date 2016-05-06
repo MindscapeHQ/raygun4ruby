@@ -1,4 +1,5 @@
 ENV['RACK_ENV'] = 'test'
+require "sidekiq"
 require_relative "../lib/raygun.rb"
 require "minitest/autorun"
 require "minitest/pride"
@@ -6,7 +7,6 @@ require "fakeweb"
 require "timecop"
 require "mocha/mini_test"
 
-require "sidekiq"
 # Convince Sidekiq it's on a server :)
 module Sidekiq
   def self.server?

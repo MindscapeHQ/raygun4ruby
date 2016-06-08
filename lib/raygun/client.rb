@@ -71,12 +71,15 @@ module Raygun
       end
 
       def user_information(env)
-        env["raygun.affected_user"]
+        env["raygun.affected_user"] || env["action_controller.instance"].current_user
       end
 
       def affected_user_present?(env)
         !!env["raygun.affected_user"]
       end
+
+      def current_user_present?(env)
+        !!env["action_controller.instance"].current_user
 
       def rack_env
         ENV["RACK_ENV"]
@@ -155,7 +158,7 @@ module Raygun
 
         error_details.merge!(groupingKey: grouping_key) if grouping_key
 
-        error_details.merge!(user: user_information(env)) if affected_user_present?(env)
+        error_details.merge!(user: user_information(env)) if affected_user_present?(env) || current_user_present?(env)
 
         {
           occurredOn: Time.now.utc.iso8601,

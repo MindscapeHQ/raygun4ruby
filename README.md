@@ -35,7 +35,8 @@ You should see an "ItWorksException" appear in your Raygun dashboard. You're rea
 
 NB: Raygun4Ruby currently requires Ruby >= 1.9
 
-Note that the generator will create a file in `config/initializers` called "raygun.rb". If you need to do any further configuration or customization of Raygun, that's the place to do it!
+Note that the generator will create a file in `config/initializers` called "raygun.rb". If you
+need to do any further configuration/customization of Raygun, that's the place to do it!
 
 By default the Rails integration is set to only report Exceptions in Production. To change this behaviour, set `config.enable_reporting` to something else in `config/initializers/raygun.rb`.
 
@@ -56,6 +57,7 @@ use Raygun::Middleware::RackExceptionInterceptor
 ```
 
 ### Standalone / Manual Exception Tracking
+*Standalone / Manual Exception Tracking will not automatically track user details.*
 
 ```ruby
 
@@ -91,7 +93,7 @@ Raygun.setup do |config|
 end
 ```
 
-### Custom User Data
+### Custom Data
 Custom data can be added to `track_exception` by passing a custom_data key in the second parameter hash.
 
 ```ruby
@@ -135,7 +137,7 @@ Raygun.setup do |config|
 end
 ```
 
-### Affected User Tracking
+### Affected User Tracking - Automatic Exception Tracking
 
 Raygun can now track how many users have been affected by an error.
 
@@ -168,6 +170,22 @@ end
 ```
 
 (Remember to set `affected_user_method` to `:raygun_user` in your config block...)
+
+### Affected User Tracking - Manual Exception Tracking (Rails controllers)
+
+You can also send user information for manually tracked exception in a Rails controller by passing `env`
+as the second parameter to `track_exception`.  
+
+```ruby
+begin
+  # more lovely code
+rescue Exception => e
+  Raygun.track_exception(e, env)
+end
+```
+You will need to configure the `affected_user_method` and `affected_user_identifier_methods`
+settings in `/config/initializers/raygun.rb` if your Rails controllers do not have a `:current_user`
+method or if the object that method returns does not respond to `:email`, `:username`, or `:id`.
 
 ### Version tracking
 

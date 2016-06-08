@@ -35,8 +35,7 @@ You should see an "ItWorksException" appear in your Raygun dashboard. You're rea
 
 NB: Raygun4Ruby currently requires Ruby >= 1.9
 
-Note that the generator will create a file in `config/initializers` called "raygun.rb". If you
-need to do any further configuration/customization of Raygun, that's the place to do it!
+Note that the generator will create a file in `config/initializers` called "raygun.rb". If you need to do any further configuration/customization of Raygun, that's the place to do it!
 
 By default the Rails integration is set to only report Exceptions in Production. To change this behaviour, set `config.enable_reporting` to something else in `config/initializers/raygun.rb`.
 

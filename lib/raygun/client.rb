@@ -80,7 +80,8 @@ module Raygun
 
       def current_user_present?(env)
         !!env["action_controller.instance"].current_user
-
+      end
+      
       def rack_env
         ENV["RACK_ENV"]
       end

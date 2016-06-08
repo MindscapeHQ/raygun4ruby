@@ -14,6 +14,7 @@ module Raygun
           user = controller.send(Raygun.configuration.affected_user_method)
 
           if user
+            byebug
             identifier = if (m = Raygun.configuration.affected_user_identifier_methods.detect { |m| user.respond_to?(m) })
               user.send(m)
             else
@@ -22,7 +23,7 @@ module Raygun
 
             env["raygun.affected_user"] = { :identifier => identifier }
           end
-          
+
         end
         raise exception
       end

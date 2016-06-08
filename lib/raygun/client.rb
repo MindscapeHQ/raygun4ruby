@@ -71,7 +71,7 @@ module Raygun
       end
 
       def user_information(env)
-        env["raygun.affected_user"] # || get_current_user_identifier(env)
+        env["raygun.affected_user"] || get_current_user_identifier(env)
       end
 
       def affected_user_present?(env)
@@ -82,9 +82,9 @@ module Raygun
         !!env["action_controller.instance"].current_user
       end
 
-      # def get_current_user_identifier(env)
-      #   { identifier: "#{env["action_controller.instance"].current_user.email}"}
-      # end
+      def get_current_user_identifier(env)
+        { identifier: "#{env["action_controller.instance"].current_user.email}"}
+      end
 
       def rack_env
         ENV["RACK_ENV"]

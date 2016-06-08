@@ -71,19 +71,27 @@ module Raygun
       end
 
       def user_information(env)
-        env["raygun.affected_user"] || get_current_user_identifier(env)
+        env["raygun.affected_user"]
       end
 
       def affected_user_present?(env)
         !!env["raygun.affected_user"]
       end
 
-      def current_user_present?(env)
-        !!env["action_controller.instance"].current_user
-      end
-
-      def get_current_user_identifier(env)
-        { identifier: "#{env["action_controller.instance"].current_user.email}"}
+      def set_user_identifier(env)
+        if affected_user_present?(env) == false
+          if (controller = env["action_controller.instance"]) && controller.respond_to?(Raygun.configuration.affected_user_method, true)
+            user = controller.send(Raygun.configuration.affected_user_method)
+            if user
+              identifier = if (m = Raygun.configuration.affected_user_identifier_methods.detect { |m| user.respond_to?(m) })
+                user.send(m)
+              else
+                user
+              end
+              env["raygun.affected_user"] = { :identifier => identifier }
+            end
+          end
+        end
       end
 
       def rack_env
@@ -163,7 +171,7 @@ module Raygun
 
         error_details.merge!(groupingKey: grouping_key) if grouping_key
 
-        error_details.merge!(user: user_information(env)) if affected_user_present?(env) || current_user_present?(env)
+        error_details.merge!(user: user_information(env)) if affected_user_present?(env) || set_user_identifier(env)
 
         {
           occurredOn: Time.now.utc.iso8601,

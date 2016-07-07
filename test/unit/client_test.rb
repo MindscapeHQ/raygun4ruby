@@ -53,8 +53,7 @@ class ClientTest < Raygun::UnitTest
       stackTrace: [
         { lineNumber: "123",  fileName: "/some/folder/some_file.rb", methodName: "some_method_name" },
         { lineNumber: "1234", fileName: "/another/path/foo.rb",      methodName: "block (3 levels) run"}
-      ],
-      innerError: {}
+      ]
     }
 
     assert_equal expected_hash, @client.send(:error_details, e)
@@ -74,8 +73,7 @@ class ClientTest < Raygun::UnitTest
       message:   oe.message,
       stackTrace: [
         { lineNumber: "123",  fileName: "/some/folder/some_file.rb", methodName: "some_method_name" }
-      ],
-      innerError: {}
+      ]
     }
 
     # test inner error according with its availability (ruby >= 2.1)
@@ -85,8 +83,7 @@ class ClientTest < Raygun::UnitTest
         message:   ie.message,
         stackTrace: [
           { lineNumber: "1234", fileName: "/another/path/foo.rb",      methodName: "block (3 levels) run"}
-        ],
-        innerError: {}
+        ]
       }
     end
 
@@ -197,8 +194,7 @@ class ClientTest < Raygun::UnitTest
             stackTrace: [
               { lineNumber: "123",  fileName: "/some/folder/some_file.rb", methodName: "some_method_name" },
               { lineNumber: "1234", fileName: "/another/path/foo.rb",      methodName: "block (3 levels) run"}
-            ],
-            innerError: {},
+            ]
           },
           userCustomData: {},
           tags:           ["test"],

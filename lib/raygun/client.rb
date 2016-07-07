@@ -45,13 +45,17 @@ module Raygun
       end
 
       def error_details(exception)
-        cause = exception.respond_to?(:cause) && exception.cause
-        {
+        details = {
           className:  exception.class.to_s,
           message:    exception.message.to_s.encode('UTF-16', :undef => :replace, :invalid => :replace).encode('UTF-8'),
           stackTrace: (exception.backtrace || []).map { |line| stack_trace_for(line) },
-          innerError: (cause && error_details(cause) || {} )
         }
+        
+        if cause = exception.respond_to?(:cause) && exception.cause
+          details.update innerError: error_details(cause)
+        end
+
+        details
       end
 
       def stack_trace_for(line)

@@ -135,9 +135,14 @@ module Raygun
         end
       end
 
+      def filter_custom_data(env)
+        params = env.delete(:custom_data) || {}
+        filter_params(params, env["action_dispatch.parameter_filter"])
+      end
+
       # see http://raygun.io/raygun-providers/rest-json-api?v=1
       def build_payload_hash(exception_instance, env = {})
-        custom_data = env.delete(:custom_data) || {}
+        custom_data = filter_custom_data(env) || {}
         tags = env.delete(:tags) || []
         tags << rack_env if rack_env_present?
 
@@ -187,7 +192,7 @@ module Raygun
           when Hash
             filter_params_with_array(v, filter_keys)
           else
-            filter_keys.include?(k) ? "[FILTERED]" : v
+            filter_keys.include?(k.to_s) ? "[FILTERED]" : v
           end
           result
         end

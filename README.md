@@ -115,7 +115,20 @@ Raygun.setup do |config|
 end
 ```
 
-You can also check which [exceptions are ignored by default](https://github.com/MindscapeHQ/raygun4ruby/blob/master/lib/raygun/configuration.rb#L26) and unignore them if needed by doing the following:
+The following exceptions are ignored by default: 
+
+```
+ActiveRecord::RecordNotFound
+ActionController::RoutingError
+ActionController::InvalidAuthenticityToken
+ActionDispatch::ParamsParser::ParseError
+CGI::Session::CookieStore::TamperedWithCookie
+ActionController::UnknownAction
+AbstractController::ActionNotFound
+Mongoid::Errors::DocumentNotFound
+```
+
+ [You can see this here](https://github.com/MindscapeHQ/raygun4ruby/blob/master/lib/raygun/configuration.rb#L51) and unignore them if needed by doing the following:
 
 ```ruby
 Raygun.setup do |config|

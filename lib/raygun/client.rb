@@ -192,7 +192,7 @@ module Raygun
           when Hash
             filter_params_with_array(v, filter_keys)
           else
-            filter_keys.include?(k.to_s) ? "[FILTERED]" : v
+            filter_keys.any? { |fk| /#{fk}/i === k.to_s } ? "[FILTERED]" : v
           end
           result
         end

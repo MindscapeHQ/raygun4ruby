@@ -290,6 +290,33 @@ class ClientTest < Raygun::UnitTest
     Raygun.configuration.filter_parameters = nil
   end
 
+  def test_filter_parameters_using_array
+    filter_params_as_from_rails = [:password]
+    Raygun.configuration.filter_parameters = filter_params_as_from_rails
+
+    parameters = {
+      "something_normal" => "hello",
+      "password" => "wouldntyouliketoknow",
+      "password_confirmation" => "wouldntyouliketoknow",
+      "PasswORD_weird_case" => "anythingatall"
+    }
+
+    expected_form_hash = {
+      "something_normal" => "hello",
+      "password" => "[FILTERED]",
+      "password_confirmation" => "[FILTERED]",
+      "PasswORD_weird_case" => "[FILTERED]"
+    }
+
+    post_body_env_hash = sample_env_hash.merge(
+      "rack.input" => StringIO.new(URI.encode_www_form(parameters))
+    )
+
+    assert_equal expected_form_hash, @client.send(:request_information, post_body_env_hash)[:form]
+  ensure
+    Raygun.configuration.filter_parameters = nil
+  end
+
   def test_ip_address_from_action_dispatch
     sample_env_hash = {
       "HTTP_VERSION"=>"HTTP/1.1",

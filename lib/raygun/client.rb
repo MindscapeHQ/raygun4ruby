@@ -86,6 +86,14 @@ module Raygun
         !!ENV["RACK_ENV"]
       end
 
+      def rails_env
+        ENV["RAILS_ENV"]
+      end
+
+      def rails_env_present?
+        !!ENV["RAILS_ENV"]
+      end
+
       def request_information(env)
         return {} if env.nil? || env.empty?
         {
@@ -144,7 +152,12 @@ module Raygun
       def build_payload_hash(exception_instance, env = {})
         custom_data = filter_custom_data(env) || {}
         tags = env.delete(:tags) || []
-        tags << rack_env if rack_env_present?
+
+        if rails_env_present?
+          tags << rails_env
+        elsif rack_env_present?
+          tags << rack_env
+        end
 
         grouping_key = env.delete(:grouping_key)
 

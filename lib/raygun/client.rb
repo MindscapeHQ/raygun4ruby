@@ -145,7 +145,9 @@ module Raygun
         custom_data = filter_custom_data(env) || {}
         tags = env.delete(:tags) || []
 
-        tags << rails_env || rack_env
+        if Raygun.configuration.auto_tag_environment
+          tags << rails_env || rack_env
+        end
 
         grouping_key = env.delete(:grouping_key)
 

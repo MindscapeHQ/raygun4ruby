@@ -76,4 +76,14 @@ class ConfigurationTest < Raygun::UnitTest
     Raygun.configuration.filter_parameters = nil
   end
 
+  def test_auto_tag_environment
+    assert_equal(['test'], Raygun::Client.new.send(:build_payload_hash,TestException.new)[:details][:tags])
+
+    Raygun.configuration.auto_tag_environment = false
+
+    assert_equal([], Raygun::Client.new.send(:build_payload_hash,TestException.new)[:details][:tags])
+  ensure
+    Raygun.configuration.auto_tag_environment = true
+  end
+
 end

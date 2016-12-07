@@ -82,8 +82,8 @@ module Raygun
         ENV["RACK_ENV"]
       end
 
-      def rack_env_present?
-        !!ENV["RACK_ENV"]
+      def rails_env
+        ENV["RAILS_ENV"]
       end
 
       def request_information(env)
@@ -144,7 +144,8 @@ module Raygun
       def build_payload_hash(exception_instance, env = {})
         custom_data = filter_custom_data(env) || {}
         tags = env.delete(:tags) || []
-        tags << rack_env if rack_env_present?
+
+        tags << rails_env || rack_env
 
         grouping_key = env.delete(:grouping_key)
 
@@ -154,7 +155,7 @@ module Raygun
             client:         client_details,
             error:          error_details(exception_instance),
             userCustomData: Raygun.configuration.custom_data.merge(custom_data),
-            tags:           Raygun.configuration.tags.concat(tags).uniq,
+            tags:           Raygun.configuration.tags.concat(tags).compact.uniq,
             request:        request_information(env)
         }
 

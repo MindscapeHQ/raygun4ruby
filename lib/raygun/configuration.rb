@@ -44,6 +44,8 @@ module Raygun
     # Which parameter keys should we filter out by default?
     config_option :filter_parameters
 
+    config_option :filter_whitelists_all
+
     # Hash of proxy settings - :address, :port (defaults to 80), :username and :password (both default to nil)
     config_option :proxy_settings
 
@@ -73,6 +75,7 @@ module Raygun
         affected_user_method:             :current_user,
         affected_user_identifier_methods: [ :email, :username, :id ],
         filter_parameters:                DEFAULT_FILTER_PARAMETERS,
+        filter_whitelist_all:             false,
         proxy_settings:                   {}
       })
     end

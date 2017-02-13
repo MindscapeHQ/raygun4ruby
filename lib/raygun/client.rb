@@ -164,6 +164,8 @@ module Raygun
 
         error_details.merge!(user: user_information(env)) if affected_user_present?(env)
 
+        error_details = filter_hash(error_details, Raygun.configuration.filter_parameters) if Raygun.configuration.filter_whitelists_all
+
         {
           occurredOn: Time.now.utc.iso8601,
           details:    error_details

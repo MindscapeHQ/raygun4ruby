@@ -116,7 +116,7 @@ module Raygun
 
       def form_params(env)
         params = action_dispatch_params(env) || rack_params(env) || {}
-        filter_params(params, env["action_dispatch.parameter_filter"])
+        filter_hash(params, env["action_dispatch.parameter_filter"])
       end
 
       def action_dispatch_params(env)
@@ -137,7 +137,7 @@ module Raygun
 
       def filter_custom_data(env)
         params = env.delete(:custom_data) || {}
-        filter_params(params, env["action_dispatch.parameter_filter"])
+        filter_hash(params, env["action_dispatch.parameter_filter"])
       end
 
       # see http://raygun.io/raygun-providers/rest-json-api?v=1
@@ -174,25 +174,25 @@ module Raygun
         self.class.post("/entries", verify_peer: true, verify: true, headers: @headers, body: JSON.generate(payload_hash))
       end
 
-      def filter_params(params_hash, extra_filter_keys = nil)
+      def filter_hash(hash, extra_filter_keys = nil)
         if Raygun.configuration.filter_parameters.is_a?(Proc)
-          filter_params_with_proc(params_hash, Raygun.configuration.filter_parameters)
+          filter_hash_with_proc(hash, Raygun.configuration.filter_parameters)
         else
           filter_keys = (Array(extra_filter_keys) + Raygun.configuration.filter_parameters).map(&:to_s)
-          filter_params_with_array(params_hash, filter_keys)
+          filter_hash_with_array(hash, filter_keys)
         end
       end
 
-      def filter_params_with_proc(params_hash, proc)
-        proc.call(params_hash)
+      def filter_hash_with_proc(hash, proc)
+        proc.call(hash)
       end
 
-      def filter_params_with_array(params_hash, filter_keys)
+      def filter_hash_with_array(hash, filter_keys)
         # Recursive filtering of (nested) hashes
-        (params_hash || {}).inject({}) do |result, (k, v)|
+        (hash || {}).inject({}) do |result, (k, v)|
           result[k] = case v
           when Hash
-            filter_params_with_array(v, filter_keys)
+            filter_hash_with_array(v, filter_keys)
           else
             filter_keys.any? { |fk| /#{fk}/i === k.to_s } ? "[FILTERED]" : v
           end

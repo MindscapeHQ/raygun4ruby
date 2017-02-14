@@ -166,9 +166,7 @@ module Raygun
 
         if Raygun.configuration.filter_whitelists_all
           error_details = filter_payload(error_details)
-          if error_details[:client] === '[FILTERED]'
-            error_details[:client] = client_details
-          end
+          error_details[:client] = client_details
         end
 
         {

@@ -428,7 +428,7 @@ class ClientTest < Raygun::UnitTest
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
                        "/another/path/foo.rb:1234:in `block (3 levels) run'"])
 
-    assert_equal nil, @client.send(:build_payload_hash, e)[:details][:error]
+    assert_equal '[FILTERED]', @client.send(:build_payload_hash, e)[:details][:error]
   end
 
   private

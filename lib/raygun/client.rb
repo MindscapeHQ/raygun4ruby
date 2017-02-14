@@ -164,7 +164,7 @@ module Raygun
 
         error_details.merge!(user: user_information(env)) if affected_user_present?(env)
 
-        error_details = filter_hash(error_details, Raygun.configuration.filter_parameters) if Raygun.configuration.filter_whitelists_all
+        error_details = filter_payload(error_details) if Raygun.configuration.filter_whitelists_all
 
         {
           occurredOn: Time.now.utc.iso8601,
@@ -176,12 +176,21 @@ module Raygun
         self.class.post("/entries", verify_peer: true, verify: true, headers: @headers, body: JSON.generate(payload_hash))
       end
 
-      def filter_hash(hash, extra_filter_keys = nil)
+      def filter_params(params_hash, extra_filter_keys = nil)
         if Raygun.configuration.filter_parameters.is_a?(Proc)
-          filter_hash_with_proc(hash, Raygun.configuration.filter_parameters)
+          filter_hash_with_proc(params_hash, Raygun.configuration.filter_parameters)
         else
           filter_keys = (Array(extra_filter_keys) + Raygun.configuration.filter_parameters).map(&:to_s)
-          filter_hash_with_array(hash, filter_keys)
+          filter_params_with_array(params_hash, filter_keys)
+        end
+      end
+
+      def filter_payload(payload_hash)
+        if Raygun.configuration.filter_parameters.is_a?(Proc)
+          filter_hash_with_proc(payload_hash, Raygun.configuration.filter_parameters)
+        else
+          filter_keys = Raygun.configuration.filter_parameters.map(&:to_s)
+          filter_payload_with_array(payload_hash, filter_keys)
         end
       end
 
@@ -201,6 +210,22 @@ module Raygun
           result
         end
       end
+
+      def filter_payload_with_array(params_hash, filter_keys)
+        # Recursive filtering of (nested) hashes, but will filter branch nodes
+        # instead of just leaves as filter_params_with_array does
+        (params_hash || {}).inject({}) do |result, (k, v)|
+          if filter_keys.any? { |fk| /#{fk}/i === k.to_s }
+            result[k] = "[FILTERED]"
+          elsif v.class == Hash
+            result[k] = filter_payload_with_array(v, filter_keys)
+          else
+            result[k] = v
+          end
+          result
+        end
+      end
+
 
       def ip_address_from(env_hash)
         ENV_IP_ADDRESS_KEYS.each do |key_to_try|

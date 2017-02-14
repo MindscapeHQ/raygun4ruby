@@ -420,6 +420,17 @@ class ClientTest < Raygun::UnitTest
     end
   end
 
+  def test_filter_whitelist_all
+    Raygun.configuration.filter_whitelists_all = true
+    Raygun.configuration.filter_parameters = ['error']
+
+    e = TestException.new("A test message")
+    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
+                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+
+    assert_equal nil, @client.send(:build_payload_hash, e)[:details][:error]
+  end
+
   private
 
     def sample_env_hash

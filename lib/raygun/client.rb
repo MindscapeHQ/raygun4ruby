@@ -217,10 +217,10 @@ module Raygun
       end
 
       def filter_payload_with_array(params_hash, filter_keys)
-        # Recursive filtering of (nested) hashes, but will filter branch nodes
-        # instead of just leaves as filter_params_with_array does
+        # Whitelist filtering of (nested) hashes, only including filter_keys
+        # that are defined in filter_parameters, recursively for both branch and leaf nodes
         (params_hash || {}).inject({}) do |result, (k, v)|
-          if filter_keys.any? { |fk| /#{fk}/i === k.to_s }
+          if !filter_keys.any? { |fk| /#{fk}/i === k.to_s }
             result[k] = "[FILTERED]"
           elsif v.class == Hash
             result[k] = filter_payload_with_array(v, filter_keys)

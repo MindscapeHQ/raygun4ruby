@@ -116,7 +116,7 @@ module Raygun
 
       def form_params(env)
         params = action_dispatch_params(env) || rack_params(env) || {}
-        filter_hash(params, env["action_dispatch.parameter_filter"])
+        filter_params(params, env["action_dispatch.parameter_filter"])
       end
 
       def action_dispatch_params(env)
@@ -137,7 +137,7 @@ module Raygun
 
       def filter_custom_data(env)
         params = env.delete(:custom_data) || {}
-        filter_hash(params, env["action_dispatch.parameter_filter"])
+        filter_params(params, env["action_dispatch.parameter_filter"])
       end
 
       # see http://raygun.io/raygun-providers/rest-json-api?v=1
@@ -189,12 +189,12 @@ module Raygun
         proc.call(hash)
       end
 
-      def filter_hash_with_array(hash, filter_keys)
+      def filter_params_with_array(params_hash, filter_keys)
         # Recursive filtering of (nested) hashes
-        (hash || {}).inject({}) do |result, (k, v)|
+        (params_hash || {}).inject({}) do |result, (k, v)|
           result[k] = case v
           when Hash
-            filter_hash_with_array(v, filter_keys)
+            filter_params_with_array(v, filter_keys)
           else
             filter_keys.any? { |fk| /#{fk}/i === k.to_s } ? "[FILTERED]" : v
           end

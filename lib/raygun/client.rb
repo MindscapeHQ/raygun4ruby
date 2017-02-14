@@ -164,7 +164,12 @@ module Raygun
 
         error_details.merge!(user: user_information(env)) if affected_user_present?(env)
 
-        error_details = filter_payload(error_details) if Raygun.configuration.filter_whitelists_all
+        if Raygun.configuration.filter_whitelists_all
+          error_details = filter_payload(error_details)
+          if error_details[:client] === '[FILTERED]'
+            error_details[:client] = client_details
+          end
+        end
 
         {
           occurredOn: Time.now.utc.iso8601,

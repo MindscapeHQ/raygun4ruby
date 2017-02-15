@@ -56,6 +56,7 @@ use Raygun::Middleware::RackExceptionInterceptor
 ```
 
 ### Standalone / Manual Exception Tracking
+*Standalone / Manual Exception Tracking will not automatically track user details.*
 
 ```ruby
 
@@ -91,7 +92,7 @@ Raygun.setup do |config|
 end
 ```
 
-### Custom User Data
+### Custom Data
 Custom data can be added to `track_exception` by passing a custom_data key in the second parameter hash.
 
 ```ruby
@@ -148,7 +149,7 @@ Raygun.setup do |config|
 end
 ```
 
-### Affected User Tracking
+### Affected User Tracking - Automatic Exception Tracking
 
 Raygun can now track how many users have been affected by an error.
 
@@ -181,6 +182,22 @@ end
 ```
 
 (Remember to set `affected_user_method` to `:raygun_user` in your config block...)
+
+### Affected User Tracking - Manual Exception Tracking (Rails controllers)
+
+You can also send user information for manually tracked exception in a Rails controller by passing `env`
+as the second parameter to `track_exception`.  
+
+```ruby
+begin
+  # more lovely code
+rescue Exception => e
+  Raygun.track_exception(e, env)
+end
+```
+You will need to configure the `affected_user_method` and `affected_user_identifier_methods`
+settings in `/config/initializers/raygun.rb` if your Rails controllers do not have a `:current_user`
+method or if the object that method returns does not respond to `:email`, `:username`, or `:id`.
 
 ### Version tracking
 

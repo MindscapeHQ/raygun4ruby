@@ -76,4 +76,8 @@ class ConfigurationTest < Raygun::UnitTest
     Raygun.configuration.filter_parameters = nil
   end
 
+  def test_filter_whitelists_all_default
+    assert_equal(false, Raygun.configuration.filter_whitelists_all)
+  end
+
 end

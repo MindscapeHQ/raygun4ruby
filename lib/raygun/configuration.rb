@@ -75,7 +75,7 @@ module Raygun
         affected_user_method:             :current_user,
         affected_user_identifier_methods: [ :email, :username, :id ],
         filter_parameters:                DEFAULT_FILTER_PARAMETERS,
-        filter_whitelist_all:             false,
+        filter_whitelists_all:            false,
         proxy_settings:                   {}
       })
     end

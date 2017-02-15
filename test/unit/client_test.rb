@@ -463,7 +463,7 @@ class ClientTest < Raygun::UnitTest
     end
   end
 
-  def test_filter_whitelists_all_exclude_error
+  def test_filter_whitelists_all_whitelist_error
     Raygun.configuration.filter_whitelists_all = true
     Raygun.configuration.filter_parameters = ['error', 'className', 'message', 'stackTrace']
 
@@ -485,7 +485,7 @@ class ClientTest < Raygun::UnitTest
     assert_equal expected_hash, details[:error]
   end
 
-  def test_filter_whitelists_all_exclude_error_except_stacktrace
+  def test_filter_whitelists_all_whitelist_error_except_stacktrace
     Raygun.configuration.filter_whitelists_all = true
     Raygun.configuration.filter_parameters = ['error', 'className', 'message']
 

@@ -183,6 +183,9 @@ module Raygun
       end
 
       def filter_params(params_hash, extra_filter_keys = nil)
+        if Raygun.configuration.filter_whitelists_all
+          params_hash
+        end
         if Raygun.configuration.filter_parameters.is_a?(Proc)
           filter_hash_with_proc(params_hash, Raygun.configuration.filter_parameters)
         else

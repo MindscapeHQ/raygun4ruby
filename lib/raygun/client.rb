@@ -145,8 +145,11 @@ module Raygun
         custom_data = filter_custom_data(env) || {}
         tags = env.delete(:tags) || []
 
-        tags << rails_env if rails_env
-        tags << rack_env if rack_env
+        if rails_env
+          tags << rails_env
+        else
+          tags << rack_env
+        end
 
         grouping_key = env.delete(:grouping_key)
 

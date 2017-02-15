@@ -47,6 +47,9 @@ module Raygun
     # Hash of proxy settings - :address, :port (defaults to 80), :username and :password (both default to nil)
     config_option :proxy_settings
 
+    # Should we add automatically add the application environment to the tags array
+    config_option :auto_tag_environment
+
     # Exception classes to ignore by default
     IGNORE_DEFAULT = ['ActiveRecord::RecordNotFound',
                       'ActionController::RoutingError',
@@ -73,7 +76,8 @@ module Raygun
         affected_user_method:             :current_user,
         affected_user_identifier_methods: [ :email, :username, :id ],
         filter_parameters:                DEFAULT_FILTER_PARAMETERS,
-        proxy_settings:                   {}
+        proxy_settings:                   {},
+        auto_tag_environment:             true
       })
     end
 

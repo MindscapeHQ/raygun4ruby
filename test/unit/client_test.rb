@@ -477,8 +477,52 @@ class ClientTest < Raygun::UnitTest
       className: "ClientTest::TestException",
       message:   e.message,
       stackTrace: [
+        { lineNumber: "[FILTERED]",  fileName: "[FILTERED]", methodName: "[FILTERED]" },
+        { lineNumber: "[FILTERED]", fileName: "[FILTERED]",      methodName: "[FILTERED]" }
+      ]
+    }
+
+    assert_equal expected_hash, details[:error]
+  end
+
+  def test_filter_payload_with_whitelist_exclude_error_and_all_stacktrace_keys
+    Raygun.configuration.filter_payload_with_whitelist = true
+    Raygun.configuration.filter_parameters = ['error', 'className', 'message', 'stackTrace', 'lineNumber', 'fileName', 'methodName']
+
+    e = TestException.new("A test message")
+    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
+                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+
+    details = @client.send(:build_payload_hash, e)[:details]
+
+    expected_hash = {
+      className: "ClientTest::TestException",
+      message:   e.message,
+      stackTrace: [
         { lineNumber: "123",  fileName: "/some/folder/some_file.rb", methodName: "some_method_name" },
-        { lineNumber: "1234", fileName: "/another/path/foo.rb",      methodName: "block (3 levels) run"}
+        { lineNumber: "1234", fileName: "/another/path/foo.rb",      methodName: "block (3 levels) run" }
+      ]
+    }
+
+    assert_equal expected_hash, details[:error]
+  end
+
+  def test_filter_payload_with_whitelist_exclude_error_and_stacktrace_keys_exception_filename
+    Raygun.configuration.filter_payload_with_whitelist = true
+    Raygun.configuration.filter_parameters = ['error', 'className', 'message', 'stackTrace', 'lineNumber', 'methodName']
+
+    e = TestException.new("A test message")
+    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
+                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+
+    details = @client.send(:build_payload_hash, e)[:details]
+
+    expected_hash = {
+      className: "ClientTest::TestException",
+      message:   e.message,
+      stackTrace: [
+        { lineNumber: "123",  fileName: "[FILTERED]", methodName: "some_method_name" },
+        { lineNumber: "1234", fileName: "[FILTERED]", methodName: "block (3 levels) run" }
       ]
     }
 

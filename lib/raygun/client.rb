@@ -199,7 +199,7 @@ module Raygun
           filter_hash_with_proc(payload_hash, Raygun.configuration.filter_parameters)
         else
           filter_keys = Raygun.configuration.filter_parameters.map(&:to_s)
-          filter_payload_with_array(payload_hash, filter_keys)
+          filter_payload_with_array(payload_hash, filter_keys, {})
         end
       end
 
@@ -220,16 +220,20 @@ module Raygun
         end
       end
 
-      def filter_payload_with_array(params_hash, filter_keys)
+      def filter_payload_with_array(params_hash, filter_keys, acc)
         # Whitelist filtering of (nested) hashes, only including filter_keys
         # that are defined in filter_parameters, recursively for both branch and leaf nodes
-        (params_hash || {}).inject({}) do |result, (k, v)|
-          if !filter_keys.any? { |fk| /#{fk}/i === k.to_s }
-            result[k] = "[FILTERED]"
+        (params_hash || {}).inject(acc) do |result, (k, v)|
+          if k.class != Hash && k.class != Array && !filter_keys.any? { |fk| /#{fk}/i === k.to_s }
+            result[k] = "[FILTERED]" # Base case for leaf nodes not in filter_keys
+          elsif k.class == Hash || k.class == Array
+            result.push(filter_payload_with_array(k, filter_keys, {})) # Case for hashes within arrays, e.g stackTrace elements
+          elsif v.class == Array
+            result[k] = filter_payload_with_array(v, filter_keys, []) # Case for array branch nodes
           elsif v.class == Hash
-            result[k] = filter_payload_with_array(v, filter_keys)
+            result[k] = filter_payload_with_array(v, filter_keys, {}) # Common case; hashes/leaf nodes within hashes
           else
-            result[k] = v
+            result[k] = v # Base case for leaf nodes in filter_keys
           end
           result
         end

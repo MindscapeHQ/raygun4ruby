@@ -167,7 +167,7 @@ module Raygun
 
         error_details.merge!(user: user_information(env)) if affected_user_present?(env)
 
-        if Raygun.configuration.filter_whitelists_all
+        if Raygun.configuration.filter_payload_with_whitelist
           error_details = filter_payload(error_details)
           error_details[:client] = client_details
         end
@@ -183,7 +183,7 @@ module Raygun
       end
 
       def filter_params(params_hash, extra_filter_keys = nil)
-        if Raygun.configuration.filter_whitelists_all
+        if Raygun.configuration.filter_payload_with_whitelist
           params_hash
         end
         if Raygun.configuration.filter_parameters.is_a?(Proc)

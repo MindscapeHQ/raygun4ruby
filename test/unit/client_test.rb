@@ -420,8 +420,8 @@ class ClientTest < Raygun::UnitTest
     end
   end
 
-  def test_filter_whitelists_all_default
-    Raygun.configuration.filter_whitelists_all = true
+  def test_filter_payload_with_whitelist_default
+    Raygun.configuration.filter_payload_with_whitelist = true
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
@@ -436,8 +436,8 @@ class ClientTest < Raygun::UnitTest
     assert_equal '[FILTERED]', details[:request]
   end
 
-  def test_filter_whitelists_all_never_filters_client
-    Raygun.configuration.filter_whitelists_all = true
+  def test_filter_payload_with_whitelist_never_filters_client
+    Raygun.configuration.filter_payload_with_whitelist = true
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
@@ -448,9 +448,9 @@ class ClientTest < Raygun::UnitTest
     assert_equal client_details, @client.send(:build_payload_hash, e)[:details][:client]
   end
 
-  def test_filter_whitelists_all_never_filters_toplevel
+  def test_filter_payload_with_whitelist_never_filters_toplevel
     Timecop.freeze do
-      Raygun.configuration.filter_whitelists_all = true
+      Raygun.configuration.filter_payload_with_whitelist = true
 
       e = TestException.new("A test message")
       e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
@@ -463,8 +463,8 @@ class ClientTest < Raygun::UnitTest
     end
   end
 
-  def test_filter_whitelists_all_whitelist_error
-    Raygun.configuration.filter_whitelists_all = true
+  def test_filter_payload_with_whitelist_exclude_error
+    Raygun.configuration.filter_payload_with_whitelist = true
     Raygun.configuration.filter_parameters = ['error', 'className', 'message', 'stackTrace']
 
     e = TestException.new("A test message")
@@ -485,8 +485,8 @@ class ClientTest < Raygun::UnitTest
     assert_equal expected_hash, details[:error]
   end
 
-  def test_filter_whitelists_all_whitelist_error_except_stacktrace
-    Raygun.configuration.filter_whitelists_all = true
+  def test_filter_payload_with_whitelist_exclude_error_except_stacktrace
+    Raygun.configuration.filter_payload_with_whitelist = true
     Raygun.configuration.filter_parameters = ['error', 'className', 'message']
 
     e = TestException.new("A test message")

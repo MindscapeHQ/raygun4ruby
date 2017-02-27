@@ -221,24 +221,27 @@ module Raygun
       end
 
       def filter_payload_with_array(params_hash, filter_keys, acc)
-        # Whitelist filtering of (nested) hashes, only including filter_keys
-        # that are defined in filter_parameters, recursively for both branch and leaf nodes
+        # Recursive filtering of the whole payload hash, handling various type scenarios
         (params_hash || {}).inject(acc) do |result, (k, v)|
-          if k.class != Hash && k.class != Array && !filter_keys.any? { |fk| /#{fk}/i === k.to_s }
-            result[k] = "[FILTERED]" # Base case for leaf nodes not in filter_keys
-          elsif k.class == Hash || k.class == Array
-            result.push(filter_payload_with_array(k, filter_keys, {})) # Case for hashes within arrays, e.g stackTrace elements
-          elsif v.class == Array
-            result[k] = filter_payload_with_array(v, filter_keys, []) # Case for array branch nodes
-          elsif v.class == Hash
-            result[k] = filter_payload_with_array(v, filter_keys, {}) # Common case; hashes/leaf nodes within hashes
+          if v.class == Hash || v.class == Array
+            if filter_keys.any? { |fk| /#{fk}/i === k.to_s }
+              nextLevelAcc = v.class == Hash ? {} : []
+              result[k] = filter_payload_with_array(v, filter_keys, nextLevelAcc) # Recurse call for hashes/arrays
+            else
+              result[k] = "[FILTERED]" # Base case for non-whitelisted hash key
+            end
+          elsif k.class == Hash && acc.class == Array # Base case for hash within array
+            result.push(filter_payload_with_array(k, filter_keys, {}))
+          elsif k.class == Array
+            result.push(filter_payload_with_array(v, filter_keys, []))
+          elsif acc.class == Hash
+            result[k] = v # Base case for a whitelisted key-value pair
           else
-            result[k] = v # Base case for leaf nodes in filter_keys
+            result = k # Base case for a primitive within an array
           end
           result
         end
       end
-
 
       def ip_address_from(env_hash)
         ENV_IP_ADDRESS_KEYS.each do |key_to_try|

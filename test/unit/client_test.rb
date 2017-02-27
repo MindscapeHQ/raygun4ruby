@@ -420,20 +420,20 @@ class ClientTest < Raygun::UnitTest
     end
   end
 
-  def test_filter_payload_with_whitelist_default
-    Raygun.configuration.filter_payload_with_whitelist = true
+  def test_filter_payload_with_whitelist_never_filters_toplevel
+    Timecop.freeze do
+      Raygun.configuration.filter_payload_with_whitelist = true
+      Raygun.configuration.whitelist_payload_keys = []
 
-    e = TestException.new("A test message")
-    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
-    
-    details = @client.send(:build_payload_hash, e)[:details]
-    assert_equal '[FILTERED]', details[:machineName]
-    assert_equal '[FILTERED]', details[:version]
-    assert_equal '[FILTERED]', details[:error]
-    assert_equal '[FILTERED]', details[:userCustomData]
-    assert_equal '[FILTERED]', details[:tags]
-    assert_equal '[FILTERED]', details[:request]
+      e = TestException.new("A test message")
+      e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
+                        "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+
+      client_details = @client.send(:client_details)
+
+      assert_equal Time.now.utc.iso8601, @client.send(:build_payload_hash, e)[:occurredOn]
+      assert_equal Hash, @client.send(:build_payload_hash, e)[:details].class
+    end
   end
 
   def test_filter_payload_with_whitelist_never_filters_client
@@ -448,46 +448,30 @@ class ClientTest < Raygun::UnitTest
     assert_equal client_details, @client.send(:build_payload_hash, e)[:details][:client]
   end
 
-  def test_filter_payload_with_whitelist_never_filters_toplevel
-    Timecop.freeze do
-      Raygun.configuration.filter_payload_with_whitelist = true
-
-      e = TestException.new("A test message")
-      e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                        "/another/path/foo.rb:1234:in `block (3 levels) run'"])
-
-      client_details = @client.send(:client_details)
-
-      assert_equal Time.now.utc.iso8601, @client.send(:build_payload_hash, e)[:occurredOn]
-      assert_equal Hash, @client.send(:build_payload_hash, e)[:details].class
-    end
-  end
-
-  def test_filter_payload_with_whitelist_exclude_error
+  def test_filter_payload_with_whitelist_default_error
     Raygun.configuration.filter_payload_with_whitelist = true
-    Raygun.configuration.filter_parameters = ['error', 'className', 'message', 'stackTrace']
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
                        "/another/path/foo.rb:1234:in `block (3 levels) run'"])
-
+    
     details = @client.send(:build_payload_hash, e)[:details]
 
     expected_hash = {
       className: "ClientTest::TestException",
       message:   e.message,
       stackTrace: [
-        { lineNumber: "[FILTERED]",  fileName: "[FILTERED]", methodName: "[FILTERED]" },
-        { lineNumber: "[FILTERED]", fileName: "[FILTERED]",      methodName: "[FILTERED]" }
+        { lineNumber: "123",  fileName: "/some/folder/some_file.rb", methodName: "some_method_name" },
+        { lineNumber: "1234", fileName: "/another/path/foo.rb",      methodName: "block (3 levels) run" }
       ]
     }
 
     assert_equal expected_hash, details[:error]
   end
 
-  def test_filter_payload_with_whitelist_exclude_error_and_all_stacktrace_keys
+  def test_filter_payload_with_whitelist_exclude_error_keys
     Raygun.configuration.filter_payload_with_whitelist = true
-    Raygun.configuration.filter_parameters = ['error', 'className', 'message', 'stackTrace', 'lineNumber', 'fileName', 'methodName']
+    Raygun.configuration.whitelist_payload_keys = ['error', 'className', 'message', 'stackTrace']
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
@@ -507,31 +491,9 @@ class ClientTest < Raygun::UnitTest
     assert_equal expected_hash, details[:error]
   end
 
-  def test_filter_payload_with_whitelist_exclude_error_and_stacktrace_keys_exception_filename
-    Raygun.configuration.filter_payload_with_whitelist = true
-    Raygun.configuration.filter_parameters = ['error', 'className', 'message', 'stackTrace', 'lineNumber', 'methodName']
-
-    e = TestException.new("A test message")
-    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
-
-    details = @client.send(:build_payload_hash, e)[:details]
-
-    expected_hash = {
-      className: "ClientTest::TestException",
-      message:   e.message,
-      stackTrace: [
-        { lineNumber: "123",  fileName: "[FILTERED]", methodName: "some_method_name" },
-        { lineNumber: "1234", fileName: "[FILTERED]", methodName: "block (3 levels) run" }
-      ]
-    }
-
-    assert_equal expected_hash, details[:error]
-  end
-
   def test_filter_payload_with_whitelist_exclude_error_except_stacktrace
     Raygun.configuration.filter_payload_with_whitelist = true
-    Raygun.configuration.filter_parameters = ['error', 'className', 'message']
+    Raygun.configuration.whitelist_payload_keys = ['error', 'className', 'message']
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
@@ -547,6 +509,54 @@ class ClientTest < Raygun::UnitTest
     details = @client.send(:build_payload_hash, e)[:details]
     assert_equal whitelisted_hash, details[:error]
   end
+
+  def test_filter_payload_with_whitelist_default_request
+    Raygun.configuration.filter_payload_with_whitelist = true
+
+    e = TestException.new("A test message")
+    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
+                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+    
+    details = @client.send(:build_payload_hash, e, sample_env_hash)[:details]
+
+    expected_hash = {
+      hostName:    "localhost",
+      url:         "/",
+      httpMethod:  "POST",
+      iPAddress:   "127.0.0.1",
+      queryString: { "a" => "b", "c" => "4945438" },
+      headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Connection"=>"keep-alive", "Cache-Control"=>"max-age=0", "Accept"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "User-Agent"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36", "Accept-Encoding"=>"gzip,deflate,sdch", "Accept-Language"=>"en-US,en;q=0.8", "Cookie"=>"cookieval" },
+      form:        {},
+      rawData:     {}
+    }
+
+    assert_equal expected_hash, details[:request]
+  end
+
+  def test_filter_payload_with_whitelist_request_specific_keys
+    Raygun.configuration.filter_payload_with_whitelist = true
+    Raygun.configuration.whitelist_payload_keys = ['request', 'url', 'httpMethod', 'hostName']
+
+    e = TestException.new("A test message")
+    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
+                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+    
+    details = @client.send(:build_payload_hash, e, sample_env_hash)[:details]
+
+    expected_hash = {
+      hostName:    "localhost",
+      url:         "/",
+      httpMethod:  "POST",
+      iPAddress:   "[FILTERED]",
+      queryString: "[FILTERED]",
+      headers:     "[FILTERED]",
+      form:        "[FILTERED]",
+      rawData:     "[FILTERED]"
+    }
+
+    assert_equal expected_hash, details[:request]
+  end
+
 
   private
 

@@ -224,23 +224,31 @@ module Raygun
         # Recursive filtering of the whole payload hash, handling various type scenarios
         (params_hash || {}).inject(acc) do |result, (k, v)|
           if v.class == Hash || v.class == Array
-            if filter_keys.any? { |fk| /#{fk}/i === k.to_s }
+            if is_whitelisted(filter_keys, k)
               nextLevelAcc = v.class == Hash ? {} : []
               result[k] = filter_payload_with_array(v, filter_keys, nextLevelAcc) # Recurse call for hashes/arrays
             else
               result[k] = "[FILTERED]" # Base case for non-whitelisted hash key
             end
-          elsif k.class == Hash && acc.class == Array # Base case for hash within array
-            result.push(filter_payload_with_array(k, filter_keys, {}))
-          elsif k.class == Array
+          elsif k.class == Hash && acc.class == Array # Case for hash within array e.g stack frame - don't filter
+            result.push(k)
+          elsif k.class == Array && acc.class == Array # Case for array within array
             result.push(filter_payload_with_array(v, filter_keys, []))
           elsif acc.class == Hash
-            result[k] = v # Base case for a whitelisted key-value pair
+            if is_whitelisted(filter_keys, k)
+              result[k] = v # Base case for a whitelisted primitive value
+            else
+              result[k] = "[FILTERED]"
+            end
           else
             result = k # Base case for a primitive within an array
           end
           result
         end
+      end
+
+      def is_whitelisted(whitelist, key)
+        whitelist.any? { |fk| /#{fk}/i === key.to_s }
       end
 
       def ip_address_from(env_hash)

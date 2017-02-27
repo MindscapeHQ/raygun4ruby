@@ -184,7 +184,7 @@ module Raygun
 
       def filter_params(params_hash, extra_filter_keys = nil)
         if Raygun.configuration.filter_payload_with_whitelist
-          params_hash
+          params_hash || {}
         end
         if Raygun.configuration.filter_parameters.is_a?(Proc)
           filter_hash_with_proc(params_hash, Raygun.configuration.filter_parameters)
@@ -224,7 +224,9 @@ module Raygun
         # Recursive filtering of the whole payload hash, handling various type scenarios
         (params_hash || {}).inject(acc) do |result, (k, v)|
           if v.class == Hash || v.class == Array
-            if is_whitelisted(filter_keys, k)
+            if is_whitelisted_recursive(filter_keys, k) # Special case for well-known keys e.g within env hash
+              result[k] = v
+            elsif is_whitelisted(filter_keys, k)
               nextLevelAcc = v.class == Hash ? {} : []
               result[k] = filter_payload_with_array(v, filter_keys, nextLevelAcc) # Recurse call for hashes/arrays
             else
@@ -249,6 +251,12 @@ module Raygun
 
       def is_whitelisted(whitelist, key)
         whitelist.any? { |fk| /#{fk}/i === key.to_s }
+      end
+
+      def is_whitelisted_recursive(whitelist, key)
+        always_whitelisted_keys = [:headers, :queryString]
+        
+        is_whitelisted(always_whitelisted_keys, key) && is_whitelisted(whitelist, key)
       end
 
       def ip_address_from(env_hash)

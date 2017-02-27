@@ -46,6 +46,8 @@ module Raygun
 
     config_option :filter_payload_with_whitelist
 
+    config_option :whitelist_payload_keys
+
     # Hash of proxy settings - :address, :port (defaults to 80), :username and :password (both default to nil)
     config_option :proxy_settings
 
@@ -60,6 +62,28 @@ module Raygun
                       'Mongoid::Errors::DocumentNotFound']
 
     DEFAULT_FILTER_PARAMETERS = [ :password, :card_number, :cvv ]
+
+
+
+    DEFAULT_WHITELIST_PAYLOAD_KEYS = [
+      :machineName,
+      :version,
+      :error,
+      :className,
+      :message,
+      :stackTrace,
+      :userCustomData,
+      :tags,
+      :request,
+      :hostName,
+      :url,
+      :httpMethod,
+      :iPAddress,
+      :queryString,
+      :headers,
+      :form,
+      :rawData
+    ]
 
     attr_reader :defaults
 
@@ -76,6 +100,7 @@ module Raygun
         affected_user_identifier_methods: [ :email, :username, :id ],
         filter_parameters:                DEFAULT_FILTER_PARAMETERS,
         filter_payload_with_whitelist:    false,
+        whitelist_payload_keys:           DEFAULT_WHITELIST_PAYLOAD_KEYS,
         proxy_settings:                   {}
       })
     end
@@ -99,6 +124,11 @@ module Raygun
     def filter_parameters(&filter_proc)
       set_value(:filter_parameters, filter_proc) if block_given?
       read_value(:filter_parameters)
+    end
+
+    def whitelist_payload_keys(&filter_proc)
+      set_value(:whitelist_payload_keys, filter_proc) if block_given?
+      read_value(:whitelist_payload_keys)
     end
 
     private

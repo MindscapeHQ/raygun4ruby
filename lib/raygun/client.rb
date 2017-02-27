@@ -195,10 +195,10 @@ module Raygun
       end
 
       def filter_payload(payload_hash)
-        if Raygun.configuration.filter_parameters.is_a?(Proc)
-          filter_hash_with_proc(payload_hash, Raygun.configuration.filter_parameters)
+        if Raygun.configuration.whitelist_payload_keys.is_a?(Proc)
+          filter_hash_with_proc(payload_hash, Raygun.configuration.whitelist_payload_keys)
         else
-          filter_keys = Raygun.configuration.filter_parameters.map(&:to_s)
+          filter_keys = Raygun.configuration.whitelist_payload_keys.map(&:to_s)
           filter_payload_with_array(payload_hash, filter_keys, {})
         end
       end

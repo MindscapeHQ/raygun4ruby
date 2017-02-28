@@ -510,6 +510,31 @@ class ClientTest < Raygun::UnitTest
     assert_equal whitelisted_hash, details[:error]
   end
 
+  def test_filter_payload_with_whitelist_proc
+    Raygun.configuration.filter_payload_with_whitelist = true
+
+    Raygun.configuration.whitelist_payload_keys do |payload|
+      payload
+    end
+
+    e = TestException.new("A test message")
+    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
+                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+
+    whitelisted_hash =
+    {
+      :className=>"ClientTest::TestException",
+      :message=>"A test message", 
+      :stackTrace=> [
+        { lineNumber: "123",  fileName: "/some/folder/some_file.rb", methodName: "some_method_name" },
+        { lineNumber: "1234", fileName: "/another/path/foo.rb",      methodName: "block (3 levels) run" }
+      ]
+    }
+
+    details = @client.send(:build_payload_hash, e)[:details]
+    assert_equal whitelisted_hash, details[:error]
+  end
+
   def test_filter_payload_with_whitelist_default_request_post
     Raygun.configuration.filter_payload_with_whitelist = true
 

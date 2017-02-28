@@ -91,6 +91,42 @@ Raygun.setup do |config|
 end
 ```
 
+### Filtering the payload by whitelist
+
+As an alternative to the above, you can also opt-in to the keys/values to be sent to Raygun by providing a specific whitelist of the keys you want to transmit.
+
+This disables the blacklist filtering above (`filter_parameters`), and is applied to the entire payload (error, request, environment and custom data included), not just the request parameters.
+
+In order to opt-in to this feature, set `filter_payload_with_whitelist` to `true`, and choose what keys you want (the default is below which is to allow everything through):
+
+```ruby
+Raygun.setup do |config|
+  config.api_key = "YOUR_RAYGUN_API_KEY"
+  config.filter_payload_with_whitelist = true
+
+  config.whitelist_payload_keys = [
+    :machineName, :version,
+    :error, :className, :message, :stackTrace,
+    :userCustomData, :tags,
+    :request, :hostName, :url, :httpMethod, :iPAddress, :queryString, :headers, :form, :rawData
+  ]
+end
+```
+
+Alternatively, provide a Proc to filter the payload using your own logic:
+
+```ruby
+Raygun.setup do |config|
+  config.api_key = "YOUR_RAYGUN_API_KEY"
+  config.filter_payload_with_whitelist = true
+
+  config.whitelist_payload_keys do |payload|
+    # Return the payload mutated into your desired form
+    payload
+  end
+end
+```
+
 ### Custom User Data
 Custom data can be added to `track_exception` by passing a custom_data key in the second parameter hash.
 

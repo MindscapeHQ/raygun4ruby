@@ -686,6 +686,50 @@ class ClientTest < Raygun::UnitTest
     assert_equal expected_hash, details[:request]
   end
 
+  def test_filter_payload_with_whitelist_being_false_does_not_filter_query_string
+    e = TestException.new("A test message")
+    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
+                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+
+    sample_env_hash = {
+      "SERVER_NAME"=>"localhost",
+      "REQUEST_METHOD"=>"GET",
+      "REQUEST_PATH"=>"/",
+      "PATH_INFO"=>"/",
+      "QUERY_STRING"=>"a=b&c=4945438",
+      "REQUEST_URI"=>"/?a=b&c=4945438",
+      "HTTP_VERSION"=>"HTTP/1.1",
+      "HTTP_HOST"=>"localhost:3000",
+      "HTTP_CONNECTION"=>"keep-alive",
+      "HTTP_CACHE_CONTROL"=>"max-age=0",
+      "HTTP_ACCEPT"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "HTTP_USER_AGENT"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36",
+      "HTTP_ACCEPT_ENCODING"=>"gzip,deflate,sdch",
+      "HTTP_ACCEPT_LANGUAGE"=>"en-US,en;q=0.8",
+      "HTTP_COOKIE"=>"cookieval",
+      "GATEWAY_INTERFACE"=>"CGI/1.2",
+      "SERVER_PORT"=>"3000",
+      "SERVER_PROTOCOL"=>"HTTP/1.1",
+      "SCRIPT_NAME"=>"",
+      "REMOTE_ADDR"=>"127.0.0.1"
+    }
+
+    expected_hash = {
+      hostName:    "localhost",
+      url:         "/",
+      httpMethod:  "GET",
+      iPAddress:   "127.0.0.1",
+      queryString: { "a" => "b", "c" => "4945438" },
+      headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Connection"=>"keep-alive", "Cache-Control"=>"max-age=0", "Accept"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "User-Agent"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36", "Accept-Encoding"=>"gzip,deflate,sdch", "Accept-Language"=>"en-US,en;q=0.8", "Cookie"=>"cookieval" },
+      form:        {},
+      rawData:     {}
+    }
+
+    details = @client.send(:build_payload_hash, e, sample_env_hash)[:details]
+
+    assert_equal expected_hash, details[:request]
+  end
+
   def test_filter_payload_with_whitelist_request_specific_keys
     Raygun.configuration.filter_payload_with_whitelist = true
     Raygun.configuration.whitelist_payload_keys = ['request', 'url', 'httpMethod', 'hostName']

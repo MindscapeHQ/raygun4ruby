@@ -82,14 +82,14 @@ class ConfigurationTest < Raygun::UnitTest
 
   def test_setting_whitelist_payload_keys_to_proc
     Raygun.setup do |config|
-      config.whitelist_payload_keys do |hash|
+      config.whitelist_payload_shape do |hash|
         # No-op
       end
     end
 
-    assert Raygun.configuration.whitelist_payload_keys.is_a?(Proc)
+    assert Raygun.configuration.whitelist_payload_shape.is_a?(Proc)
     ensure
-      Raygun.configuration.whitelist_payload_keys = nil
+      Raygun.configuration.whitelist_payload_shape = nil
   end
 
 end

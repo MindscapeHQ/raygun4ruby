@@ -425,7 +425,7 @@ class ClientTest < Raygun::UnitTest
   def test_filter_payload_with_whitelist_never_filters_toplevel
     Timecop.freeze do
       Raygun.configuration.filter_payload_with_whitelist = true
-      Raygun.configuration.whitelist_payload_keys = []
+      Raygun.configuration.whitelist_payload_shape = {}
 
       e = TestException.new("A test message")
       e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
@@ -440,6 +440,7 @@ class ClientTest < Raygun::UnitTest
 
   def test_filter_payload_with_whitelist_never_filters_client
     Raygun.configuration.filter_payload_with_whitelist = true
+    Raygun.configuration.whitelist_payload_shape = {}
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
@@ -473,7 +474,13 @@ class ClientTest < Raygun::UnitTest
 
   def test_filter_payload_with_whitelist_exclude_error_keys
     Raygun.configuration.filter_payload_with_whitelist = true
-    Raygun.configuration.whitelist_payload_keys = ['error', 'className', 'message', 'stackTrace']
+    Raygun.configuration.whitelist_payload_shape = {
+      error: {
+        className: true,
+        message: true,
+        stackTrace: true
+      }
+    }
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
@@ -495,7 +502,12 @@ class ClientTest < Raygun::UnitTest
 
   def test_filter_payload_with_whitelist_exclude_error_except_stacktrace
     Raygun.configuration.filter_payload_with_whitelist = true
-    Raygun.configuration.whitelist_payload_keys = ['error', 'className', 'message']
+    Raygun.configuration.whitelist_payload_shape = {
+      error: {
+        className: true,
+        message: true,
+      }
+    }
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
@@ -514,7 +526,7 @@ class ClientTest < Raygun::UnitTest
 
   def test_filter_payload_with_whitelist_proc
     Raygun.configuration.filter_payload_with_whitelist = true
-    Raygun.configuration.whitelist_payload_keys do |payload|
+    Raygun.configuration.whitelist_payload_shape do |payload|
       payload
     end
 
@@ -565,7 +577,11 @@ class ClientTest < Raygun::UnitTest
 
   def test_filter_payload_with_whitelist_request_post_except_formkey
     Raygun.configuration.filter_payload_with_whitelist = true
-    Raygun.configuration.whitelist_payload_keys = Raygun.configuration.whitelist_payload_keys.concat ['username']
+    Raygun.configuration.whitelist_payload_shape = Raygun.configuration.whitelist_payload.shape.merge({
+      form: {
+        username: true
+      }
+    })
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
@@ -638,10 +654,10 @@ class ClientTest < Raygun::UnitTest
   end
 
   def test_filter_payload_with_whitelist_default_request_get_except_querystring
-    keys_without_qs = [ :request, :hostName, :url, :httpMethod, :iPAddress, :headers, :form, :rawData ]
-
     Raygun.configuration.filter_payload_with_whitelist = true
-    Raygun.configuration.whitelist_payload_keys = keys_without_qs
+    Raygun.configuration.whitelist_payload_shape[:request] = Raygun::Configuration::DEFAULT_WHITELIST_PAYLOAD_SHAPE_REQUEST.tap do |h|
+      h.delete(:queryString)
+    end
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
@@ -687,6 +703,7 @@ class ClientTest < Raygun::UnitTest
   end
 
   def test_filter_payload_with_whitelist_being_false_does_not_filter_query_string
+    Raygun.configuration.filter_payload_with_whitelist = false
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
                        "/another/path/foo.rb:1234:in `block (3 levels) run'"])
@@ -732,12 +749,18 @@ class ClientTest < Raygun::UnitTest
 
   def test_filter_payload_with_whitelist_request_specific_keys
     Raygun.configuration.filter_payload_with_whitelist = true
-    Raygun.configuration.whitelist_payload_keys = ['request', 'url', 'httpMethod', 'hostName']
+    Raygun.configuration.whitelist_payload_shape = {
+      request: {
+        url: true,
+        httpMethod: true,
+        hostName: true
+      }
+    }
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
                        "/another/path/foo.rb:1234:in `block (3 levels) run'"])
-    
+
     details = @client.send(:build_payload_hash, e, sample_env_hash)[:details]
 
     expected_hash = {

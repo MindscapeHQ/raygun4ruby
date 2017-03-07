@@ -11,6 +11,10 @@ require "raygun/client"
 require "raygun/middleware/rack_exception_interceptor"
 require "raygun/testable"
 require "raygun/railtie" if defined?(Rails)
+begin
+  require "pry"
+rescue LoadError
+end
 
 module Raygun
 

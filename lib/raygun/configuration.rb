@@ -26,7 +26,7 @@ module Raygun
     # Tags to send with each exception
     config_option :tags
 
-    # Logger to use when if we find an exception :)
+    # Logger to use when we find an exception :)
     config_option :logger
 
     # Should we actually report exceptions to Raygun? (Usually disabled in Development mode, for instance)
@@ -44,8 +44,10 @@ module Raygun
     # Which parameter keys should we filter out by default?
     config_option :filter_parameters
 
+    # Should we switch to a white listing mode for keys instead of the default blacklist?
     config_option :filter_payload_with_whitelist
 
+    # If :filter_payload_with_whitelist is true, which keys should we whitelist?
     config_option :whitelist_payload_keys
 
     # Hash of proxy settings - :address, :port (defaults to 80), :username and :password (both default to nil)

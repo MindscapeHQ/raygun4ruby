@@ -113,7 +113,7 @@ class ClientTest < Raygun::UnitTest
   end
 
   def test_unicode
-    e = TestException.new('日本語のメッセージ')
+    e = TestException.new('日本語のメッセージ です')
 
     assert_silent { @client.track_exception(e) }
   end
@@ -271,10 +271,12 @@ class ClientTest < Raygun::UnitTest
   def test_filter_parameters_using_proc
     # filter any parameters that start with "nsa_only"
     Raygun.configuration.filter_parameters do |hash|
-      hash.inject({}) do |sanitized_hash, pair|
-        k, v = pair
-        v = "[OUREYESONLY]" if k[0...8] == "nsa_only"
-        sanitized_hash[k] = v
+      hash.inject({}) do |sanitized_hash, (k, v)|
+        sanitized_hash[k] = if k.start_with? "nsa_only"
+                              "[OUREYESONLY]"
+                            else
+                              v
+                            end
         sanitized_hash
       end
     end
@@ -454,7 +456,7 @@ class ClientTest < Raygun::UnitTest
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
                        "/another/path/foo.rb:1234:in `block (3 levels) run'"])
-    
+
     details = @client.send(:build_payload_hash, e)[:details]
 
     expected_hash = {
@@ -499,20 +501,19 @@ class ClientTest < Raygun::UnitTest
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
                        "/another/path/foo.rb:1234:in `block (3 levels) run'"])
 
-    whitelisted_hash =
-    {
-      :className=>"ClientTest::TestException",
-      :message=>"A test message", 
-      :stackTrace=>"[FILTERED]"
+    details = @client.send(:build_payload_hash, e)[:details]
+
+    expected_hash = {
+      className: "ClientTest::TestException",
+      message: "A test message",
+      stackTrace: "[FILTERED]"
     }
 
-    details = @client.send(:build_payload_hash, e)[:details]
-    assert_equal whitelisted_hash, details[:error]
+    assert_equal expected_hash, details[:error]
   end
 
   def test_filter_payload_with_whitelist_proc
     Raygun.configuration.filter_payload_with_whitelist = true
-
     Raygun.configuration.whitelist_payload_keys do |payload|
       payload
     end
@@ -521,18 +522,18 @@ class ClientTest < Raygun::UnitTest
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
                        "/another/path/foo.rb:1234:in `block (3 levels) run'"])
 
-    whitelisted_hash =
-    {
-      :className=>"ClientTest::TestException",
-      :message=>"A test message", 
-      :stackTrace=> [
+    details = @client.send(:build_payload_hash, e)[:details]
+
+    expected_hash = {
+      className: "ClientTest::TestException",
+      message: "A test message",
+      stackTrace: [
         { lineNumber: "123",  fileName: "/some/folder/some_file.rb", methodName: "some_method_name" },
         { lineNumber: "1234", fileName: "/another/path/foo.rb",      methodName: "block (3 levels) run" }
       ]
     }
 
-    details = @client.send(:build_payload_hash, e)[:details]
-    assert_equal whitelisted_hash, details[:error]
+    assert_equal expected_hash, details[:error]
   end
 
   def test_filter_payload_with_whitelist_default_request_post
@@ -545,7 +546,7 @@ class ClientTest < Raygun::UnitTest
     post_body_env_hash = sample_env_hash.merge(
       "rack.input"=>StringIO.new("a=b&c=4945438&password=swordfish")
     )
-    
+
     details = @client.send(:build_payload_hash, e, post_body_env_hash)[:details]
 
     expected_hash = {
@@ -573,7 +574,7 @@ class ClientTest < Raygun::UnitTest
     post_body_env_hash = sample_env_hash.merge(
       "rack.input"=>StringIO.new("username=foo&password=swordfish")
     )
-    
+
     details = @client.send(:build_payload_hash, e, post_body_env_hash)[:details]
 
     expected_hash = {

@@ -255,7 +255,7 @@ module Raygun
 
       def is_whitelisted_recursive(whitelist, key)
         always_whitelisted_keys = [:headers, :queryString]
-        
+
         is_whitelisted(always_whitelisted_keys, key) && is_whitelisted(whitelist, key)
       end
 

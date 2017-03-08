@@ -107,7 +107,7 @@ class AffectedUserTest < Raygun::UnitTest
     begin
       @middleware.call("action_controller.instance" => @controller)
     rescue TestException
-      user_hash = { :identifier => "testemail@something.com" }
+      user_hash = {:IsAnonymous=>false, :Identifier=>123, :Email=>"testemail@something.com"}
       assert_equal user_hash, @app.env["raygun.affected_user"]
     end
   end

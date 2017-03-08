@@ -273,6 +273,10 @@ Raygun4Ruby can track errors from Sidekiq (2.x or 3+). All you need to do is add
 
 Either in your Raygun initializer or wherever else takes your fancy :)
 
+### Other Configuration options
+
+For a complete list of configuration options see the [configuration.rb](https://github.com/MindscapeHQ/raygun4ruby/blob/master/lib/raygun/configuration.rb) file
+
 ## Found a bug?
 
 Oops! Just let us know by opening an Issue on Github.

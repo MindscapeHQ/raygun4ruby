@@ -108,6 +108,26 @@ describe ApplyWhitelistFilterToPayload do
     end
   end
 
+  describe "string keys" do
+    it "handles the case where a payload key is a string and a whitelist key is a symbol" do
+      shape = {
+        foo: true
+      }
+      payload = {
+        "foo" => 1,
+        "bar" => 2
+      }
+      expected = {
+        "foo" => 1,
+        "bar" => '[FILTERED]'
+      }
+
+      new_payload = service.call(shape, payload)
+
+      new_payload.must_equal(expected)
+    end
+  end
+
   it "handles a very complex shape" do
     shape = {
       machineName: true,

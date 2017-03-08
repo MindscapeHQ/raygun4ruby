@@ -1,5 +1,5 @@
 class Raygun::Railtie < Rails::Railtie
-  after_initialize "raygun.configure_rails_initialization" do |app|
+  initializer "raygun.configure_rails_initialization" do |app|
     if Raygun.configured?
       # Thanks Airbrake: See https://github.com/rails/rails/pull/8624
       middleware = if defined?(ActionDispatch::DebugExceptions)

@@ -91,6 +91,53 @@ Raygun.setup do |config|
 end
 ```
 
+### Filtering the payload by whitelist
+
+As an alternative to the above, you can also opt-in to the keys/values to be sent to Raygun by providing a specific whitelist of the keys you want to transmit.
+
+This disables the blacklist filtering above (`filter_parameters`), and is applied to the entire payload (error, request, environment and custom data included), not just the request parameters.
+
+In order to opt-in to this feature, set `filter_payload_with_whitelist` to `true`, and specify a shape of what keys you want (the default is below which is to allow everything through, this also means that the query parameters filtered out by default like password, creditcard etc will not be unless changed):
+
+```ruby
+Raygun.setup do |config|
+  config.api_key = "YOUR_RAYGUN_API_KEY"
+  config.filter_payload_with_whitelist = true
+
+  config.whitelist_payload_shape = {
+      machineName: true,
+      version: true,
+      error: true,
+      userCustomData: true,
+      tags: true,
+      request: {
+        hostName: true,
+        url: true,
+        httpMethod: true,
+        iPAddress: true,
+        queryString: true,
+        headers: true,
+        form: {}, # Set to empty hash so that it doesn't just filter out the whole thing, but instead filters out each individual param
+        rawData: true
+      }
+    }
+end
+```
+
+Alternatively, provide a Proc to filter the payload using your own logic:
+
+```ruby
+Raygun.setup do |config|
+  config.api_key = "YOUR_RAYGUN_API_KEY"
+  config.filter_payload_with_whitelist = true
+
+  config.whitelist_payload_keys do |payload|
+    # Return the payload mutated into your desired form
+    payload
+  end
+end
+```
+
 ### Custom User Data
 Custom data can be added to `track_exception` by passing a custom_data key in the second parameter hash.
 
@@ -225,6 +272,10 @@ Raygun4Ruby can track errors from Sidekiq (2.x or 3+). All you need to do is add
 ```
 
 Either in your Raygun initializer or wherever else takes your fancy :)
+
+### Other Configuration options
+
+For a complete list of configuration options see the [configuration.rb](https://github.com/MindscapeHQ/raygun4ruby/blob/master/lib/raygun/configuration.rb) file
 
 ## Found a bug?
 

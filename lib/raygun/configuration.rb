@@ -26,7 +26,7 @@ module Raygun
     # Tags to send with each exception
     config_option :tags
 
-    # Logger to use when if we find an exception :)
+    # Logger to use when we find an exception :)
     config_option :logger
 
     # Should we actually report exceptions to Raygun? (Usually disabled in Development mode, for instance)
@@ -44,6 +44,12 @@ module Raygun
     # Which parameter keys should we filter out by default?
     config_option :filter_parameters
 
+    # Should we switch to a white listing mode for keys instead of the default blacklist?
+    config_option :filter_payload_with_whitelist
+
+    # If :filter_payload_with_whitelist is true, which keys should we whitelist?
+    config_option :whitelist_payload_shape
+
     # Hash of proxy settings - :address, :port (defaults to 80), :username and :password (both default to nil)
     config_option :proxy_settings
 
@@ -59,6 +65,25 @@ module Raygun
 
     DEFAULT_FILTER_PARAMETERS = [ :password, :card_number, :cvv ]
 
+    DEFAULT_WHITELIST_PAYLOAD_SHAPE_REQUEST = {
+      hostName: true,
+      url: true,
+      httpMethod: true,
+      iPAddress: true,
+      queryString: true,
+      headers: true,
+      form: {}, # Set to empty hash so that it doesn't just filter out the whole thing, but instead filters out each individual param
+      rawData: true
+    }.freeze
+    DEFAULT_WHITELIST_PAYLOAD_SHAPE = {
+      machineName: true,
+      version: true,
+      error: true,
+      userCustomData: true,
+      tags: true,
+      request: DEFAULT_WHITELIST_PAYLOAD_SHAPE_REQUEST
+    }.freeze
+
     attr_reader :defaults
 
     def initialize
@@ -73,6 +98,8 @@ module Raygun
         affected_user_method:             :current_user,
         affected_user_identifier_methods: [ :email, :username, :id ],
         filter_parameters:                DEFAULT_FILTER_PARAMETERS,
+        filter_payload_with_whitelist:    false,
+        whitelist_payload_shape:          DEFAULT_WHITELIST_PAYLOAD_SHAPE,
         proxy_settings:                   {}
       })
     end
@@ -96,6 +123,11 @@ module Raygun
     def filter_parameters(&filter_proc)
       set_value(:filter_parameters, filter_proc) if block_given?
       read_value(:filter_parameters)
+    end
+
+    def whitelist_payload_shape(&filter_proc)
+      set_value(:whitelist_payload_shape, filter_proc) if block_given?
+      read_value(:whitelist_payload_shape)
     end
 
     private

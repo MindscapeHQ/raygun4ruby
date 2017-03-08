@@ -32,4 +32,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "resque"
   spec.add_development_dependency "sidekiq", [">= 3", "< 3.2.2"]
   spec.add_development_dependency "mocha"
+  spec.add_development_dependency "pry"
 end

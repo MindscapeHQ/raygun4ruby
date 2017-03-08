@@ -116,7 +116,7 @@ module Raygun
 
       def form_params(env)
         params = action_dispatch_params(env) || rack_params(env) || {}
-        filter_params(params, env["action_dispatch.parameter_filter"])
+        filter_params_with_blacklist(params, env["action_dispatch.parameter_filter"])
       end
 
       def action_dispatch_params(env)
@@ -137,7 +137,7 @@ module Raygun
 
       def filter_custom_data(env)
         params = env.delete(:custom_data) || {}
-        filter_params(params, env["action_dispatch.parameter_filter"])
+        filter_params_with_blacklist(params, env["action_dispatch.parameter_filter"])
       end
 
       # see http://raygun.io/raygun-providers/rest-json-api?v=1
@@ -145,7 +145,11 @@ module Raygun
         custom_data = filter_custom_data(env) || {}
         tags = env.delete(:tags) || []
 
-        tags << rails_env || rack_env
+        if rails_env
+          tags << rails_env
+        else
+          tags << rack_env
+        end
 
         grouping_key = env.delete(:grouping_key)
 
@@ -163,6 +167,10 @@ module Raygun
 
         error_details.merge!(user: user_information(env)) if affected_user_present?(env)
 
+        if Raygun.configuration.filter_payload_with_whitelist
+          error_details = filter_payload_with_whitelist(error_details)
+        end
+
         {
           occurredOn: Time.now.utc.iso8601,
           details:    error_details
@@ -173,17 +181,29 @@ module Raygun
         self.class.post("/entries", verify_peer: true, verify: true, headers: @headers, body: JSON.generate(payload_hash))
       end
 
-      def filter_params(params_hash, extra_filter_keys = nil)
-        if Raygun.configuration.filter_parameters.is_a?(Proc)
-          filter_params_with_proc(params_hash, Raygun.configuration.filter_parameters)
+      def filter_params_with_blacklist(params_hash = {}, extra_filter_keys = nil)
+        return params_hash if Raygun.configuration.filter_payload_with_whitelist
+
+        filter_parameters = Raygun.configuration.filter_parameters
+
+        if filter_parameters.is_a? Proc
+          filter_parameters.call(params_hash)
         else
-          filter_keys = (Array(extra_filter_keys) + Raygun.configuration.filter_parameters).map(&:to_s)
+          filter_keys = (Array(extra_filter_keys) + filter_parameters).map(&:to_s)
+
           filter_params_with_array(params_hash, filter_keys)
         end
       end
 
-      def filter_params_with_proc(params_hash, proc)
-        proc.call(params_hash)
+      def filter_payload_with_whitelist(payload_hash)
+        shape = Raygun.configuration.whitelist_payload_shape
+
+        if shape.is_a? Proc
+          shape.call(payload_hash)
+        else
+          # Always keep the client hash, so force it to true here
+          Services::ApplyWhitelistFilterToPayload.new.call(shape.merge(client: true), payload_hash)
+        end
       end
 
       def filter_params_with_array(params_hash, filter_keys)

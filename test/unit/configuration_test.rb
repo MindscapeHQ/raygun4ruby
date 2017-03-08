@@ -76,4 +76,20 @@ class ConfigurationTest < Raygun::UnitTest
     Raygun.configuration.filter_parameters = nil
   end
 
+  def test_filter_payload_with_whitelist_default
+    assert_equal(false, Raygun.configuration.filter_payload_with_whitelist)
+  end
+
+  def test_setting_whitelist_payload_keys_to_proc
+    Raygun.setup do |config|
+      config.whitelist_payload_shape do |hash|
+        # No-op
+      end
+    end
+
+    assert Raygun.configuration.whitelist_payload_shape.is_a?(Proc)
+    ensure
+      Raygun.configuration.whitelist_payload_shape = nil
+  end
+
 end

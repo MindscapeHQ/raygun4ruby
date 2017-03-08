@@ -65,8 +65,6 @@ module Raygun
 
     DEFAULT_FILTER_PARAMETERS = [ :password, :card_number, :cvv ]
 
-
-
     DEFAULT_WHITELIST_PAYLOAD_SHAPE_REQUEST = {
       hostName: true,
       url: true,
@@ -76,7 +74,7 @@ module Raygun
       headers: true,
       form: {}, # Set to empty hash so that it doesn't just filter out the whole thing, but instead filters out each individual param
       rawData: true
-    }
+    }.freeze
     DEFAULT_WHITELIST_PAYLOAD_SHAPE = {
       machineName: true,
       version: true,
@@ -84,7 +82,7 @@ module Raygun
       userCustomData: true,
       tags: true,
       request: DEFAULT_WHITELIST_PAYLOAD_SHAPE_REQUEST
-    }
+    }.freeze
 
     attr_reader :defaults
 

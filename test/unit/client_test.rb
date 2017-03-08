@@ -429,7 +429,7 @@ class ClientTest < Raygun::UnitTest
 
       e = TestException.new("A test message")
       e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                        "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
 
       client_details = @client.send(:client_details)
 
@@ -444,7 +444,7 @@ class ClientTest < Raygun::UnitTest
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
 
     client_details = @client.send(:client_details)
 
@@ -456,7 +456,7 @@ class ClientTest < Raygun::UnitTest
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
 
     details = @client.send(:build_payload_hash, e)[:details]
 
@@ -484,7 +484,7 @@ class ClientTest < Raygun::UnitTest
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
 
     details = @client.send(:build_payload_hash, e)[:details]
 
@@ -511,7 +511,7 @@ class ClientTest < Raygun::UnitTest
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
 
     details = @client.send(:build_payload_hash, e)[:details]
 
@@ -532,7 +532,7 @@ class ClientTest < Raygun::UnitTest
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
 
     details = @client.send(:build_payload_hash, e)[:details]
 
@@ -553,7 +553,7 @@ class ClientTest < Raygun::UnitTest
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
 
     post_body_env_hash = sample_env_hash.merge(
       "rack.input"=>StringIO.new("a=b&c=4945438&password=swordfish")
@@ -577,15 +577,17 @@ class ClientTest < Raygun::UnitTest
 
   def test_filter_payload_with_whitelist_request_post_except_formkey
     Raygun.configuration.filter_payload_with_whitelist = true
-    Raygun.configuration.whitelist_payload_shape[:request] = Raygun.configuration.whitelist_payload_shape[:request].merge(
+    shape = Raygun.configuration.whitelist_payload_shape.dup
+    shape[:request] = Raygun.configuration.whitelist_payload_shape[:request].merge(
       form: {
         username: true
       }
     )
+    Raygun.configuration.whitelist_payload_shape = shape
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
 
     post_body_env_hash = sample_env_hash.merge(
       "rack.input"=>StringIO.new("username=foo&password=swordfish")
@@ -612,7 +614,7 @@ class ClientTest < Raygun::UnitTest
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
 
     sample_env_hash = {
       "SERVER_NAME"=>"localhost",
@@ -655,13 +657,15 @@ class ClientTest < Raygun::UnitTest
 
   def test_filter_payload_with_whitelist_default_request_get_except_querystring
     Raygun.configuration.filter_payload_with_whitelist = true
-    Raygun.configuration.whitelist_payload_shape[:request] = Raygun::Configuration::DEFAULT_WHITELIST_PAYLOAD_SHAPE_REQUEST.tap do |h|
+    shape = Raygun.configuration.whitelist_payload_shape.dup
+    shape[:request] = Raygun::Configuration::DEFAULT_WHITELIST_PAYLOAD_SHAPE_REQUEST.dup.tap do |h|
       h.delete(:queryString)
     end
+    Raygun.configuration.whitelist_payload_shape = shape
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
 
     sample_env_hash = {
       "SERVER_NAME"=>"localhost",
@@ -706,7 +710,7 @@ class ClientTest < Raygun::UnitTest
     Raygun.configuration.filter_payload_with_whitelist = false
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
 
     sample_env_hash = {
       "SERVER_NAME"=>"localhost",
@@ -759,7 +763,7 @@ class ClientTest < Raygun::UnitTest
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
 
     details = @client.send(:build_payload_hash, e, sample_env_hash)[:details]
 
@@ -780,29 +784,29 @@ class ClientTest < Raygun::UnitTest
 
   private
 
-    def sample_env_hash
-      {
-        "SERVER_NAME"=>"localhost",
-        "REQUEST_METHOD"=>"POST",
-        "REQUEST_PATH"=>"/",
-        "PATH_INFO"=>"/",
-        "QUERY_STRING"=>"",
-        "REQUEST_URI"=>"/",
-        "HTTP_VERSION"=>"HTTP/1.1",
-        "HTTP_HOST"=>"localhost:3000",
-        "HTTP_CONNECTION"=>"keep-alive",
-        "HTTP_CACHE_CONTROL"=>"max-age=0",
-        "HTTP_ACCEPT"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "HTTP_USER_AGENT"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36",
-        "HTTP_ACCEPT_ENCODING"=>"gzip,deflate,sdch",
-        "HTTP_ACCEPT_LANGUAGE"=>"en-US,en;q=0.8",
-        "HTTP_COOKIE"=>"cookieval",
-        "GATEWAY_INTERFACE"=>"CGI/1.2",
-        "SERVER_PORT"=>"3000",
-        "SERVER_PROTOCOL"=>"HTTP/1.1",
-        "SCRIPT_NAME"=>"",
-        "REMOTE_ADDR"=>"127.0.0.1"
-      }
-    end
+  def sample_env_hash
+    {
+      "SERVER_NAME"=>"localhost",
+      "REQUEST_METHOD"=>"POST",
+      "REQUEST_PATH"=>"/",
+      "PATH_INFO"=>"/",
+      "QUERY_STRING"=>"",
+      "REQUEST_URI"=>"/",
+      "HTTP_VERSION"=>"HTTP/1.1",
+      "HTTP_HOST"=>"localhost:3000",
+      "HTTP_CONNECTION"=>"keep-alive",
+      "HTTP_CACHE_CONTROL"=>"max-age=0",
+      "HTTP_ACCEPT"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "HTTP_USER_AGENT"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36",
+      "HTTP_ACCEPT_ENCODING"=>"gzip,deflate,sdch",
+      "HTTP_ACCEPT_LANGUAGE"=>"en-US,en;q=0.8",
+      "HTTP_COOKIE"=>"cookieval",
+      "GATEWAY_INTERFACE"=>"CGI/1.2",
+      "SERVER_PORT"=>"3000",
+      "SERVER_PROTOCOL"=>"HTTP/1.1",
+      "SCRIPT_NAME"=>"",
+      "REMOTE_ADDR"=>"127.0.0.1"
+    }
+  end
 
 end

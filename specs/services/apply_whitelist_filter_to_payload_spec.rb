@@ -10,7 +10,7 @@ describe ApplyWhitelistFilterToPayload do
       { foo: 1, bar: 2 }
     end
     let(:expected) do
-      { foo: 1 }
+      { foo: 1 , bar: '[FILTERED]'}
     end
 
     it "filters out keys that are not present in the shape" do
@@ -46,7 +46,8 @@ describe ApplyWhitelistFilterToPayload do
     let(:expected) {{
       foo: 1,
       bar: {
-        baz: 2
+        baz: 2,
+        qux: '[FILTERED]'
       }
     }}
 
@@ -67,7 +68,7 @@ describe ApplyWhitelistFilterToPayload do
       shape = {
         foo: true
       }
-      expected.delete(:bar)
+      expected[:bar] = "[FILTERED]"
 
       new_payload = service.call(shape, payload)
 
@@ -79,6 +80,7 @@ describe ApplyWhitelistFilterToPayload do
         bar: true
       }
       expected = {
+        foo: '[FILTERED]',
         bar: {
           baz: 2,
           qux: 3
@@ -96,7 +98,8 @@ describe ApplyWhitelistFilterToPayload do
         bar: false
       }
       expected = {
-        foo: 1
+        foo: 1,
+        bar: '[FILTERED]'
       }
 
       new_payload = service.call(shape, payload)
@@ -196,18 +199,25 @@ describe ApplyWhitelistFilterToPayload do
         queryString: {
           param1: "1",
           param2: "2",
+          param3: '[FILTERED]'
         },
         headers: {
           "Host"=>"localhost:3000",
           "Connection"=>"keep-alive",
           "Upgrade-Insecure_requests"=>"1",
+          "User-Agent" => "[FILTERED]",
           "Accept"=>"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+          "Accept-Encoding" => "[FILTERED]",
+          "Accept-Language" => "[FILTERED]",
+          "Version" => "[FILTERED]"
         },
         form: {
           controller: "home",
+          action: "[FILTERED]"
         },
         rawData: {
           controller: "home",
+          action: "[FILTERED]"
         }
       }
     }

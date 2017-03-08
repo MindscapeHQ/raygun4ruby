@@ -8,7 +8,7 @@ class ApplyWhitelistFilterToPayload
   def filter_hash(whitelist, hash)
     hash.each do |k, v|
       unless whitelist && whitelist[k]
-        hash.delete(k)
+        hash[k] = '[FILTERED]'
       end
 
       if v.is_a?(Hash) && whitelist[k].is_a?(Hash)

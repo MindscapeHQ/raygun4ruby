@@ -24,14 +24,14 @@ class Raygun::Railtie < Rails::Railtie
       affected_user_middleware = affected_user_middleware.to_s unless Rails::VERSION::STRING >= "5"
       app.config.middleware.insert_after Raygun::Middleware::RackExceptionInterceptor, affected_user_middleware
     end
+  end
 
-    config.to_prepare do
-      Raygun.default_configuration.logger           = Rails.logger
-      Raygun.default_configuration.enable_reporting = Rails.env.production?
-    end
+  config.to_prepare do
+    Raygun.default_configuration.logger           = Rails.logger
+    Raygun.default_configuration.enable_reporting = Rails.env.production?
+  end
 
-    rake_tasks do
-      load "tasks/raygun.tasks"
-    end
+  rake_tasks do
+    load "tasks/raygun.tasks"
   end
 end

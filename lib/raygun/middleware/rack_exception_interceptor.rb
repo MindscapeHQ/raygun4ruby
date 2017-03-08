@@ -9,7 +9,7 @@ module Raygun
       def call(env)
         response = @app.call(env)
       rescue Exception => exception
-        Raygun.track_exception(exception, env)
+        Raygun.track_exception(exception, env) if Raygun.configured?
         raise exception
       end
 

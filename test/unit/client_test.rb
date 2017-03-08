@@ -577,11 +577,11 @@ class ClientTest < Raygun::UnitTest
 
   def test_filter_payload_with_whitelist_request_post_except_formkey
     Raygun.configuration.filter_payload_with_whitelist = true
-    Raygun.configuration.whitelist_payload_shape = Raygun.configuration.whitelist_payload.shape.merge({
+    Raygun.configuration.whitelist_payload_shape[:request] = Raygun.configuration.whitelist_payload_shape[:request].merge(
       form: {
         username: true
       }
-    })
+    )
 
     e = TestException.new("A test message")
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",

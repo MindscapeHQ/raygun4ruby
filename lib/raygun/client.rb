@@ -116,7 +116,7 @@ module Raygun
 
       def form_params(env)
         params = action_dispatch_params(env) || rack_params(env) || {}
-        filter_params(params, env["action_dispatch.parameter_filter"])
+        filter_params_with_blacklist(params, env["action_dispatch.parameter_filter"])
       end
 
       def action_dispatch_params(env)
@@ -137,7 +137,7 @@ module Raygun
 
       def filter_custom_data(env)
         params = env.delete(:custom_data) || {}
-        filter_params(params, env["action_dispatch.parameter_filter"])
+        filter_params_with_blacklist(params, env["action_dispatch.parameter_filter"])
       end
 
       # see http://raygun.io/raygun-providers/rest-json-api?v=1
@@ -168,8 +168,7 @@ module Raygun
         error_details.merge!(user: user_information(env)) if affected_user_present?(env)
 
         if Raygun.configuration.filter_payload_with_whitelist
-          error_details = filter_payload(error_details)
-          error_details[:client] = client_details
+          error_details = filter_payload_with_whitelist(error_details)
         end
 
         {
@@ -182,29 +181,29 @@ module Raygun
         self.class.post("/entries", verify_peer: true, verify: true, headers: @headers, body: JSON.generate(payload_hash))
       end
 
-      def filter_params(params_hash, extra_filter_keys = nil)
-        if Raygun.configuration.filter_payload_with_whitelist
-          params_hash || {}
-        end
-        if Raygun.configuration.filter_parameters.is_a?(Proc)
-          filter_hash_with_proc(params_hash, Raygun.configuration.filter_parameters)
+      def filter_params_with_blacklist(params_hash = {}, extra_filter_keys = nil)
+        return params_hash if Raygun.configuration.filter_payload_with_whitelist
+
+        filter_parameters = Raygun.configuration.filter_parameters
+
+        if filter_parameters.is_a? Proc
+          filter_parameters.call(params_hash)
         else
-          filter_keys = (Array(extra_filter_keys) + Raygun.configuration.filter_parameters).map(&:to_s)
+          filter_keys = (Array(extra_filter_keys) + filter_parameters).map(&:to_s)
+
           filter_params_with_array(params_hash, filter_keys)
         end
       end
 
-      def filter_payload(payload_hash)
-        if Raygun.configuration.whitelist_payload_keys.is_a?(Proc)
-          filter_hash_with_proc(payload_hash, Raygun.configuration.whitelist_payload_keys)
-        else
-          filter_keys = Raygun.configuration.whitelist_payload_keys.map(&:to_s)
-          filter_payload_with_array(payload_hash, filter_keys, {})
-        end
-      end
+      def filter_payload_with_whitelist(payload_hash)
+        shape = Raygun.configuration.whitelist_payload_shape
 
-      def filter_hash_with_proc(hash, proc)
-        proc.call(hash)
+        if shape.is_a? Proc
+          shape.call(payload_hash)
+        else
+          # Always keep the client hash, so force it to true here
+          Services::ApplyWhitelistFilterToPayload.new.call(shape.merge(client: true), payload_hash)
+        end
       end
 
       def filter_params_with_array(params_hash, filter_keys)
@@ -218,45 +217,6 @@ module Raygun
           end
           result
         end
-      end
-
-      def filter_payload_with_array(params_hash, filter_keys, acc)
-        # Recursive filtering of the whole payload hash, handling various type scenarios
-        (params_hash || {}).inject(acc) do |result, (k, v)|
-          if v.class == Hash || v.class == Array
-            if is_whitelisted_recursive(filter_keys, k) # Special case for well-known keys e.g within env hash
-              result[k] = v
-            elsif is_whitelisted(filter_keys, k)
-              nextLevelAcc = v.class == Hash ? {} : []
-              result[k] = filter_payload_with_array(v, filter_keys, nextLevelAcc) # Recurse call for hashes/arrays
-            else
-              result[k] = "[FILTERED]" # Base case for non-whitelisted hash key
-            end
-          elsif k.class == Hash && acc.class == Array # Case for hash within array e.g stack frame - don't filter
-            result.push(k)
-          elsif k.class == Array && acc.class == Array # Case for array within array
-            result.push(filter_payload_with_array(v, filter_keys, []))
-          elsif acc.class == Hash
-            if is_whitelisted(filter_keys, k)
-              result[k] = v # Base case for a whitelisted primitive value
-            else
-              result[k] = "[FILTERED]"
-            end
-          else
-            result = k # Base case for a primitive within an array
-          end
-          result
-        end
-      end
-
-      def is_whitelisted(whitelist, key)
-        whitelist.any? { |fk| /#{fk}/i === key.to_s }
-      end
-
-      def is_whitelisted_recursive(whitelist, key)
-        always_whitelisted_keys = [:headers, :queryString]
-
-        is_whitelisted(always_whitelisted_keys, key) && is_whitelisted(whitelist, key)
       end
 
       def ip_address_from(env_hash)

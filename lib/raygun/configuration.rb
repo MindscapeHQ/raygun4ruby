@@ -74,7 +74,7 @@ module Raygun
       iPAddress: true,
       queryString: true,
       headers: true,
-      form: true,
+      form: {}, # Set to empty hash so that it doesn't just filter out the whole thing, but instead filters out each individual param
       rawData: true
     }
     DEFAULT_WHITELIST_PAYLOAD_SHAPE = {

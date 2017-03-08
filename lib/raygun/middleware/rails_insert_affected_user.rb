@@ -22,7 +22,6 @@ module Raygun
 
             env["raygun.affected_user"] = { :identifier => identifier }
           end
-          
         end
         raise exception
       end

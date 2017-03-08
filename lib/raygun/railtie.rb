@@ -1,5 +1,4 @@
 class Raygun::Railtie < Rails::Railtie
-
   initializer "raygun.configure_rails_initialization" do |app|
 
     # Thanks Airbrake: See https://github.com/rails/rails/pull/8624
@@ -34,5 +33,4 @@ class Raygun::Railtie < Rails::Railtie
   rake_tasks do
     load "tasks/raygun.tasks"
   end
-
 end

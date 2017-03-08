@@ -145,6 +145,8 @@ class ClientTest < Raygun::UnitTest
       e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
                        "/another/path/foo.rb:1234:in `block (3 levels) run'"])
 
+      grouping_key = "my custom group"
+
       expected_hash = {
         occurredOn: Time.now.utc.iso8601,
         details: {
@@ -165,11 +167,12 @@ class ClientTest < Raygun::UnitTest
           },
           userCustomData: {},
           tags:           ["test"],
-          request:        {}
+          request:        {},
+          groupingKey:    grouping_key
         }
       }
 
-      assert_equal expected_hash, @client.send(:build_payload_hash, e)
+      assert_equal expected_hash, @client.send(:build_payload_hash, e, { grouping_key: grouping_key })
     end
   end
 
@@ -281,6 +284,33 @@ class ClientTest < Raygun::UnitTest
     )
 
     expected_form_hash = { "nsa_only_info" => "[OUREYESONLY]", "nsa_only_metadata" => "[OUREYESONLY]", "something_normal" => "hello" }
+
+    assert_equal expected_form_hash, @client.send(:request_information, post_body_env_hash)[:form]
+  ensure
+    Raygun.configuration.filter_parameters = nil
+  end
+
+  def test_filter_parameters_using_array
+    filter_params_as_from_rails = [:password]
+    Raygun.configuration.filter_parameters = filter_params_as_from_rails
+
+    parameters = {
+      "something_normal" => "hello",
+      "password" => "wouldntyouliketoknow",
+      "password_confirmation" => "wouldntyouliketoknow",
+      "PasswORD_weird_case" => "anythingatall"
+    }
+
+    expected_form_hash = {
+      "something_normal" => "hello",
+      "password" => "[FILTERED]",
+      "password_confirmation" => "[FILTERED]",
+      "PasswORD_weird_case" => "[FILTERED]"
+    }
+
+    post_body_env_hash = sample_env_hash.merge(
+      "rack.input" => StringIO.new(URI.encode_www_form(parameters))
+    )
 
     assert_equal expected_form_hash, @client.send(:request_information, post_body_env_hash)[:form]
   ensure

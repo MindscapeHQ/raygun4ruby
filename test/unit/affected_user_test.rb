@@ -22,6 +22,13 @@ class AffectedUserTest < Raygun::UnitTest
 
     def no_logged_in_user
     end
+
+    private
+
+      def private_current_user
+        user_with_email
+      end
+
   end
 
   class MockApp
@@ -93,5 +100,15 @@ class AffectedUserTest < Raygun::UnitTest
     end
   end
 
+  def test_with_private_method
+    Raygun.configuration.affected_user_method = :private_current_user
+    assert @controller.respond_to?(Raygun.configuration.affected_user_method, true)
 
+    begin
+      @middleware.call("action_controller.instance" => @controller)
+    rescue TestException
+      user_hash = { :identifier => "testemail@something.com" }
+      assert_equal user_hash, @app.env["raygun.affected_user"]
+    end
+  end
 end

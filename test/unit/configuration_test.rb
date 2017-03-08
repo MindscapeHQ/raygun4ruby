@@ -52,12 +52,44 @@ class ConfigurationTest < Raygun::UnitTest
     assert_equal({}, Raygun.configuration.custom_data)
   end
 
+  def test_default_tags_set
+    assert_equal([], Raygun.configuration.tags)
+  end
+
   def test_overriding_defaults
     Raygun.default_configuration.custom_data = { robby: "robot" }
     assert_equal({ robby: "robot" }, Raygun.configuration.custom_data)
 
     Raygun.configuration.custom_data = { sally: "stegosaurus" }
     assert_equal({ sally: "stegosaurus" }, Raygun.configuration.custom_data)
+  end
+
+  def test_setting_filter_paramters_to_proc
+    Raygun.setup do |config|
+      config.filter_parameters do |hash|
+        # Don't need to do anything :)
+      end
+    end
+
+    assert Raygun.configuration.filter_parameters.is_a?(Proc)
+  ensure
+    Raygun.configuration.filter_parameters = nil
+  end
+
+  def test_filter_payload_with_whitelist_default
+    assert_equal(false, Raygun.configuration.filter_payload_with_whitelist)
+  end
+
+  def test_setting_whitelist_payload_keys_to_proc
+    Raygun.setup do |config|
+      config.whitelist_payload_shape do |hash|
+        # No-op
+      end
+    end
+
+    assert Raygun.configuration.whitelist_payload_shape.is_a?(Proc)
+    ensure
+      Raygun.configuration.whitelist_payload_shape = nil
   end
 
 end

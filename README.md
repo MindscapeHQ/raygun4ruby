@@ -97,19 +97,30 @@ As an alternative to the above, you can also opt-in to the keys/values to be sen
 
 This disables the blacklist filtering above (`filter_parameters`), and is applied to the entire payload (error, request, environment and custom data included), not just the request parameters.
 
-In order to opt-in to this feature, set `filter_payload_with_whitelist` to `true`, and choose what keys you want (the default is below which is to allow everything through):
+In order to opt-in to this feature, set `filter_payload_with_whitelist` to `true`, and specify a shape of what keys you want (the default is below which is to allow everything through, this also means that the query parameters filtered out by default like password, creditcard etc will not be unless changed):
 
 ```ruby
 Raygun.setup do |config|
   config.api_key = "YOUR_RAYGUN_API_KEY"
   config.filter_payload_with_whitelist = true
 
-  config.whitelist_payload_keys = [
-    :machineName, :version,
-    :error, :className, :message, :stackTrace,
-    :userCustomData, :tags,
-    :request, :hostName, :url, :httpMethod, :iPAddress, :queryString, :headers, :form, :rawData
-  ]
+  config.whitelist_payload_shape = {
+      machineName: true,
+      version: true,
+      error: true,
+      userCustomData: true,
+      tags: true,
+      request: {
+        hostName: true,
+        url: true,
+        httpMethod: true,
+        iPAddress: true,
+        queryString: true,
+        headers: true,
+        form: {}, # Set to empty hash so that it doesn't just filter out the whole thing, but instead filters out each individual param
+        rawData: true
+      }
+    }
 end
 ```
 

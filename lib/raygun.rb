@@ -46,7 +46,7 @@ module Raygun
       !!configuration.api_key
     end
 
-    def track_exception(exception_instance, env = {})
+    def track_exception(exception_instance, env = {}, retry_count = 1)
       if should_report?(exception_instance)
         log("[Raygun] Tracking Exception...")
         Client.new.track_exception(exception_instance, env)
@@ -54,6 +54,16 @@ module Raygun
     rescue Exception => e
       if configuration.failsafe_logger
         failsafe_log("Problem reporting exception to Raygun: #{e.class}: #{e.message}\n\n#{e.backtrace.join("\n")}")
+      end
+
+      if retry_count > 0
+        new_exception = e.exception("raygun4ruby encountered an exception processing your exception")
+        new_exception.set_backtrace(e.backtrace)
+
+        env[:custom_data] ||= {}
+        env[:custom_data].merge!(original_stacktrace: exception_instance.backtrace)
+
+        track_exception(new_exception, env, retry_count - 1)
       else
         raise e
       end

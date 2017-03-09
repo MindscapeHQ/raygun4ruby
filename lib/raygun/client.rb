@@ -143,7 +143,11 @@ module Raygun
       # see http://raygun.io/raygun-providers/rest-json-api?v=1
       def build_payload_hash(exception_instance, env = {}, user = nil)
         custom_data = filter_custom_data(env) || {}
-        exception_custom_data = exception_instance.respond_to?(:raygun_custom_data) ? exception_instance.raygun_custom_data : {}
+        exception_custom_data = if exception_instance.respond_to?(:raygun_custom_data)
+                                  exception_instance.raygun_custom_data
+                                else
+                                  {}
+                                end
 
         tags = env.delete(:tags) || []
 
@@ -155,12 +159,19 @@ module Raygun
 
         grouping_key = env.delete(:grouping_key)
 
+        configuration_custom_data = Raygun.configuration.custom_data
+        configured_custom_data = if configuration_custom_data.is_a?(Proc)
+                                  configuration_custom_data.call(exception_instance, env)
+                                 else
+                                  configuration_custom_data
+                                 end
+
         error_details = {
             machineName:    hostname,
             version:        version,
             client:         client_details,
             error:          error_details(exception_instance),
-            userCustomData: Raygun.configuration.custom_data.merge(custom_data).merge(exception_custom_data),
+            userCustomData: exception_custom_data.merge(custom_data).merge(configured_custom_data),
             tags:           Raygun.configuration.tags.concat(tags).compact.uniq,
             request:        request_information(env)
         }

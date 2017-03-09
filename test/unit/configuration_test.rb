@@ -92,4 +92,25 @@ class ConfigurationTest < Raygun::UnitTest
       Raygun.configuration.whitelist_payload_shape = nil
   end
 
+  def test_setting_custom_data_to_proc
+    Raygun.setup do |config|
+      config.custom_data do |exception, env|
+        # No-op
+      end
+    end
+
+    assert Raygun.configuration.custom_data.is_a?(Proc)
+  ensure
+      Raygun.configuration.custom_data = nil
+  end
+
+  def test_setting_custom_data_to_hash
+    Raygun.setup do |config|
+      config.custom_data = {}
+    end
+
+    assert Raygun.configuration.custom_data.is_a?(Hash)
+  ensure
+      Raygun.configuration.custom_data = nil
+  end
 end

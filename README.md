@@ -158,6 +158,26 @@ end
 
 ```
 
+Custom data can also be specified globally either by setting `config.custom_data` to a hash
+
+```ruby
+Raygun.setup do |config|
+  config.api_key = "YOUR_RAYGUN_API_KEY"
+  config.custom_data = {custom_data: 'goes here'}
+end
+```
+
+or to a proc, which gets passed the exception and environment hash
+
+```ruby
+Raygun.setup do |config|
+  config.api_key = "YOUR_RAYGUN_API_KEY"
+  config.custom_data do |e, env|
+    {message: e.message, server: env["SERVER_NAME"]}
+  end
+end
+```
+
 ### Ignoring Some Errors
 
 You can ignore certain types of Exception using the `ignore` option in the setup block, like so:

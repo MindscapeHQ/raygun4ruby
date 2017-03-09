@@ -257,6 +257,25 @@ class ClientTest < Raygun::UnitTest
     assert_equal expected_form_hash, @client.send(:build_payload_hash, e, test_env)[:details][:userCustomData]
   end
 
+  def test_custom_data_configuration_with_hash
+    custom_data = {foo: '123'}
+    Raygun.configuration.custom_data = custom_data
+
+    assert_equal custom_data, @client.send(:build_payload_hash, test_exception, sample_env_hash)[:details][:userCustomData]
+  end
+
+  def test_custom_data_configuration_with_proc
+    Raygun.configuration.custom_data do |exception, env|
+      {exception_message: exception.message, server_name: env["SERVER_NAME"]}
+    end
+    expected = {
+      exception_message: "A test message",
+      server_name: "localhost"
+    }
+
+    assert_equal expected, @client.send(:build_payload_hash, test_exception, sample_env_hash)[:details][:userCustomData]
+  end
+
   def test_filtering_parameters
     post_body_env_hash = sample_env_hash.merge(
       "rack.input"=>StringIO.new("a=b&c=4945438&password=swordfish")

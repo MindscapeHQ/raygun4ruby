@@ -5,6 +5,11 @@ require "socket"
 require "rack"
 require "ostruct"
 
+begin
+  require "pry"
+rescue LoadError
+end
+
 require "raygun/version"
 require "raygun/configuration"
 require "raygun/client"
@@ -14,10 +19,6 @@ require "raygun/error"
 require "raygun/affected_user"
 require "raygun/services/apply_whitelist_filter_to_payload"
 require "raygun/railtie" if defined?(Rails)
-begin
-  require "pry"
-rescue LoadError
-end
 
 module Raygun
 

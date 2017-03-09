@@ -11,6 +11,17 @@ module Raygun
       end
     end
 
+    def self.proc_config_option(name)
+      define_method(name) do |&block|
+        set_value(name, block) unless block == nil
+        read_value(name)
+      end
+
+      define_method("#{name}=") do |value|
+        set_value(name, value)
+      end
+    end
+
     # Your Raygun API Key - this can be found on your dashboard at Raygun.io
     config_option :api_key
 
@@ -21,7 +32,7 @@ module Raygun
     config_option :version
 
     # Custom Data to send with each exception
-    config_option :custom_data
+    proc_config_option :custom_data
 
     # Tags to send with each exception
     config_option :tags
@@ -42,13 +53,13 @@ module Raygun
     config_option :affected_user_mapping
 
     # Which parameter keys should we filter out by default?
-    config_option :filter_parameters
+    proc_config_option :filter_parameters
 
     # Should we switch to a white listing mode for keys instead of the default blacklist?
     config_option :filter_payload_with_whitelist
 
     # If :filter_payload_with_whitelist is true, which keys should we whitelist?
-    config_option :whitelist_payload_shape
+    proc_config_option :whitelist_payload_shape
 
     # Hash of proxy settings - :address, :port (defaults to 80), :username and :password (both default to nil)
     config_option :proxy_settings
@@ -123,16 +134,6 @@ module Raygun
     def affected_user_identifier_methods
       Raygun.deprecation_warning("Please note: You should now user config.affected_user_method_mapping.Identifier instead of config.affected_user_identifier_methods")
       read_value(:affected_user_method_mapping).Identifier
-    end
-
-    def filter_parameters(&filter_proc)
-      set_value(:filter_parameters, filter_proc) if block_given?
-      read_value(:filter_parameters)
-    end
-
-    def whitelist_payload_shape(&filter_proc)
-      set_value(:whitelist_payload_shape, filter_proc) if block_given?
-      read_value(:whitelist_payload_shape)
     end
 
     private

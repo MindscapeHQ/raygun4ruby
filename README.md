@@ -74,6 +74,13 @@ rescue Exception => e
   Raygun.track_exception(e)
 end
 
+# You may also pass a user object as the third argument to allow affected user tracking, like so
+begin
+  # your lovely code here
+rescue Exception => e
+  # The second argument is the request environment variables
+  Raygun.track_exception(e, {}, user)
+end
 ```
 
 You can also pass a Hash as the second parameter to `track_exception`. It should look like a [Rack Env Hash](http://rack.rubyforge.org/doc/SPEC.html)

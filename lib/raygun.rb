@@ -47,10 +47,10 @@ module Raygun
       !!configuration.api_key
     end
 
-    def track_exception(exception_instance, env = {}, retry_count = 1)
+    def track_exception(exception_instance, env = {}, user = nil, retry_count = 1)
       if should_report?(exception_instance)
         log("[Raygun] Tracking Exception...")
-        Client.new.track_exception(exception_instance, env)
+        Client.new.track_exception(exception_instance, env, user)
       end
     rescue Exception => e
       if configuration.failsafe_logger
@@ -64,7 +64,7 @@ module Raygun
         env[:custom_data] ||= {}
         env[:custom_data].merge!(original_stacktrace: exception_instance.backtrace)
 
-        track_exception(new_exception, env, retry_count - 1)
+        track_exception(new_exception, env, user, retry_count - 1)
       else
         raise e
       end

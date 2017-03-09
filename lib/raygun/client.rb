@@ -23,8 +23,8 @@ module Raygun
       Raygun.configuration.api_key || print_api_key_warning
     end
 
-    def track_exception(exception_instance, env = {})
-      create_entry(build_payload_hash(exception_instance, env))
+    def track_exception(exception_instance, env = {}, user = nil)
+      create_entry(build_payload_hash(exception_instance, env, user))
     end
 
     private
@@ -141,7 +141,7 @@ module Raygun
       end
 
       # see http://raygun.io/raygun-providers/rest-json-api?v=1
-      def build_payload_hash(exception_instance, env = {})
+      def build_payload_hash(exception_instance, env = {}, user = nil)
         custom_data = filter_custom_data(env) || {}
         tags = env.delete(:tags) || []
 
@@ -165,7 +165,12 @@ module Raygun
 
         error_details.merge!(groupingKey: grouping_key) if grouping_key
 
-        error_details.merge!(user: user_information(env)) if affected_user_present?(env)
+        user_details = if affected_user_present?(env)
+                         user_information(env)
+                       elsif user != nil
+                         AffectedUser.information_hash(user)
+                       end
+        error_details.merge!(user: user_details) unless user_details == nil
 
         if Raygun.configuration.filter_payload_with_whitelist
           error_details = filter_payload_with_whitelist(error_details)

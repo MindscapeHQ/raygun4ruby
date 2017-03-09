@@ -16,6 +16,10 @@ class AffectedUserTest < Raygun::UnitTest
       OpenStruct.new(login: "topsecret")
     end
 
+    def user_with_full_details
+      OpenStruct.new(id: 123, email: "testemail@something.com", first_name: "Taylor", last_name: "Lodge")
+    end
+
     def user_as_string
       "some-string-identifier"
     end
@@ -64,7 +68,9 @@ class AffectedUserTest < Raygun::UnitTest
 
   def test_changing_method_mapping
     Raygun.configuration.affected_user_method = :user_with_login
-    Raygun.configuration.affected_user_method_mapping.Identifier << :login
+    Raygun.configuration.affected_user_mapping = {
+      identifier: :login
+    }
 
     assert @controller.respond_to?(Raygun.configuration.affected_user_method)
 
@@ -108,6 +114,22 @@ class AffectedUserTest < Raygun::UnitTest
       @middleware.call("action_controller.instance" => @controller)
     rescue TestException
       user_hash = {:IsAnonymous=>false, :Identifier=>123, :Email=>"testemail@something.com"}
+      assert_equal user_hash, @app.env["raygun.affected_user"]
+    end
+  end
+
+  def test_with_proc_for_mapping
+    Raygun.configuration.affected_user_method = :user_with_full_details
+    Raygun.configuration.affected_user_mapping = Raygun::AffectedUser::DEFAULT_MAPPING.merge({
+      full_name: ->(user) { "#{user.first_name} #{user.last_name}" }
+    })
+
+    assert @controller.respond_to?(Raygun.configuration.affected_user_method, true)
+
+    begin
+      @middleware.call("action_controller.instance" => @controller)
+    rescue TestException
+      user_hash = {:IsAnonymous=>false, :Identifier=>123, :Email=>"testemail@something.com", :FullName => "Taylor Lodge", :FirstName => "Taylor"}
       assert_equal user_hash, @app.env["raygun.affected_user"]
     end
   end

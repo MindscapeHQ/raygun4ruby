@@ -39,7 +39,7 @@ module Raygun
     config_option :affected_user_method
 
     # Mapping of methods for the affected user object - which methods should we call for user information
-    config_option :affected_user_method_mapping
+    config_option :affected_user_mapping
 
     # Which parameter keys should we filter out by default?
     config_option :filter_parameters
@@ -96,7 +96,7 @@ module Raygun
         tags:                             [],
         enable_reporting:                 true,
         affected_user_method:             :current_user,
-        affected_user_method_mapping:     AffectedUser::MethodMapping.default_mapping,
+        affected_user_mapping:            AffectedUser::DEFAULT_MAPPING,
         filter_parameters:                DEFAULT_FILTER_PARAMETERS,
         filter_payload_with_whitelist:    false,
         whitelist_payload_shape:          DEFAULT_WHITELIST_PAYLOAD_SHAPE,

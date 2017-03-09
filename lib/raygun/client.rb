@@ -155,12 +155,20 @@ module Raygun
 
         grouping_key = env.delete(:grouping_key)
 
+        configuration_custom_data = Raygun.configuration.custom_data
+        user_custom_data = custom_data.merge(exception_custom_data)
+        configured_custom_data = if configuration_custom_data.is_a?(Proc)
+                                  configuration_custom_data.call(exception_instance, env)
+                                 else
+                                  configuration_custom_data
+                                 end
+
         error_details = {
             machineName:    hostname,
             version:        version,
             client:         client_details,
             error:          error_details(exception_instance),
-            userCustomData: Raygun.configuration.custom_data.merge(custom_data).merge(exception_custom_data),
+            userCustomData: user_custom_data.merge(configured_custom_data),
             tags:           Raygun.configuration.tags.concat(tags).compact.uniq,
             request:        request_information(env)
         }

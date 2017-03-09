@@ -50,10 +50,8 @@ module Raygun
           message:    exception.message.to_s.encode('UTF-16', :undef => :replace, :invalid => :replace).encode('UTF-8'),
           stackTrace: (exception.backtrace || []).map { |line| stack_trace_for(line) },
         }
-        
-        if cause = exception.respond_to?(:cause) && exception.cause
-          details.update innerError: error_details(cause)
-        end
+
+        details.update(innerError: error_details(exception.cause)) if exception.respond_to?(:cause) && exception.cause
 
         details
       end

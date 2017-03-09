@@ -8,13 +8,17 @@ module Raygun
       private
 
       def filter_hash(whitelist, hash)
+        # dup the input so each level of the hash is dup'd
+        # not just the top as dup isn't deep
+        hash = hash.dup
+
         hash.each do |k, v|
           unless whitelist && (whitelist[k] || whitelist[k.to_sym])
             hash[k] = '[FILTERED]'
           end
 
           if v.is_a?(Hash) && whitelist[k].is_a?(Hash)
-            filter_hash(whitelist[k], v)
+            hash[k] = filter_hash(whitelist[k], v)
           end
         end
       end

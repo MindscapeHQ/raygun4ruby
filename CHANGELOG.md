@@ -1,3 +1,8 @@
+## 1.2.1 (09/03/2017)
+
+Bugfixes:
+  - dup input hashes before applying whitelist filtering, previously this was modifying the contents of `action_dispatch.request.parameters`
+
 ## 1.2.0 (09/03/2017)
 
 Features:

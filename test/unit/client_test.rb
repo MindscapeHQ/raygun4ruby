@@ -781,8 +781,29 @@ class ClientTest < Raygun::UnitTest
     assert_equal expected_hash, details[:request]
   end
 
+  def test_build_payload_hash_adds_affected_user_details_when_supplied_with_user
+    user = OpenStruct.new(id: '123', email: 'test@email.com', first_name: 'Taylor')
+    expected_details = {
+      :IsAnonymous => false,
+      :Identifier => '123',
+      :Email => 'test@email.com',
+      :FirstName => 'Taylor',
+    }
+
+    user_details = @client.send(:build_payload_hash, test_exception, sample_env_hash, user)[:details][:user]
+
+    assert_equal expected_details, user_details
+  end
 
   private
+
+  def test_exception
+    e = TestException.new("A test message")
+    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
+                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+
+    e
+  end
 
   def sample_env_hash
     {

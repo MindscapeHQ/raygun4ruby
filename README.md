@@ -203,15 +203,22 @@ By default, Raygun looks for a method called `current_user` on your controller, 
 
 (e.g Raygun will call `email` to populate the user's email, and `first_name` for the user's first name)
 
-You can inspect and customize this mapping using `config.affected_user_method_mapping`, like so:
+You can inspect and customize this mapping using `config.affected_user_mapping`, like so:
 
 ```ruby
 Raygun.setup do |config|
   config.api_key = "MY_SWEET_API_KEY"
   config.affected_user_method = :my_current_user # `current_user` by default
-  config.affected_user_method_mapping.Email << :email_address # adds "email_address" to the list of methods that should be called
+  # To augment the defaults with your unique methods you can do the following
+  config.affected_user_mapping = Raygun::AffectedUser::DEFAULT_MAPPING.merge({
+    identifier: :some_custom_unique_identifier,
+    # If you set the key to a proc it will be passed the user object and you can construct the value your self
+    full_name: ->(user) { "#{user.first_name} #{user.last_name}" }
+  })
 end
 ```
+
+To see the defaults check out [affected_user.rb](https://github.com/MindscapeHQ/raygun4ruby/tree/master/lib/raygun/affected_user.rb)
 
 If you're using Rails, most authentication systems will have this method set and you should be good to go.
 

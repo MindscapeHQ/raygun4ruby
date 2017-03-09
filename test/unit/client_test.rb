@@ -65,6 +65,37 @@ class ClientTest < Raygun::UnitTest
     assert_equal expected_message, @client.send(:error_details, e)[:message]
   end
 
+  def test_inner_error_details
+    oe = TestException.new("A test message")
+    oe.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'"])
+
+    ie = TestException.new("Inner test message")
+    ie.set_backtrace(["/another/path/foo.rb:1234:in `block (3 levels) run'"])
+
+    e = nest_exceptions(oe, ie)
+
+    expected_hash = {
+      className: "ClientTest::TestException",
+      message:   oe.message,
+      stackTrace: [
+        { lineNumber: "123",  fileName: "/some/folder/some_file.rb", methodName: "some_method_name" }
+      ]
+    }
+
+    # test inner error according with its availability (ruby >= 2.1)
+    if e.respond_to? :cause
+      expected_hash[:innerError] = {
+        className: "ClientTest::TestException",
+        message:   ie.message,
+        stackTrace: [
+          { lineNumber: "1234", fileName: "/another/path/foo.rb",      methodName: "block (3 levels) run"}
+        ]
+      }
+    end
+
+    assert_equal expected_hash, @client.send(:error_details, e)
+  end
+
   def test_client_details
     expected_hash = {
       name:      Raygun::CLIENT_NAME,
@@ -805,6 +836,21 @@ class ClientTest < Raygun::UnitTest
     e
   end
 
+  def nest_exceptions(outer_exception, inner_exception)
+    begin
+      begin
+        raise inner_exception.class, inner_exception.message
+      rescue => e
+        e.set_backtrace inner_exception.backtrace
+        raise outer_exception.class, outer_exception.message
+      end
+    rescue => nested_exception
+      nested_exception.set_backtrace outer_exception.backtrace
+    end
+
+    nested_exception
+  end
+
   def sample_env_hash
     {
       "SERVER_NAME"=>"localhost",
@@ -829,5 +875,4 @@ class ClientTest < Raygun::UnitTest
       "REMOTE_ADDR"=>"127.0.0.1"
     }
   end
-
 end

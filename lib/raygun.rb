@@ -10,6 +10,7 @@ require "raygun/configuration"
 require "raygun/client"
 require "raygun/middleware/rack_exception_interceptor"
 require "raygun/testable"
+require "raygun/affected_user"
 require "raygun/services/apply_whitelist_filter_to_payload"
 require "raygun/railtie" if defined?(Rails)
 begin
@@ -81,6 +82,14 @@ module Raygun
 
     def failsafe_log(message)
       configuration.failsafe_logger.info(message)
+    end
+
+    def deprecation_warning(message)
+      if defined?(ActiveSupport::Deprecation)
+        ActiveSupport::Deprecation.warn(message)
+      else
+        puts message
+      end
     end
 
     private

@@ -38,8 +38,8 @@ module Raygun
     # Which controller method should we call to find out the affected user?
     config_option :affected_user_method
 
-    # Which methods should we try on the affected user object in order to get an identifier
-    config_option :affected_user_identifier_methods
+    # Mapping of methods for the affected user object - which methods should we call for user information
+    config_option :affected_user_mapping
 
     # Which parameter keys should we filter out by default?
     config_option :filter_parameters
@@ -96,7 +96,7 @@ module Raygun
         tags:                             [],
         enable_reporting:                 true,
         affected_user_method:             :current_user,
-        affected_user_identifier_methods: [ :email, :username, :id ],
+        affected_user_mapping:            AffectedUser::DEFAULT_MAPPING,
         filter_parameters:                DEFAULT_FILTER_PARAMETERS,
         filter_payload_with_whitelist:    false,
         whitelist_payload_shape:          DEFAULT_WHITELIST_PAYLOAD_SHAPE,
@@ -118,6 +118,11 @@ module Raygun
 
     def silence_reporting=(value)
       self.enable_reporting = !value
+    end
+
+    def affected_user_identifier_methods
+      Raygun.deprecation_warning("Please note: You should now user config.affected_user_method_mapping.Identifier instead of config.affected_user_identifier_methods")
+      read_value(:affected_user_method_mapping).Identifier
     end
 
     def filter_parameters(&filter_proc)

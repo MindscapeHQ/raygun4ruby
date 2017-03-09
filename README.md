@@ -74,6 +74,13 @@ rescue Exception => e
   Raygun.track_exception(e)
 end
 
+# You may also pass a user object as the third argument to allow affected user tracking, like so
+begin
+  # your lovely code here
+rescue Exception => e
+  # The second argument is the request environment variables
+  Raygun.track_exception(e, {}, user)
+end
 ```
 
 You can also pass a Hash as the second parameter to `track_exception`. It should look like a [Rack Env Hash](http://rack.rubyforge.org/doc/SPEC.html)
@@ -87,6 +94,53 @@ Raygun.setup do |config|
   config.api_key = "YOUR_RAYGUN_API_KEY"
   config.filter_parameters do |params|
     params.slice("only", "a", "few", "keys") # note that Hash#slice is in ActiveSupport
+  end
+end
+```
+
+### Filtering the payload by whitelist
+
+As an alternative to the above, you can also opt-in to the keys/values to be sent to Raygun by providing a specific whitelist of the keys you want to transmit.
+
+This disables the blacklist filtering above (`filter_parameters`), and is applied to the entire payload (error, request, environment and custom data included), not just the request parameters.
+
+In order to opt-in to this feature, set `filter_payload_with_whitelist` to `true`, and specify a shape of what keys you want (the default is below which is to allow everything through, this also means that the query parameters filtered out by default like password, creditcard etc will not be unless changed):
+
+```ruby
+Raygun.setup do |config|
+  config.api_key = "YOUR_RAYGUN_API_KEY"
+  config.filter_payload_with_whitelist = true
+
+  config.whitelist_payload_shape = {
+      machineName: true,
+      version: true,
+      error: true,
+      userCustomData: true,
+      tags: true,
+      request: {
+        hostName: true,
+        url: true,
+        httpMethod: true,
+        iPAddress: true,
+        queryString: true,
+        headers: true,
+        form: {}, # Set to empty hash so that it doesn't just filter out the whole thing, but instead filters out each individual param
+        rawData: true
+      }
+    }
+end
+```
+
+Alternatively, provide a Proc to filter the payload using your own logic:
+
+```ruby
+Raygun.setup do |config|
+  config.api_key = "YOUR_RAYGUN_API_KEY"
+  config.filter_payload_with_whitelist = true
+
+  config.whitelist_payload_keys do |payload|
+    # Return the payload mutated into your desired form
+    payload
   end
 end
 ```
@@ -152,21 +206,30 @@ end
 
 Raygun can now track how many users have been affected by an error.
 
-By default, Raygun looks for a method called `current_user` on your controller, and calls either `email`, `username` or `id` on the object returned by that method.
+By default, Raygun looks for a method called `current_user` on your controller, and it will populate the user's information based on a default method name mapping.
 
-You can customize those method names in your configuration block:
+(e.g Raygun will call `email` to populate the user's email, and `first_name` for the user's first name)
+
+You can inspect and customize this mapping using `config.affected_user_mapping`, like so:
 
 ```ruby
 Raygun.setup do |config|
   config.api_key = "MY_SWEET_API_KEY"
   config.affected_user_method = :my_current_user # `current_user` by default
-  config.affected_user_identifier_methods << :login # `[ :email, :username, :id ]` by default - will use the first that works
+  # To augment the defaults with your unique methods you can do the following
+  config.affected_user_mapping = Raygun::AffectedUser::DEFAULT_MAPPING.merge({
+    identifier: :some_custom_unique_identifier,
+    # If you set the key to a proc it will be passed the user object and you can construct the value your self
+    full_name: ->(user) { "#{user.first_name} #{user.last_name}" }
+  })
 end
 ```
 
+To see the defaults check out [affected_user.rb](https://github.com/MindscapeHQ/raygun4ruby/tree/master/lib/raygun/affected_user.rb)
+
 If you're using Rails, most authentication systems will have this method set and you should be good to go.
 
-The count of unique affected users will appear on the error group in the Raygun dashboard. If your user has an `email` method, and that email has a Gravatars associated, you will also see your user's avatar.
+The count of unique affected users will appear on the error group in the Raygun dashboard. If your user has an `Email` attribute, and that email has a Gravatar associated with that address, you will also see your user's avatar.
 
 If you wish to keep it anonymous, you could set this identifier to something like `SecureRandom.uuid` and store that in a cookie, like so:
 
@@ -225,6 +288,10 @@ Raygun4Ruby can track errors from Sidekiq (2.x or 3+). All you need to do is add
 ```
 
 Either in your Raygun initializer or wherever else takes your fancy :)
+
+### Other Configuration options
+
+For a complete list of configuration options see the [configuration.rb](https://github.com/MindscapeHQ/raygun4ruby/blob/master/lib/raygun/configuration.rb) file
 
 ## Found a bug?
 

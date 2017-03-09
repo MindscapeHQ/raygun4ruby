@@ -11,7 +11,13 @@ require "raygun/client"
 require "raygun/middleware/rack_exception_interceptor"
 require "raygun/testable"
 require "raygun/error"
+require "raygun/affected_user"
+require "raygun/services/apply_whitelist_filter_to_payload"
 require "raygun/railtie" if defined?(Rails)
+begin
+  require "pry"
+rescue LoadError
+end
 
 module Raygun
 
@@ -38,14 +44,28 @@ module Raygun
       configuration.defaults
     end
 
-    def track_exception(exception_instance, env = {})
+    def configured?
+      !!configuration.api_key
+    end
+
+    def track_exception(exception_instance, env = {}, user = nil, retry_count = 1)
       if should_report?(exception_instance)
         log("[Raygun] Tracking Exception...")
-        Client.new.track_exception(exception_instance, env)
+        Client.new.track_exception(exception_instance, env, user)
       end
     rescue Exception => e
       if configuration.failsafe_logger
         failsafe_log("Problem reporting exception to Raygun: #{e.class}: #{e.message}\n\n#{e.backtrace.join("\n")}")
+      end
+
+      if retry_count > 0
+        new_exception = e.exception("raygun4ruby encountered an exception processing your exception")
+        new_exception.set_backtrace(e.backtrace)
+
+        env[:custom_data] ||= {}
+        env[:custom_data].merge!(original_stacktrace: exception_instance.backtrace)
+
+        track_exception(new_exception, env, user, retry_count - 1)
       else
         raise e
       end
@@ -65,7 +85,19 @@ module Raygun
       configuration.failsafe_logger.info(message)
     end
 
+    def deprecation_warning(message)
+      if defined?(ActiveSupport::Deprecation)
+        ActiveSupport::Deprecation.warn(message)
+      else
+        puts message
+      end
+    end
+
     private
+
+      def print_api_key_warning
+        $stderr.puts(NO_API_KEY_MESSAGE)
+      end
 
       def should_report?(exception)
         return false if configuration.silence_reporting

@@ -10,6 +10,7 @@ require "raygun/configuration"
 require "raygun/client"
 require "raygun/middleware/rack_exception_interceptor"
 require "raygun/testable"
+require "raygun/error"
 require "raygun/affected_user"
 require "raygun/services/apply_whitelist_filter_to_payload"
 require "raygun/railtie" if defined?(Rails)

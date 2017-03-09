@@ -143,6 +143,8 @@ module Raygun
       # see http://raygun.io/raygun-providers/rest-json-api?v=1
       def build_payload_hash(exception_instance, env = {}, user = nil)
         custom_data = filter_custom_data(env) || {}
+        exception_custom_data = exception_instance.respond_to?(:raygun_custom_data) ? exception_instance.raygun_custom_data : {}
+
         tags = env.delete(:tags) || []
 
         if rails_env
@@ -158,7 +160,7 @@ module Raygun
             version:        version,
             client:         client_details,
             error:          error_details(exception_instance),
-            userCustomData: Raygun.configuration.custom_data.merge(custom_data),
+            userCustomData: Raygun.configuration.custom_data.merge(custom_data).merge(exception_custom_data),
             tags:           Raygun.configuration.tags.concat(tags).compact.uniq,
             request:        request_information(env)
         }

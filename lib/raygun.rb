@@ -111,7 +111,7 @@ module Raygun
 
       if configuration.ignore.flatten.include?(exception.class.to_s)
         if configuration.debug
-          log("[Raygun] skipping reporting of except #{exception.class} because it is in the ignore list")
+          log("[Raygun] skipping reporting of exception #{exception.class} because it is in the ignore list")
         end
 
         return false

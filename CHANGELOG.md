@@ -1,4 +1,4 @@
-## 1.3.0
+## 1.3.0 (10/03/2017)
 
 Features:
   - Improve affected user handling to let you specify all Raygun parameters, identifier, email, first name, full name and uuid. See [README.md](https://github.com/MindscapeHQ/raygun4ruby#affected-user-tracking) for details

@@ -4,7 +4,12 @@ require 'stringio'
 
 class ClientTest < Raygun::UnitTest
 
-  class TestException < StandardError; end
+  class TestException < StandardError
+    def initialize(message = nil)
+      super(message || "A test message")
+    end
+  end
+
   class NilMessageError < StandardError
     def message
       nil
@@ -43,20 +48,7 @@ class ClientTest < Raygun::UnitTest
   end
 
   def test_error_details
-    e = TestException.new("A test message")
-    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
-
-    expected_hash = {
-      className: "ClientTest::TestException",
-      message:   e.message,
-      stackTrace: [
-        { lineNumber: "123",  fileName: "/some/folder/some_file.rb", methodName: "some_method_name" },
-        { lineNumber: "1234", fileName: "/another/path/foo.rb",      methodName: "block (3 levels) run"}
-      ]
-    }
-
-    assert_equal expected_hash, @client.send(:error_details, e)
+    assert_equal exception_hash, @client.send(:error_details, test_exception)
   end
 
   def test_error_details_with_nil_message
@@ -85,11 +77,10 @@ class ClientTest < Raygun::UnitTest
   end
 
   def test_affected_user
-    e             = TestException.new("A test message")
     test_env      = { "raygun.affected_user" => { :identifier => "somepooruser@yourapp.com" } }
     expected_hash = test_env["raygun.affected_user"]
 
-    assert_equal expected_hash, @client.send(:build_payload_hash, e, test_env)[:details][:user]
+    assert_equal expected_hash, @client.send(:build_payload_hash, test_exception, test_env)[:details][:user]
   end
 
   def test_tags
@@ -101,11 +92,10 @@ class ClientTest < Raygun::UnitTest
       config.tags = configuration_tags
     end
 
-    e             = TestException.new("A test message")
     test_env      = { tags: explicit_env_tags }
     expected_tags =  configuration_tags + explicit_env_tags + rack_env_tag
 
-    assert_equal expected_tags, @client.send(:build_payload_hash, e, test_env)[:details][:tags]
+    assert_equal expected_tags, @client.send(:build_payload_hash, test_exception, test_env)[:details][:tags]
   end
 
   def test_hostname
@@ -141,10 +131,6 @@ class ClientTest < Raygun::UnitTest
   def test_full_payload_hash
     Timecop.freeze do
       Raygun.configuration.version = 123
-      e = TestException.new("A test message")
-      e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
-
       grouping_key = "my custom group"
 
       expected_hash = {
@@ -157,14 +143,7 @@ class ClientTest < Raygun::UnitTest
             version:   Raygun::VERSION,
             clientUrl: Raygun::CLIENT_URL
           },
-          error: {
-            className: "ClientTest::TestException",
-            message:   e.message,
-            stackTrace: [
-              { lineNumber: "123",  fileName: "/some/folder/some_file.rb", methodName: "some_method_name" },
-              { lineNumber: "1234", fileName: "/another/path/foo.rb",      methodName: "block (3 levels) run"}
-            ]
-          },
+          error: exception_hash,
           userCustomData: {},
           tags:           ["test"],
           request:        {},
@@ -172,33 +151,15 @@ class ClientTest < Raygun::UnitTest
         }
       }
 
-      assert_equal expected_hash, @client.send(:build_payload_hash, e, { grouping_key: grouping_key })
+      assert_equal expected_hash, @client.send(:build_payload_hash, test_exception, { grouping_key: grouping_key })
     end
   end
 
   def test_getting_request_information
-    sample_env_hash = {
-      "SERVER_NAME"=>"localhost",
-      "REQUEST_METHOD"=>"GET",
-      "REQUEST_PATH"=>"/",
-      "PATH_INFO"=>"/",
+    env_hash = sample_env_hash.merge({
       "QUERY_STRING"=>"a=b&c=4945438",
       "REQUEST_URI"=>"/?a=b&c=4945438",
-      "HTTP_VERSION"=>"HTTP/1.1",
-      "HTTP_HOST"=>"localhost:3000",
-      "HTTP_CONNECTION"=>"keep-alive",
-      "HTTP_CACHE_CONTROL"=>"max-age=0",
-      "HTTP_ACCEPT"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-      "HTTP_USER_AGENT"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36",
-      "HTTP_ACCEPT_ENCODING"=>"gzip,deflate,sdch",
-      "HTTP_ACCEPT_LANGUAGE"=>"en-US,en;q=0.8",
-      "HTTP_COOKIE"=>"cookieval",
-      "GATEWAY_INTERFACE"=>"CGI/1.2",
-      "SERVER_PORT"=>"3000",
-      "SERVER_PROTOCOL"=>"HTTP/1.1",
-      "SCRIPT_NAME"=>"",
-      "REMOTE_ADDR"=>"127.0.0.1"
-    }
+    })
 
     expected_hash = {
       hostName:    "localhost",
@@ -206,12 +167,12 @@ class ClientTest < Raygun::UnitTest
       httpMethod:  "GET",
       iPAddress:   "127.0.0.1",
       queryString: { "a" => "b", "c" => "4945438" },
-      headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Connection"=>"keep-alive", "Cache-Control"=>"max-age=0", "Accept"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "User-Agent"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36", "Accept-Encoding"=>"gzip,deflate,sdch", "Accept-Language"=>"en-US,en;q=0.8", "Cookie"=>"cookieval" },
+      headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Cookie"=>"cookieval" },
       form:        {},
       rawData:     {}
     }
 
-    assert_equal expected_hash, @client.send(:request_information, sample_env_hash)
+    assert_equal expected_hash, @client.send(:request_information, env_hash)
   end
 
   def test_getting_request_information_with_nil_env
@@ -219,29 +180,10 @@ class ClientTest < Raygun::UnitTest
   end
 
   def test_non_form_parameters
-    put_body_env_hash = {
-      "SERVER_NAME"=>"localhost",
+    put_body_env_hash = sample_env_hash.merge({
       "REQUEST_METHOD"=>"PUT",
-      "REQUEST_PATH"=>"/",
-      "PATH_INFO"=>"/",
-      "QUERY_STRING"=>"",
-      "REQUEST_URI"=>"/",
-      "HTTP_VERSION"=>"HTTP/1.1",
-      "HTTP_HOST"=>"localhost:3000",
-      "HTTP_CONNECTION"=>"keep-alive",
-      "HTTP_CACHE_CONTROL"=>"max-age=0",
-      "HTTP_ACCEPT"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-      "HTTP_USER_AGENT"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36",
-      "HTTP_ACCEPT_ENCODING"=>"gzip,deflate,sdch",
-      "HTTP_ACCEPT_LANGUAGE"=>"en-US,en;q=0.8",
-      "HTTP_COOKIE"=>"cookieval",
-      "GATEWAY_INTERFACE"=>"CGI/1.2",
-      "SERVER_PORT"=>"3000",
-      "SERVER_PROTOCOL"=>"HTTP/1.1",
-      "SCRIPT_NAME"=>"",
-      "REMOTE_ADDR"=>"127.0.0.1",
       "action_dispatch.request.parameters"=> { "a" => "b", "c" => "4945438", "password" => "swordfish" }
-    }
+    })
 
     expected_form_hash = { "a" => "b", "c" => "4945438", "password" => "[FILTERED]" }
 
@@ -278,6 +220,7 @@ class ClientTest < Raygun::UnitTest
 
   def test_filtering_parameters
     post_body_env_hash = sample_env_hash.merge(
+      "REQUEST_METHOD" => "POST",
       "rack.input"=>StringIO.new("a=b&c=4945438&password=swordfish")
     )
 
@@ -288,6 +231,7 @@ class ClientTest < Raygun::UnitTest
 
   def test_filtering_nested_params
     post_body_env_hash = sample_env_hash.merge(
+      "REQUEST_METHOD" => "POST",
       "rack.input" => StringIO.new("a=b&bank%5Bcredit_card%5D%5Bcard_number%5D=my_secret_bank_number&bank%5Bname%5D=something&c=123456&user%5Bpassword%5D=my_fancy_password")
     )
 
@@ -310,6 +254,7 @@ class ClientTest < Raygun::UnitTest
     end
 
     post_body_env_hash = sample_env_hash.merge(
+      "REQUEST_METHOD" => "POST",
       "rack.input" => StringIO.new("nsa_only_info=123&nsa_only_metadata=seekrit&something_normal=hello")
     )
 
@@ -339,6 +284,7 @@ class ClientTest < Raygun::UnitTest
     }
 
     post_body_env_hash = sample_env_hash.merge(
+      "REQUEST_METHOD" => "POST",
       "rack.input" => StringIO.new(URI.encode_www_form(parameters))
     )
 
@@ -348,93 +294,38 @@ class ClientTest < Raygun::UnitTest
   end
 
   def test_ip_address_from_action_dispatch
-    sample_env_hash = {
-      "HTTP_VERSION"=>"HTTP/1.1",
-      "HTTP_HOST"=>"localhost:3000",
-      "HTTP_CONNECTION"=>"keep-alive",
-      "HTTP_CACHE_CONTROL"=>"max-age=0",
-      "HTTP_ACCEPT"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-      "HTTP_USER_AGENT"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36",
-      "HTTP_ACCEPT_ENCODING"=>"gzip,deflate,sdch",
-      "HTTP_ACCEPT_LANGUAGE"=>"en-US,en;q=0.8",
-      "HTTP_COOKIE"=>"cookieval",
-      "GATEWAY_INTERFACE"=>"CGI/1.2",
-      "SERVER_PORT"=>"3000",
-      "SERVER_PROTOCOL"=>"HTTP/1.1",
-      "SCRIPT_NAME"=>"",
-      "REMOTE_ADDR"=>"127.0.0.1",
+    env_hash = sample_env_hash.merge({
       "action_dispatch.remote_ip"=> "123.456.789.012"
-    }
+    })
 
-    assert_equal "123.456.789.012", @client.send(:ip_address_from, sample_env_hash)
-    assert_equal "123.456.789.012", @client.send(:request_information, sample_env_hash)[:iPAddress]
+    assert_equal "123.456.789.012", @client.send(:ip_address_from, env_hash)
+    assert_equal "123.456.789.012", @client.send(:request_information, env_hash)[:iPAddress]
   end
 
   def test_ip_address_from_old_action_dispatch
     old_action_dispatch_ip = FakeActionDispatcherIp.new("123.456.789.012")
-    sample_env_hash = {
-      "HTTP_VERSION"=>"HTTP/1.1",
-      "HTTP_HOST"=>"localhost:3000",
-      "HTTP_CONNECTION"=>"keep-alive",
-      "HTTP_CACHE_CONTROL"=>"max-age=0",
-      "HTTP_ACCEPT"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-      "HTTP_USER_AGENT"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36",
-      "HTTP_ACCEPT_ENCODING"=>"gzip,deflate,sdch",
-      "HTTP_ACCEPT_LANGUAGE"=>"en-US,en;q=0.8",
-      "HTTP_COOKIE"=>"cookieval",
-      "GATEWAY_INTERFACE"=>"CGI/1.2",
-      "SERVER_PORT"=>"3000",
-      "SERVER_PROTOCOL"=>"HTTP/1.1",
-      "SCRIPT_NAME"=>"",
-      "REMOTE_ADDR"=>"127.0.0.1",
+    env_hash = sample_env_hash.merge({
       "action_dispatch.remote_ip"=> old_action_dispatch_ip
-    }
+    })
 
-    assert_equal old_action_dispatch_ip, @client.send(:ip_address_from, sample_env_hash)
-    assert_equal "123.456.789.012", @client.send(:request_information, sample_env_hash)[:iPAddress]
+    assert_equal old_action_dispatch_ip, @client.send(:ip_address_from, env_hash)
+    assert_equal "123.456.789.012", @client.send(:request_information, env_hash)[:iPAddress]
   end
 
   def test_ip_address_from_raygun_specific_key
-    sample_env_hash = {
-      "HTTP_VERSION"=>"HTTP/1.1",
-      "HTTP_HOST"=>"localhost:3000",
-      "HTTP_CONNECTION"=>"keep-alive",
-      "HTTP_CACHE_CONTROL"=>"max-age=0",
-      "HTTP_ACCEPT"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-      "HTTP_USER_AGENT"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36",
-      "HTTP_ACCEPT_ENCODING"=>"gzip,deflate,sdch",
-      "HTTP_ACCEPT_LANGUAGE"=>"en-US,en;q=0.8",
-      "HTTP_COOKIE"=>"cookieval",
-      "GATEWAY_INTERFACE"=>"CGI/1.2",
-      "SERVER_PORT"=>"3000",
-      "SERVER_PROTOCOL"=>"HTTP/1.1",
-      "SCRIPT_NAME"=>"",
-      "REMOTE_ADDR"=>"127.0.0.1",
+    env_hash = sample_env_hash.merge({
       "raygun.remote_ip"=>"123.456.789.012"
-    }
+    })
 
-    assert_equal "123.456.789.012", @client.send(:ip_address_from, sample_env_hash)
-    assert_equal "123.456.789.012", @client.send(:request_information, sample_env_hash)[:iPAddress]
+    assert_equal "123.456.789.012", @client.send(:ip_address_from, env_hash)
+    assert_equal "123.456.789.012", @client.send(:request_information, env_hash)[:iPAddress]
   end
 
   def test_ip_address_returns_not_available_if_not_set
-    sample_env_hash = {
-      "HTTP_VERSION"=>"HTTP/1.1",
-      "HTTP_HOST"=>"localhost:3000",
-      "HTTP_CONNECTION"=>"keep-alive",
-      "HTTP_CACHE_CONTROL"=>"max-age=0",
-      "HTTP_ACCEPT"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-      "HTTP_USER_AGENT"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36",
-      "HTTP_ACCEPT_ENCODING"=>"gzip,deflate,sdch",
-      "HTTP_ACCEPT_LANGUAGE"=>"en-US,en;q=0.8",
-      "HTTP_COOKIE"=>"cookieval",
-      "GATEWAY_INTERFACE"=>"CGI/1.2",
-      "SERVER_PORT"=>"3000",
-      "SERVER_PROTOCOL"=>"HTTP/1.1",
-      "SCRIPT_NAME"=>""
-    }
+    env_hash = sample_env_hash.dup
+    env_hash.delete("REMOTE_ADDR")
 
-    assert_equal "(Not Available)", @client.send(:ip_address_from, sample_env_hash)
+    assert_equal "(Not Available)", @client.send(:ip_address_from, env_hash)
   end
 
   def test_setting_up_http_proxy
@@ -455,11 +346,7 @@ class ClientTest < Raygun::UnitTest
       Raygun.configuration.filter_payload_with_whitelist = true
       Raygun.configuration.whitelist_payload_shape = {}
 
-      e = TestException.new("A test message")
-      e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                       "/another/path/foo.rb:1234:in `block (3 levels) run'"])
-
-      client_details = @client.send(:client_details)
+      e = test_exception
 
       assert_equal Time.now.utc.iso8601, @client.send(:build_payload_hash, e)[:occurredOn]
       assert_equal Hash, @client.send(:build_payload_hash, e)[:details].class
@@ -470,34 +357,17 @@ class ClientTest < Raygun::UnitTest
     Raygun.configuration.filter_payload_with_whitelist = true
     Raygun.configuration.whitelist_payload_shape = {}
 
-    e = TestException.new("A test message")
-    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
-
     client_details = @client.send(:client_details)
 
-    assert_equal client_details, @client.send(:build_payload_hash, e)[:details][:client]
+    assert_equal client_details, @client.send(:build_payload_hash, test_exception)[:details][:client]
   end
 
   def test_filter_payload_with_whitelist_default_error
     Raygun.configuration.filter_payload_with_whitelist = true
 
-    e = TestException.new("A test message")
-    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+    details = @client.send(:build_payload_hash, test_exception)[:details]
 
-    details = @client.send(:build_payload_hash, e)[:details]
-
-    expected_hash = {
-      className: "ClientTest::TestException",
-      message:   e.message,
-      stackTrace: [
-        { lineNumber: "123",  fileName: "/some/folder/some_file.rb", methodName: "some_method_name" },
-        { lineNumber: "1234", fileName: "/another/path/foo.rb",      methodName: "block (3 levels) run" }
-      ]
-    }
-
-    assert_equal expected_hash, details[:error]
+    assert_equal exception_hash, details[:error]
   end
 
   def test_filter_payload_with_whitelist_exclude_error_keys
@@ -510,22 +380,9 @@ class ClientTest < Raygun::UnitTest
       }
     }
 
-    e = TestException.new("A test message")
-    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+    details = @client.send(:build_payload_hash, test_exception)[:details]
 
-    details = @client.send(:build_payload_hash, e)[:details]
-
-    expected_hash = {
-      className: "ClientTest::TestException",
-      message:   e.message,
-      stackTrace: [
-        { lineNumber: "123",  fileName: "/some/folder/some_file.rb", methodName: "some_method_name" },
-        { lineNumber: "1234", fileName: "/another/path/foo.rb",      methodName: "block (3 levels) run" }
-      ]
-    }
-
-    assert_equal expected_hash, details[:error]
+    assert_equal exception_hash, details[:error]
   end
 
   def test_filter_payload_with_whitelist_exclude_error_except_stacktrace
@@ -537,17 +394,11 @@ class ClientTest < Raygun::UnitTest
       }
     }
 
-    e = TestException.new("A test message")
-    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+    details = @client.send(:build_payload_hash, test_exception)[:details]
 
-    details = @client.send(:build_payload_hash, e)[:details]
-
-    expected_hash = {
-      className: "ClientTest::TestException",
-      message: "A test message",
+    expected_hash = exception_hash.merge({
       stackTrace: "[FILTERED]"
-    }
+    })
 
     assert_equal expected_hash, details[:error]
   end
@@ -558,36 +409,20 @@ class ClientTest < Raygun::UnitTest
       payload
     end
 
-    e = TestException.new("A test message")
-    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
+    details = @client.send(:build_payload_hash, test_exception)[:details]
 
-    details = @client.send(:build_payload_hash, e)[:details]
-
-    expected_hash = {
-      className: "ClientTest::TestException",
-      message: "A test message",
-      stackTrace: [
-        { lineNumber: "123",  fileName: "/some/folder/some_file.rb", methodName: "some_method_name" },
-        { lineNumber: "1234", fileName: "/another/path/foo.rb",      methodName: "block (3 levels) run" }
-      ]
-    }
-
-    assert_equal expected_hash, details[:error]
+    assert_equal exception_hash, details[:error]
   end
 
   def test_filter_payload_with_whitelist_default_request_post
     Raygun.configuration.filter_payload_with_whitelist = true
 
-    e = TestException.new("A test message")
-    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
-
     post_body_env_hash = sample_env_hash.merge(
+      "REQUEST_METHOD" => "POST",
       "rack.input"=>StringIO.new("a=b&c=4945438&password=swordfish")
     )
 
-    details = @client.send(:build_payload_hash, e, post_body_env_hash)[:details]
+    details = @client.send(:build_payload_hash, test_exception, post_body_env_hash)[:details]
 
     expected_hash = {
       hostName:    "localhost",
@@ -595,7 +430,7 @@ class ClientTest < Raygun::UnitTest
       httpMethod:  "POST",
       iPAddress:   "127.0.0.1",
       queryString: { },
-      headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Connection"=>"keep-alive", "Cache-Control"=>"max-age=0", "Accept"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "User-Agent"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36", "Accept-Encoding"=>"gzip,deflate,sdch", "Accept-Language"=>"en-US,en;q=0.8", "Cookie"=>"cookieval" },
+      headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Cookie"=>"cookieval" },
       form:        { "a" => "[FILTERED]", "c" => "[FILTERED]", "password" => "[FILTERED]" },
       rawData:     nil
     }
@@ -613,15 +448,12 @@ class ClientTest < Raygun::UnitTest
     )
     Raygun.configuration.whitelist_payload_shape = shape
 
-    e = TestException.new("A test message")
-    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
-
     post_body_env_hash = sample_env_hash.merge(
+      "REQUEST_METHOD" => "POST",
       "rack.input"=>StringIO.new("username=foo&password=swordfish")
     )
 
-    details = @client.send(:build_payload_hash, e, post_body_env_hash)[:details]
+    details = @client.send(:build_payload_hash, test_exception, post_body_env_hash)[:details]
 
     expected_hash = {
       hostName:    "localhost",
@@ -629,7 +461,7 @@ class ClientTest < Raygun::UnitTest
       httpMethod:  "POST",
       iPAddress:   "127.0.0.1",
       queryString: { },
-      headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Connection"=>"keep-alive", "Cache-Control"=>"max-age=0", "Accept"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "User-Agent"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36", "Accept-Encoding"=>"gzip,deflate,sdch", "Accept-Language"=>"en-US,en;q=0.8", "Cookie"=>"cookieval" },
+      headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Cookie"=>"cookieval" },
       form:        { "username" => "foo", "password" => "[FILTERED]" },
       rawData:     nil
     }
@@ -640,45 +472,22 @@ class ClientTest < Raygun::UnitTest
   def test_filter_payload_with_whitelist_default_request_get
     Raygun.configuration.filter_payload_with_whitelist = true
 
-    e = TestException.new("A test message")
-    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
-
-    sample_env_hash = {
-      "SERVER_NAME"=>"localhost",
-      "REQUEST_METHOD"=>"GET",
-      "REQUEST_PATH"=>"/",
-      "PATH_INFO"=>"/",
+    env_hash = sample_env_hash.merge({
       "QUERY_STRING"=>"a=b&c=4945438",
       "REQUEST_URI"=>"/?a=b&c=4945438",
-      "HTTP_VERSION"=>"HTTP/1.1",
-      "HTTP_HOST"=>"localhost:3000",
-      "HTTP_CONNECTION"=>"keep-alive",
-      "HTTP_CACHE_CONTROL"=>"max-age=0",
-      "HTTP_ACCEPT"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-      "HTTP_USER_AGENT"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36",
-      "HTTP_ACCEPT_ENCODING"=>"gzip,deflate,sdch",
-      "HTTP_ACCEPT_LANGUAGE"=>"en-US,en;q=0.8",
-      "HTTP_COOKIE"=>"cookieval",
-      "GATEWAY_INTERFACE"=>"CGI/1.2",
-      "SERVER_PORT"=>"3000",
-      "SERVER_PROTOCOL"=>"HTTP/1.1",
-      "SCRIPT_NAME"=>"",
-      "REMOTE_ADDR"=>"127.0.0.1"
-    }
-
+    })
     expected_hash = {
       hostName:    "localhost",
       url:         "/",
       httpMethod:  "GET",
       iPAddress:   "127.0.0.1",
       queryString: { "a" => "b", "c" => "4945438" },
-      headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Connection"=>"keep-alive", "Cache-Control"=>"max-age=0", "Accept"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "User-Agent"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36", "Accept-Encoding"=>"gzip,deflate,sdch", "Accept-Language"=>"en-US,en;q=0.8", "Cookie"=>"cookieval" },
+      headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Cookie"=>"cookieval" },
       form:        {},
       rawData:     {}
     }
 
-    details = @client.send(:build_payload_hash, e, sample_env_hash)[:details]
+    details = @client.send(:build_payload_hash, test_exception, env_hash)[:details]
 
     assert_equal expected_hash, details[:request]
   end
@@ -691,90 +500,41 @@ class ClientTest < Raygun::UnitTest
     end
     Raygun.configuration.whitelist_payload_shape = shape
 
-    e = TestException.new("A test message")
-    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
-
-    sample_env_hash = {
-      "SERVER_NAME"=>"localhost",
-      "REQUEST_METHOD"=>"GET",
-      "REQUEST_PATH"=>"/",
-      "PATH_INFO"=>"/",
-      "QUERY_STRING"=>"a=b&c=4945438",
-      "REQUEST_URI"=>"/?a=b&c=4945438",
-      "HTTP_VERSION"=>"HTTP/1.1",
-      "HTTP_HOST"=>"localhost:3000",
-      "HTTP_CONNECTION"=>"keep-alive",
-      "HTTP_CACHE_CONTROL"=>"max-age=0",
-      "HTTP_ACCEPT"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-      "HTTP_USER_AGENT"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36",
-      "HTTP_ACCEPT_ENCODING"=>"gzip,deflate,sdch",
-      "HTTP_ACCEPT_LANGUAGE"=>"en-US,en;q=0.8",
-      "HTTP_COOKIE"=>"cookieval",
-      "GATEWAY_INTERFACE"=>"CGI/1.2",
-      "SERVER_PORT"=>"3000",
-      "SERVER_PROTOCOL"=>"HTTP/1.1",
-      "SCRIPT_NAME"=>"",
-      "REMOTE_ADDR"=>"127.0.0.1"
-    }
-
     expected_hash = {
       hostName:    "localhost",
       url:         "/",
       httpMethod:  "GET",
       iPAddress:   "127.0.0.1",
       queryString: "[FILTERED]",
-      headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Connection"=>"keep-alive", "Cache-Control"=>"max-age=0", "Accept"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "User-Agent"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36", "Accept-Encoding"=>"gzip,deflate,sdch", "Accept-Language"=>"en-US,en;q=0.8", "Cookie"=>"cookieval" },
+      headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Cookie"=>"cookieval" },
       form:        {},
       rawData:     {}
     }
 
-    details = @client.send(:build_payload_hash, e, sample_env_hash)[:details]
+    details = @client.send(:build_payload_hash, test_exception, sample_env_hash)[:details]
 
     assert_equal expected_hash, details[:request]
   end
 
   def test_filter_payload_with_whitelist_being_false_does_not_filter_query_string
     Raygun.configuration.filter_payload_with_whitelist = false
-    e = TestException.new("A test message")
-    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
 
-    sample_env_hash = {
-      "SERVER_NAME"=>"localhost",
-      "REQUEST_METHOD"=>"GET",
-      "REQUEST_PATH"=>"/",
-      "PATH_INFO"=>"/",
+    env_hash = sample_env_hash.merge({
       "QUERY_STRING"=>"a=b&c=4945438",
       "REQUEST_URI"=>"/?a=b&c=4945438",
-      "HTTP_VERSION"=>"HTTP/1.1",
-      "HTTP_HOST"=>"localhost:3000",
-      "HTTP_CONNECTION"=>"keep-alive",
-      "HTTP_CACHE_CONTROL"=>"max-age=0",
-      "HTTP_ACCEPT"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-      "HTTP_USER_AGENT"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36",
-      "HTTP_ACCEPT_ENCODING"=>"gzip,deflate,sdch",
-      "HTTP_ACCEPT_LANGUAGE"=>"en-US,en;q=0.8",
-      "HTTP_COOKIE"=>"cookieval",
-      "GATEWAY_INTERFACE"=>"CGI/1.2",
-      "SERVER_PORT"=>"3000",
-      "SERVER_PROTOCOL"=>"HTTP/1.1",
-      "SCRIPT_NAME"=>"",
-      "REMOTE_ADDR"=>"127.0.0.1"
-    }
-
+    })
     expected_hash = {
       hostName:    "localhost",
       url:         "/",
       httpMethod:  "GET",
       iPAddress:   "127.0.0.1",
       queryString: { "a" => "b", "c" => "4945438" },
-      headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Connection"=>"keep-alive", "Cache-Control"=>"max-age=0", "Accept"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "User-Agent"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36", "Accept-Encoding"=>"gzip,deflate,sdch", "Accept-Language"=>"en-US,en;q=0.8", "Cookie"=>"cookieval" },
+      headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Cookie"=>"cookieval" },
       form:        {},
       rawData:     {}
     }
 
-    details = @client.send(:build_payload_hash, e, sample_env_hash)[:details]
+    details = @client.send(:build_payload_hash, test_exception, env_hash)[:details]
 
     assert_equal expected_hash, details[:request]
   end
@@ -789,16 +549,12 @@ class ClientTest < Raygun::UnitTest
       }
     }
 
-    e = TestException.new("A test message")
-    e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
-                     "/another/path/foo.rb:1234:in `block (3 levels) run'"])
-
-    details = @client.send(:build_payload_hash, e, sample_env_hash)[:details]
+    details = @client.send(:build_payload_hash, test_exception, sample_env_hash)[:details]
 
     expected_hash = {
       hostName:    "localhost",
       url:         "/",
-      httpMethod:  "POST",
+      httpMethod:  "GET",
       iPAddress:   "[FILTERED]",
       queryString: "[FILTERED]",
       headers:     "[FILTERED]",
@@ -826,29 +582,34 @@ class ClientTest < Raygun::UnitTest
   private
 
   def test_exception
-    e = TestException.new("A test message")
+    e = TestException.new
     e.set_backtrace(["/some/folder/some_file.rb:123:in `some_method_name'",
                      "/another/path/foo.rb:1234:in `block (3 levels) run'"])
 
     e
   end
 
+  def exception_hash
+    {
+      className: "ClientTest::TestException",
+      message:   "A test message",
+      stackTrace: [
+        { lineNumber: "123",  fileName: "/some/folder/some_file.rb", methodName: "some_method_name" },
+        { lineNumber: "1234", fileName: "/another/path/foo.rb",      methodName: "block (3 levels) run"}
+      ]
+    }
+  end
+
   def sample_env_hash
     {
       "SERVER_NAME"=>"localhost",
-      "REQUEST_METHOD"=>"POST",
+      "REQUEST_METHOD"=>"GET",
       "REQUEST_PATH"=>"/",
       "PATH_INFO"=>"/",
       "QUERY_STRING"=>"",
       "REQUEST_URI"=>"/",
       "HTTP_VERSION"=>"HTTP/1.1",
       "HTTP_HOST"=>"localhost:3000",
-      "HTTP_CONNECTION"=>"keep-alive",
-      "HTTP_CACHE_CONTROL"=>"max-age=0",
-      "HTTP_ACCEPT"=>"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-      "HTTP_USER_AGENT"=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.22 Safari/537.36",
-      "HTTP_ACCEPT_ENCODING"=>"gzip,deflate,sdch",
-      "HTTP_ACCEPT_LANGUAGE"=>"en-US,en;q=0.8",
       "HTTP_COOKIE"=>"cookieval",
       "GATEWAY_INTERFACE"=>"CGI/1.2",
       "SERVER_PORT"=>"3000",

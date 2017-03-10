@@ -64,6 +64,18 @@ class ConfigurationTest < Raygun::UnitTest
     assert_equal({ sally: "stegosaurus" }, Raygun.configuration.custom_data)
   end
 
+  def test_debug
+    Raygun.setup do |config|
+      config.debug = true
+    end
+
+    assert_equal Raygun.configuration.debug, true
+  end
+
+  def test_debug_default_set
+    assert_equal false, Raygun.configuration.debug
+  end
+
   def test_setting_filter_paramters_to_proc
     Raygun.setup do |config|
       config.filter_parameters do |hash|

@@ -64,6 +64,9 @@ module Raygun
     # Hash of proxy settings - :address, :port (defaults to 80), :username and :password (both default to nil)
     config_option :proxy_settings
 
+    # Set this to true to have raygun4ruby log the reason why it skips reporting an exception
+    config_option :debug
+
     # Exception classes to ignore by default
     IGNORE_DEFAULT = ['ActiveRecord::RecordNotFound',
                       'ActionController::RoutingError',
@@ -111,7 +114,8 @@ module Raygun
         filter_parameters:                DEFAULT_FILTER_PARAMETERS,
         filter_payload_with_whitelist:    false,
         whitelist_payload_shape:          DEFAULT_WHITELIST_PAYLOAD_SHAPE,
-        proxy_settings:                   {}
+        proxy_settings:                   {},
+        debug: false
       })
     end
 

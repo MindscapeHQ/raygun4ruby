@@ -1,4 +1,4 @@
-# Raygun 4 Ruby [![Build Status](https://travis-ci.org/MindscapeHQ/raygun4ruby.png?branch=master)](https://travis-ci.org/MindscapeHQ/raygun4ruby)
+# Raygun 4 Ruby [![Build Status](https://travis-ci.org/MindscapeHQ/raygun4ruby.png?branch=master)](https://travis-ci.org/MindscapeHQ/raygun4ruby) [![Gem Version](https://badge.fury.io/rb/raygun4ruby.svg)](https://badge.fury.io/rb/raygun4ruby)
 
 This is the Ruby adapter for the Raygun error reporter, http://raygun.io.
 

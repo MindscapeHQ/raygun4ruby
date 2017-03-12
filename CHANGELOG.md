@@ -1,3 +1,8 @@
+## 1.4.0
+
+Features:
+  - Raygun API url is now configurable via `Configuration.api_url`
+
 ## 1.3.0 (10/03/2017)
 
 Features:

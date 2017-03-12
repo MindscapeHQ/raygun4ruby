@@ -8,8 +8,6 @@ module Raygun
 
     include HTTParty
 
-    base_uri "https://api.raygun.io/"
-
     def initialize
       @api_key = require_api_key
       @headers = {
@@ -17,6 +15,7 @@ module Raygun
       }
 
       enable_http_proxy if Raygun.configuration.proxy_settings[:address]
+      self.class.base_uri Raygun.configuration.api_url
     end
 
     def require_api_key

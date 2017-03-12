@@ -67,6 +67,9 @@ module Raygun
     # Set this to true to have raygun4ruby log the reason why it skips reporting an exception
     config_option :debug
 
+    # Override this if you wish to connect to a different Raygun API than the standard one
+    config_option :api_url
+
     # Exception classes to ignore by default
     IGNORE_DEFAULT = ['ActiveRecord::RecordNotFound',
                       'ActionController::RoutingError',
@@ -115,7 +118,8 @@ module Raygun
         filter_payload_with_whitelist:    false,
         whitelist_payload_shape:          DEFAULT_WHITELIST_PAYLOAD_SHAPE,
         proxy_settings:                   {},
-        debug: false
+        debug:                            false,
+        api_url:                          'https://api.raygun.io/'
       })
     end
 

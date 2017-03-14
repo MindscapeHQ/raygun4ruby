@@ -2,6 +2,7 @@
 
 Features:
   - Raygun API url is now configurable via `Configuration.api_url`
+  - Added support for `Exception#cause` to be tracked as `innerError` on Raygun. Only supported on Ruby >= 2.1
 
 ## 1.3.0 (10/03/2017)
 

@@ -1,4 +1,4 @@
-# Raygun 4 Ruby [![Build Status](https://travis-ci.org/MindscapeHQ/raygun4ruby.png?branch=master)](https://travis-ci.org/MindscapeHQ/raygun4ruby)
+# Raygun 4 Ruby [![Build Status](https://travis-ci.org/MindscapeHQ/raygun4ruby.png?branch=master)](https://travis-ci.org/MindscapeHQ/raygun4ruby) [![Gem Version](https://badge.fury.io/rb/raygun4ruby.svg)](https://badge.fury.io/rb/raygun4ruby)
 
 This is the Ruby adapter for the Raygun error reporter, http://raygun.io.
 
@@ -156,6 +156,26 @@ rescue Exception => e
   Raygun.track_exception(e, custom_data: {my: 'custom data', goes: 'here'})
 end
 
+```
+
+Custom data can also be specified globally either by setting `config.custom_data` to a hash
+
+```ruby
+Raygun.setup do |config|
+  config.api_key = "YOUR_RAYGUN_API_KEY"
+  config.custom_data = {custom_data: 'goes here'}
+end
+```
+
+or to a proc, which gets passed the exception and environment hash
+
+```ruby
+Raygun.setup do |config|
+  config.api_key = "YOUR_RAYGUN_API_KEY"
+  config.custom_data do |e, env|
+    {message: e.message, server: env["SERVER_NAME"]}
+  end
+end
 ```
 
 ### Ignoring Some Errors

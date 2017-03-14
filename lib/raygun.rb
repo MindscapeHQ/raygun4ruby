@@ -5,18 +5,20 @@ require "socket"
 require "rack"
 require "ostruct"
 
+begin
+  require "pry"
+rescue LoadError
+end
+
 require "raygun/version"
 require "raygun/configuration"
 require "raygun/client"
 require "raygun/middleware/rack_exception_interceptor"
 require "raygun/testable"
+require "raygun/error"
 require "raygun/affected_user"
 require "raygun/services/apply_whitelist_filter_to_payload"
 require "raygun/railtie" if defined?(Rails)
-begin
-  require "pry"
-rescue LoadError
-end
 
 module Raygun
 
@@ -94,15 +96,28 @@ module Raygun
 
     private
 
-      def print_api_key_warning
-        $stderr.puts(NO_API_KEY_MESSAGE)
+    def print_api_key_warning
+      $stderr.puts(NO_API_KEY_MESSAGE)
+    end
+
+    def should_report?(exception)
+      if configuration.silence_reporting
+        if configuration.debug
+          log('[Raygun] skipping reporting because Configuration.silence_reporting is enabled')
+        end
+
+        return false
       end
 
-      def should_report?(exception)
-        return false if configuration.silence_reporting
-        return false if configuration.ignore.flatten.include?(exception.class.to_s)
-        true
+      if configuration.ignore.flatten.include?(exception.class.to_s)
+        if configuration.debug
+          log("[Raygun] skipping reporting of exception #{exception.class} because it is in the ignore list")
+        end
+
+        return false
       end
 
+      true
+    end
   end
 end

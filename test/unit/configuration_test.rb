@@ -64,6 +64,18 @@ class ConfigurationTest < Raygun::UnitTest
     assert_equal({ sally: "stegosaurus" }, Raygun.configuration.custom_data)
   end
 
+  def test_debug
+    Raygun.setup do |config|
+      config.debug = true
+    end
+
+    assert_equal Raygun.configuration.debug, true
+  end
+
+  def test_debug_default_set
+    assert_equal false, Raygun.configuration.debug
+  end
+
   def test_setting_filter_paramters_to_proc
     Raygun.setup do |config|
       config.filter_parameters do |hash|
@@ -92,4 +104,29 @@ class ConfigurationTest < Raygun::UnitTest
       Raygun.configuration.whitelist_payload_shape = nil
   end
 
+  def test_setting_custom_data_to_proc
+    Raygun.setup do |config|
+      config.custom_data do |exception, env|
+        # No-op
+      end
+    end
+
+    assert Raygun.configuration.custom_data.is_a?(Proc)
+  ensure
+      Raygun.configuration.custom_data = nil
+  end
+
+  def test_setting_custom_data_to_hash
+    Raygun.setup do |config|
+      config.custom_data = {}
+    end
+
+    assert Raygun.configuration.custom_data.is_a?(Hash)
+  ensure
+      Raygun.configuration.custom_data = nil
+  end
+
+  def test_api_url_default
+    assert_equal "https://api.raygun.io/", Raygun.configuration.api_url
+  end
 end

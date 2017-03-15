@@ -176,7 +176,10 @@ module Raygun
             error:          error_details(exception_instance),
             userCustomData: exception_custom_data.merge(custom_data).merge(configured_custom_data),
             tags:           Raygun.configuration.tags.concat(tags).compact.uniq,
-            request:        request_information(env)
+            request:        request_information(env),
+            environment:    {
+              utcOffset: Time.now.utc_offset / 3600
+            }
         }
 
         error_details.merge!(groupingKey: grouping_key) if grouping_key
@@ -250,6 +253,5 @@ module Raygun
       def print_api_key_warning
         $stderr.puts(NO_API_KEY_MESSAGE)
       end
-
   end
 end

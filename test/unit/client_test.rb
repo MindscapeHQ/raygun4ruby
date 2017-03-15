@@ -30,6 +30,9 @@ class ClientTest < Raygun::UnitTest
     super
     @client = Raygun::Client.new
     fake_successful_entry
+
+    # Force NZ time zone for utcOffset tests
+    ENV['TZ'] = 'UTC-13'
   end
 
   def test_api_key_required_message
@@ -55,6 +58,12 @@ class ClientTest < Raygun::UnitTest
     e = NilMessageError.new
     expected_message = ""
     assert_equal expected_message, @client.send(:error_details, e)[:message]
+  end
+
+  def test_utc_offset
+    expected = 13
+
+    assert_equal expected, @client.send(:build_payload_hash, test_exception, sample_env_hash)[:details][:environment][:utcOffset]
   end
 
   def test_inner_error_details
@@ -178,7 +187,10 @@ class ClientTest < Raygun::UnitTest
           userCustomData: {},
           tags:           ["test"],
           request:        {},
-          groupingKey:    grouping_key
+          groupingKey:    grouping_key,
+          environment: {
+            utcOffset: 13
+          }
         }
       }
 

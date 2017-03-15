@@ -1,4 +1,9 @@
-## 1.4.0
+## 1.5.0 (16/03/2017)
+
+Features
+  - Send utcOffset with Raygun payload to calculate local server time in Raygun dashboard
+
+## 1.4.0 (14/03/2017)
 
 Features:
   - Raygun API url is now configurable via `Configuration.api_url`

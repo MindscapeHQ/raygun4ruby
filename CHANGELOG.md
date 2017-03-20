@@ -31,4 +31,4 @@ Features:
   - When raygun4ruby encounters an exception trying to track an exception it will try once to send that exception to Raygun so you are notified ([#104](https://github.com/MindscapeHQ/raygun4ruby/pull/104))
 
 Bugfixes:
-  - raygun4ruby will no longer crash and suppress app exceptions when the API key is not configured
+  - raygun4ruby will no longer crash and suppress app exceptions when the API key is not configured ([#87](https://github.com/MindscapeHQ/raygun4ruby/pull/87))

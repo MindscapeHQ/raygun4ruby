@@ -1,3 +1,5 @@
+require_relative 'breadcrumb'
+
 module Raygun
   class Breadcrumbs
     def self.initialize_store

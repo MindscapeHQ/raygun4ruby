@@ -7,7 +7,7 @@ namespace :test do
 
   desc "Test the basics of the adapter"
   Rake::TestTask.new(:units) do |t|
-    t.test_files = FileList["test/unit/*_test.rb"]
+    t.test_files = FileList["test/unit/*_test.rb", "specs/**/*_spec.rb"]
     t.verbose = true
   end
 

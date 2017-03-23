@@ -18,6 +18,7 @@ require "raygun/testable"
 require "raygun/error"
 require "raygun/affected_user"
 require "raygun/services/apply_whitelist_filter_to_payload"
+require "raygun/breadcrumbs"
 require "raygun/railtie" if defined?(Rails)
 
 module Raygun

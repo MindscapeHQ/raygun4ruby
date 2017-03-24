@@ -1,17 +1,10 @@
-require_relative 'breadcrumb'
-
 module Raygun
-  class Breadcrumbs
-    def self.initialize_store
-      Thread.current[:breadcrumbs] ||= []
-    end
+  module Breadcrumbs
+    def record_breadcrumb(&block)
+      crumb = Breadcrumb.new
+      crumb.class_name = self.class.name
 
-    def self.clear_store
-      Thread.current[:breadcrumbs] = nil
-    end
-
-    def self.stored
-      Thread.current[:breadcrumbs]
+      Breadcrumbs::Store.record(crumb, &block)
     end
   end
 end

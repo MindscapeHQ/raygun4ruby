@@ -22,11 +22,11 @@ module Raygun
         end
 
         it 'has a level' do
-          message = 'foo'
+          level = 'foo'
 
-          subject.message = message
+          subject.level = level
 
-          subject.message.must_equal(message)
+          subject.level.must_equal(level)
         end
 
         it 'has a timestamp' do
@@ -67,6 +67,54 @@ module Raygun
           subject.line_number = line_number
 
           subject.line_number.must_equal(line_number)
+        end
+      end
+
+      describe "#build_payload" do
+        before do
+          Timecop.freeze
+          Store.initialize_store
+        end
+        after do
+          Timecop.return
+          Store.clear_store
+        end
+
+        let(:breadcrumb) do
+          Store.record do |c|
+            c.message = "test"
+            c.category = "test"
+            c.level = "info"
+            c.class_name = "HomeController"
+            c.method_name = "index"
+            c.line_number = 17
+            c.metadata = {
+              foo: 'bar'
+            }
+          end
+
+          Store.stored[0]
+        end
+        let(:payload) { breadcrumb.build_payload }
+
+        it "joins the class name, method name and line number together" do
+          payload[:location].must_equal("HomeController:index:17")
+        end
+
+        it "does not include the method name and line number if the class name is missing" do
+          breadcrumb.class_name = nil
+
+          payload.has_key?(:location).must_equal(false)
+        end
+
+        it "includes the rest of the fields" do
+          payload[:message].must_equal("test")
+          payload[:category].must_equal("test")
+          payload[:level].must_equal("info")
+          payload[:timestamp].must_equal(Time.now.utc)
+          payload[:data].must_equal({
+            foo: 'bar'
+          })
         end
       end
     end

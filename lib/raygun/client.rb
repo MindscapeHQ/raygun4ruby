@@ -181,6 +181,8 @@ module Raygun
               utcOffset: Time.now.utc_offset / 3600
             }
         }
+        store = ::Raygun::Breadcrumbs::Store
+        error_details[:breadcrumbs] = store.stored.map(&:build_payload) if store.any?
 
         error_details.merge!(groupingKey: grouping_key) if grouping_key
 

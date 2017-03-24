@@ -622,6 +622,19 @@ class ClientTest < Raygun::UnitTest
     assert_equal expected_details, user_details
   end
 
+  def test_build_payload_includes_breadcrumbs
+    ::Raygun::Breadcrumbs::Store.initialize_store
+    ::Raygun::Breadcrumbs::Store.record do |crumb|
+      crumb.message = "foo"
+    end
+
+    breadcrumbs = @client.send(:build_payload_hash, test_exception, sample_env_hash)[:details][:breadcrumbs]
+    ::Raygun::Breadcrumbs::Store.clear_store
+
+    assert_equal breadcrumbs.length, 1
+    assert breadcrumbs[0].is_a? Hash
+  end
+
   private
 
   def test_exception

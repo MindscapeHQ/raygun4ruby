@@ -24,6 +24,10 @@ module Raygun
 
         Thread.current[:breadcrumbs] << crumb
       end
+
+      def self.any?
+        stored != nil && stored.length > 0
+      end
     end
   end
 end

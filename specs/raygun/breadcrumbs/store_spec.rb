@@ -29,6 +29,30 @@ module Raygun
         end
       end
 
+      describe "any?" do
+        after { subject.clear_store }
+
+        it "returns true if any breadcrumbs have been logged" do
+          subject.initialize_store
+
+          subject.record do |c|
+            c.message = "test"
+          end
+
+          subject.any?.must_equal(true)
+        end
+
+        it "returns false if none have been logged" do
+          subject.initialize_store
+
+          subject.any?.must_equal(false)
+        end
+
+        it "returns false if the store is uninitialized" do
+          subject.any?.must_equal(false)
+        end
+      end
+
       describe "#clear_store" do
         before do
           subject.initialize_store

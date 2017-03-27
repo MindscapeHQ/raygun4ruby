@@ -73,11 +73,11 @@ module Raygun
       describe "#build_payload" do
         before do
           Timecop.freeze
-          Store.initialize_store
+          Store.initialize
         end
         after do
           Timecop.return
-          Store.clear_store
+          Store.clear
         end
 
         let(:breadcrumb) do

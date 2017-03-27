@@ -7,15 +7,15 @@ module Raygun
     describe Store do
       let(:subject) { Store }
 
-      describe "#initialize_store" do
+      describe "#initialize" do
         before do
           subject.stored.must_equal(nil)
 
-          subject.initialize_store
+          subject.initialize
         end
 
         after do
-          subject.clear_store
+          subject.clear
         end
 
         it "creates the store on the current Thread" do
@@ -30,10 +30,10 @@ module Raygun
       end
 
       describe "any?" do
-        after { subject.clear_store }
+        after { subject.clear }
 
         it "returns true if any breadcrumbs have been logged" do
-          subject.initialize_store
+          subject.initialize
 
           subject.record do |c|
             c.message = "test"
@@ -43,7 +43,7 @@ module Raygun
         end
 
         it "returns false if none have been logged" do
-          subject.initialize_store
+          subject.initialize
 
           subject.any?.must_equal(false)
         end
@@ -53,13 +53,13 @@ module Raygun
         end
       end
 
-      describe "#clear_store" do
+      describe "#clear" do
         before do
-          subject.initialize_store
+          subject.initialize
         end
 
         it "resets the store back to nil" do
-          subject.clear_store
+          subject.clear
 
           subject.stored.must_equal(nil)
         end
@@ -77,8 +77,8 @@ module Raygun
         end
 
         before do
-          subject.clear_store
-          subject.initialize_store
+          subject.clear
+          subject.initialize
         end
 
         it "gets stored" do

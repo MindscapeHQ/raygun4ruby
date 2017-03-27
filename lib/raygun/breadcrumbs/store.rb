@@ -3,11 +3,11 @@ require_relative 'breadcrumb'
 module Raygun
   module Breadcrumbs
     class Store
-      def self.initialize_store
+      def self.initialize
         Thread.current[:breadcrumbs] ||= []
       end
 
-      def self.clear_store
+      def self.clear
         Thread.current[:breadcrumbs] = nil
       end
 

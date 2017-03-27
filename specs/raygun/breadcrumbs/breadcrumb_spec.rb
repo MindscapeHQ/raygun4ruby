@@ -107,6 +107,12 @@ module Raygun
           payload.has_key?(:location).must_equal(false)
         end
 
+        it "does not inlcude the line number if is it missing" do
+          breadcrumb.line_number = nil
+
+          payload[:location].must_equal("HomeController:index")
+        end
+
         it "includes the rest of the fields" do
           payload[:message].must_equal("test")
           payload[:category].must_equal("test")

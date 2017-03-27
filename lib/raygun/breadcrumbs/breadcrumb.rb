@@ -15,7 +15,8 @@ module Raygun
           data: metadata,
           timestamp: timestamp,
         }
-        payload[:location] = "#{class_name}:#{method_name}:#{line_number}" unless class_name == nil
+        payload[:location] = "#{class_name}:#{method_name}" unless class_name == nil
+        payload[:location] += ":#{line_number}" if payload.has_key?(:location) && line_number != nil
 
         payload
       end

@@ -624,9 +624,7 @@ class ClientTest < Raygun::UnitTest
 
   def test_build_payload_includes_breadcrumbs
     ::Raygun::Breadcrumbs::Store.initialize
-    ::Raygun::Breadcrumbs::Store.record do |crumb|
-      crumb.message = "foo"
-    end
+    ::Raygun::Breadcrumbs::Store.record(message: "foo")
 
     breadcrumbs = @client.send(:build_payload_hash, test_exception, sample_env_hash)[:details][:breadcrumbs]
     ::Raygun::Breadcrumbs::Store.clear

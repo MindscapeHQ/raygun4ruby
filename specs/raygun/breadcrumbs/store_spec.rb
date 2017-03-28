@@ -35,9 +35,7 @@ module Raygun
         it "returns true if any breadcrumbs have been logged" do
           subject.initialize
 
-          subject.record do |c|
-            c.message = "test"
-          end
+          subject.record(message: "test")
 
           subject.any?.must_equal(true)
         end
@@ -81,9 +79,7 @@ module Raygun
           include ::Raygun::Breadcrumbs
 
           def bar
-            record_breadcrumb do |crumb|
-              crumb.message = "test"
-            end
+            record_breadcrumb(message: "test")
           end
         end
 
@@ -93,25 +89,10 @@ module Raygun
         end
 
         it "gets stored" do
-          subject.record do |crumb|
-            crumb.message = "test"
-          end
+          subject.record(message: "test")
 
           subject.stored.length.must_equal(1)
           subject.stored[0].message.must_equal("test")
-        end
-
-        it "lets you pass in a pre constructed breadcrumb" do
-          breadcrumb = Breadcrumb.new
-          breadcrumb.category = "test"
-
-          subject.record(breadcrumb) do |crumb|
-            crumb.message = "test"
-          end
-
-          bc = subject.stored[0]
-          bc.category.must_equal("test")
-          bc.message.must_equal("test")
         end
 
         it "automatically sets the class name" do
@@ -129,9 +110,7 @@ module Raygun
         end
 
         it "does not set the method name if it is already set" do
-          subject.record do |crumb|
-            crumb.method_name = "foo"
-          end
+          subject.record(message: 'test', method_name: "foo")
 
           subject.stored[0].method_name.must_equal("foo")
         end
@@ -150,9 +129,7 @@ module Raygun
           time = Time.now.utc
 
           Timecop.freeze do
-            subject.record do |crumb|
-              crumb.timestamp = time
-            end
+            subject.record(message: 'test', timestamp: time)
 
             subject.stored[0].timestamp.wont_equal(Time.now.utc)
           end

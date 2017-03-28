@@ -81,17 +81,17 @@ module Raygun
         end
 
         let(:breadcrumb) do
-          Store.record do |c|
-            c.message = "test"
-            c.category = "test"
-            c.level = :info
-            c.class_name = "HomeController"
-            c.method_name = "index"
-            c.line_number = 17
-            c.metadata = {
+          Store.record(
+            message: "test",
+            category: "test",
+            level: :info,
+            class_name: "HomeController",
+            method_name: "index",
+            line_number: 17,
+            metadata: {
               foo: 'bar'
             }
-          end
+          )
 
           Store.stored[0]
         end

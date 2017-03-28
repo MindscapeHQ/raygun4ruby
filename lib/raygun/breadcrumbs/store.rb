@@ -15,16 +15,29 @@ module Raygun
         Thread.current[:breadcrumbs]
       end
 
-      def self.record(crumb = nil, &block)
-        crumb = Breadcrumb.new if crumb == nil
+      def self.record(
+        message: nil,
+        category: '',
+        level: :info,
+        timestamp: Time.now.utc,
+        metadata: {},
+        class_name: nil,
+        method_name: nil,
+        line_number: nil
+      )
+        raise ArgumentError.new('missing keyword: message') if message == nil
+        crumb = Breadcrumb.new
 
-        block.call(crumb)
+        crumb.message = message
+        crumb.category = category
+        crumb.level = level
+        crumb.metadata = metadata
+        crumb.timestamp = timestamp
 
         caller = caller_locations[1]
-        crumb.method_name = caller.label if crumb.method_name == nil
-        crumb.line_number = caller.lineno
-        crumb.timestamp = Time.now.utc if crumb.timestamp == nil
-        crumb.level = :info if crumb.level == nil
+        crumb.class_name = class_name
+        crumb.method_name = method_name || caller.label
+        crumb.line_number = line_number || caller.lineno
 
         Thread.current[:breadcrumbs] << crumb if should_record?(crumb)
       end

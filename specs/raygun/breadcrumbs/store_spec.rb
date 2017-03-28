@@ -6,16 +6,13 @@ module Raygun
   module Breadcrumbs
     describe Store do
       let(:subject) { Store }
+      after { subject.clear }
 
       describe "#initialize" do
         before do
           subject.stored.must_equal(nil)
 
           subject.initialize
-        end
-
-        after do
-          subject.clear
         end
 
         it "creates the store on the current Thread" do
@@ -30,8 +27,6 @@ module Raygun
       end
 
       describe "any?" do
-        after { subject.clear }
-
         it "returns true if any breadcrumbs have been logged" do
           subject.initialize
 

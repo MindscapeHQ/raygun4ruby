@@ -120,7 +120,7 @@ module Raygun
         proxy_settings:                {},
         debug:                         false,
         api_url:                       'https://api.raygun.io/',
-        breadcrumb_level:              :warning
+        breadcrumb_level:              :info
       })
     end
 

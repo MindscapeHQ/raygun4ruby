@@ -145,7 +145,7 @@ class ConfigurationTest < Raygun::UnitTest
       config.breadcrumb_level = :invalid
     end
 
-    assert_equal :warning, Raygun.configuration.breadcrumb_level
+    assert_equal :info, Raygun.configuration.breadcrumb_level
     assert(
       logger.get.include?("unknown breadcrumb level"),
       "unknown breadcrumb level message was not logged"
@@ -153,6 +153,6 @@ class ConfigurationTest < Raygun::UnitTest
   end
 
   def test_breadcrumb_level_default
-    assert_equal :warning, Raygun.configuration.breadcrumb_level
+    assert_equal :info, Raygun.configuration.breadcrumb_level
   end
 end

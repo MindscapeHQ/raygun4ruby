@@ -19,14 +19,27 @@ module Raygun
         crumb = Breadcrumb.new if crumb == nil
 
         block.call(crumb)
+
         crumb.method_name = caller_locations[1].label if crumb.method_name == nil
         crumb.timestamp = Time.now.utc if crumb.timestamp == nil
+        crumb.level = :info if crumb.level == nil
 
-        Thread.current[:breadcrumbs] << crumb
+        Thread.current[:breadcrumbs] << crumb if should_record?(crumb)
       end
 
       def self.any?
         stored != nil && stored.length > 0
+      end
+
+      private
+
+      def self.should_record?(crumb)
+        levels = Raygun::Breadcrumbs::BREADCRUMB_LEVELS
+
+        active_level = levels.index(Raygun.configuration.breadcrumb_level)
+        crumb_level = levels.index(crumb.level) || -1
+
+        crumb_level >= active_level
       end
     end
   end

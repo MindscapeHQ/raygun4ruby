@@ -84,7 +84,7 @@ module Raygun
           Store.record do |c|
             c.message = "test"
             c.category = "test"
-            c.level = "info"
+            c.level = :info
             c.class_name = "HomeController"
             c.method_name = "index"
             c.line_number = 17
@@ -116,7 +116,7 @@ module Raygun
         it "includes the rest of the fields" do
           payload[:message].must_equal("test")
           payload[:category].must_equal("test")
-          payload[:level].must_equal("info")
+          payload[:level].must_equal(:info)
           payload[:timestamp].must_equal(Time.now.utc)
           payload[:data].must_equal({
             foo: 'bar'

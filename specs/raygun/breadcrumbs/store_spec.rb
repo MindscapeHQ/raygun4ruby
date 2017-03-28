@@ -65,6 +65,17 @@ module Raygun
         end
       end
 
+      describe "#should_record?" do
+        it "returns false when the log level is above the breadcrumbs level" do
+          Raygun.configuration.stubs(:breadcrumb_level).returns(:error)
+
+          crumb = Breadcrumb.new
+          crumb.level = :warning
+
+          assert_equal false, subject.send(:should_record?, crumb)
+        end
+      end
+
       context "adding a breadcrumb" do
         class Foo
           include ::Raygun::Breadcrumbs
@@ -145,6 +156,19 @@ module Raygun
 
             subject.stored[0].timestamp.wont_equal(Time.now.utc)
           end
+        end
+
+        it "sets the log level to :info if one is not supplied" do
+          Foo.new.bar
+
+          subject.stored[0].level.must_equal(:info)
+        end
+
+        it "does not record the breadcrumb if should_record? is false" do
+          subject.stubs(:should_record?).returns(false)
+          Foo.new.bar
+
+          subject.stored.length.must_equal(0)
         end
       end
     end

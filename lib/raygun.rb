@@ -82,6 +82,10 @@ module Raygun
       track_exception(e)
     end
 
+    def record_breadcrumb(&block)
+      Breadcrumbs::Store.record(nil, &block)
+    end
+
     def log(message)
       configuration.logger.info(message) if configuration.logger
     end

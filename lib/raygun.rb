@@ -82,8 +82,26 @@ module Raygun
       track_exception(e)
     end
 
-    def record_breadcrumb(&block)
-      Breadcrumbs::Store.record(nil, &block)
+    def record_breadcrumb(
+        message: nil,
+        category: '',
+        level: :info,
+        timestamp: Time.now.utc,
+        metadata: {},
+        class_name: nil,
+        method_name: nil,
+        line_number: nil
+    )
+      Raygun::Breadcrumbs::Store.record(
+        message: message,
+        category: category,
+        level: level,
+        timestamp: timestamp,
+        metadata: metadata,
+        class_name: class_name,
+        method_name: method_name,
+        line_number: line_number,
+      )
     end
 
     def log(message)

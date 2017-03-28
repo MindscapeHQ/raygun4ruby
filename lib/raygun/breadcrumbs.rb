@@ -19,7 +19,7 @@ module Raygun
         line_number: nil
     )
       class_name = class_name || self.class.name
-      Breadcrumbs::Store.record(
+      Raygun::Breadcrumbs::Store.record(
         message: message,
         category: category,
         level: level,

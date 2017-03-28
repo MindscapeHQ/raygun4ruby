@@ -20,7 +20,9 @@ module Raygun
 
         block.call(crumb)
 
-        crumb.method_name = caller_locations[1].label if crumb.method_name == nil
+        caller = caller_locations[1]
+        crumb.method_name = caller.label if crumb.method_name == nil
+        crumb.line_number = caller.lineno
         crumb.timestamp = Time.now.utc if crumb.timestamp == nil
         crumb.level = :info if crumb.level == nil
 

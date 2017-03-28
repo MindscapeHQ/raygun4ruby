@@ -54,7 +54,13 @@ module Raygun
         active_level = levels.index(Raygun.configuration.breadcrumb_level)
         crumb_level = levels.index(crumb.level) || -1
 
-        crumb_level >= active_level
+        discard = crumb_level < active_level
+
+        if discard && Raygun.configuration.debug
+          Raygun.log("[Raygun.breadcrumbs] discarding breadcrumb because #{crumb.level} is below active breadcrumb level (#{Raygun.configuration.breadcrumb_level})")
+        end
+
+        !discard
       end
     end
   end

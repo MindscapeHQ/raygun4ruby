@@ -1,3 +1,8 @@
+## 1.6.0
+
+Features
+  - Ability to record breadcrumbs in your code that will be sent to Raygun along with a raised exception ([#113](https://github.com/MindscapeHQ/raygun4ruby/pull/113))
+
 ## 1.5.0 (16/03/2017)
 
 Features

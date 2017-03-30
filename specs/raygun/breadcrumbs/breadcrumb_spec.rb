@@ -113,12 +113,18 @@ module Raygun
           payload[:location].must_equal("HomeController:index")
         end
 
+        it "does not include CustomData if data is missing" do
+          breadcrumb.metadata = nil
+
+          payload.key?(:CustomData).must_equal(false)
+        end
+
         it "includes the rest of the fields" do
           payload[:message].must_equal("test")
           payload[:category].must_equal("test")
           payload[:level].must_equal(1)
           payload[:timestamp].must_equal(Time.now.utc)
-          payload[:data].must_equal({
+          payload[:CustomData].must_equal({
             foo: 'bar'
           })
         end

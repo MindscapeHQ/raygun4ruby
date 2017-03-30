@@ -12,9 +12,10 @@ module Raygun
           message: message,
           category: category,
           level: Breadcrumbs::BREADCRUMB_LEVELS.index(level),
-          data: metadata,
           timestamp: timestamp,
         }
+
+        payload[:CustomData] = metadata unless metadata == nil
         payload[:location] = "#{class_name}:#{method_name}" unless class_name == nil
         payload[:location] += ":#{line_number}" if payload.has_key?(:location) && line_number != nil
 

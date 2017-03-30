@@ -113,10 +113,12 @@ module Raygun
           payload[:location].must_equal("HomeController:index")
         end
 
-        it "does not include CustomData if data is missing" do
+        it "does not include keys in payload with nil values" do
           breadcrumb.metadata = nil
+          breadcrumb.category = nil
 
           payload.key?(:CustomData).must_equal(false)
+          payload.key?(:category).must_equal(false)
         end
 
         it "includes the rest of the fields" do

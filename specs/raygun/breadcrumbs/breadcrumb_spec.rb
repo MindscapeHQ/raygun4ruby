@@ -116,7 +116,7 @@ module Raygun
         it "includes the rest of the fields" do
           payload[:message].must_equal("test")
           payload[:category].must_equal("test")
-          payload[:level].must_equal(:info)
+          payload[:level].must_equal(1)
           payload[:timestamp].must_equal(Time.now.utc)
           payload[:data].must_equal({
             foo: 'bar'

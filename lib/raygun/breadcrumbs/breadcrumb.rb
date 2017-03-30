@@ -11,7 +11,7 @@ module Raygun
         payload = {
           message: message,
           category: category,
-          level: level,
+          level: Breadcrumbs::BREADCRUMB_LEVELS.index(level),
           data: metadata,
           timestamp: timestamp,
         }

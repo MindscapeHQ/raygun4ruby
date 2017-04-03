@@ -19,7 +19,7 @@ module Raygun
         message: nil,
         category: '',
         level: :info,
-        timestamp: Time.now.utc,
+        timestamp: Time.now.utc.to_i,
         metadata: {},
         class_name: nil,
         method_name: nil,

@@ -116,7 +116,7 @@ module Raygun
             Foo.new.bar
 
             bc = subject.stored[0]
-            bc.timestamp.must_equal(Time.now.utc)
+            bc.timestamp.must_equal(Time.now.utc.to_i)
           end
         end
 

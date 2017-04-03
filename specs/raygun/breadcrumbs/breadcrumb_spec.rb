@@ -121,14 +121,12 @@ module Raygun
           payload.key?(:category).must_equal(false)
         end
 
-        it "includes the rest of the fields" do
-          payload[:message].must_equal("test")
-          payload[:category].must_equal("test")
+        it 'includes the rest of the fields' do
+          payload[:message].must_equal('test')
+          payload[:category].must_equal('test')
           payload[:level].must_equal(1)
-          payload[:timestamp].must_equal(Time.now.utc)
-          payload[:CustomData].must_equal({
-            foo: 'bar'
-          })
+          payload[:timestamp].wont_be_nil
+          payload[:CustomData].must_equal(foo: 'bar')
         end
       end
     end

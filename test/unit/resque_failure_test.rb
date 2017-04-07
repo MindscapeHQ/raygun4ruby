@@ -16,7 +16,7 @@ class ResqueFailureTest < Raygun::UnitTest
       "TestWorker PID 123",
       "super_important_jobs",
       class: "SendCookies", args: [ "nik" ]
-    ).save.success?
+    ).save.tap{|x| x.wait!}.instance_variable_get("@value").success?
   end
 
 end

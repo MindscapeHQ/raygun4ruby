@@ -1,4 +1,5 @@
 require "httparty"
+require "concurrent"
 require "logger"
 require "json"
 require "socket"
@@ -52,7 +53,7 @@ module Raygun
     def track_exception(exception_instance, env = {}, user = nil, retry_count = 1)
       if should_report?(exception_instance)
         log("[Raygun] Tracking Exception...")
-        Client.new.track_exception(exception_instance, env, user)
+        Client.new.async.track_exception(exception_instance, env, user)
       end
     rescue Exception => e
       if configuration.failsafe_logger

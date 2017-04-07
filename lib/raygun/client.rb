@@ -7,6 +7,7 @@ module Raygun
     NO_API_KEY_MESSAGE  = "[RAYGUN] Just a note, you've got no API Key configured, which means we can't report exceptions. Specify your Raygun API key using Raygun#setup (find yours at https://app.raygun.io)"
 
     include HTTParty
+    include Concurrent::Async
 
     def initialize
       @api_key = require_api_key

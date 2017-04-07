@@ -47,6 +47,9 @@ class ClientTest < Raygun::UnitTest
       raise TestException.new
     end
 
+    response.wait!
+    # response.value doesn't work
+    response = response.instance_variable_get("@value")
     assert response.success?
   end
 

@@ -3,7 +3,8 @@ module Raygun
     class Breadcrumb
       ATTRIBUTES = [
         :message, :category, :metadata, :class_name,
-        :method_name, :line_number, :timestamp, :level
+        :method_name, :line_number, :timestamp, :level,
+        :type
       ]
       attr_accessor(*ATTRIBUTES)
 
@@ -14,6 +15,7 @@ module Raygun
           level: Breadcrumbs::BREADCRUMB_LEVELS.index(level),
           CustomData: metadata,
           timestamp: timestamp,
+          type: type
         }
 
         payload[:location] = "#{class_name}:#{method_name}" unless class_name == nil

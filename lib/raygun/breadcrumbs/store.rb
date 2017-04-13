@@ -33,6 +33,7 @@ module Raygun
         crumb.level = level
         crumb.metadata = metadata
         crumb.timestamp = timestamp
+        crumb.type = 'manual'
 
         caller = caller_locations[1]
         crumb.class_name = class_name

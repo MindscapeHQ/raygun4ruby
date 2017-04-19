@@ -233,6 +233,17 @@ class ClientTest < Raygun::UnitTest
     assert_equal '{"foo": "bar"}', @client.send(:request_information, env_hash)[:rawData]
   end
 
+  def test_raw_post_body_with_more_than_4096_chars
+    input = "0" * 5000;
+    env_hash = sample_env_hash.merge({
+      "CONTENT_TYPE" => "application/json",
+      "REQUEST_METHOD" => "POST",
+      "rack.input" => StringIO.new(input)
+    })
+
+    assert_equal input.slice(0, 4096), @client.send(:request_information, env_hash)[:rawData]
+  end
+
   def test_raw_post_body_with_config_disabled
     Raygun.configuration.record_raw_data = false
     env_hash = sample_env_hash.merge({

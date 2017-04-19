@@ -133,8 +133,11 @@ module Raygun
 
       def raw_data(rack_env)
         request = Rack::Request.new(rack_env)
-        unless request.form_data?
-          form_params(rack_env)
+
+        if rack_env['rack.input'] && !request.form_data?
+          rack_env['rack.input'].read
+        else
+          {}
         end
       end
 

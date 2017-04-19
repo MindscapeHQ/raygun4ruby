@@ -55,6 +55,8 @@ module Raygun
         Client.new.track_exception(exception_instance, env, user)
       end
     rescue Exception => e
+      p "Exception"
+      p e.inspect
       if configuration.failsafe_logger
         failsafe_log("Problem reporting exception to Raygun: #{e.class}: #{e.message}\n\n#{e.backtrace.join("\n")}")
       end

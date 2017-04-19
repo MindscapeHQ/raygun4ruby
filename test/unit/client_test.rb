@@ -222,15 +222,14 @@ class ClientTest < Raygun::UnitTest
     assert_equal({}, @client.send(:request_information, nil))
   end
 
-  def test_non_form_parameters
-    put_body_env_hash = sample_env_hash.merge({
-      "REQUEST_METHOD"=>"PUT",
-      "action_dispatch.request.parameters"=> { "a" => "b", "c" => "4945438", "password" => "swordfish" }
+  def test_raw_post_body
+    env_hash = sample_env_hash.merge({
+      "CONTENT_TYPE" => "application/json",
+      "REQUEST_METHOD" => "POST",
+      "rack.input" => StringIO.new('{"foo": "bar"}')
     })
 
-    expected_form_hash = { "a" => "b", "c" => "4945438", "password" => "[FILTERED]" }
-
-    assert_equal expected_form_hash, @client.send(:request_information, put_body_env_hash)[:rawData]
+    assert_equal '{"foo": "bar"}', @client.send(:request_information, env_hash)[:rawData]
   end
 
   def test_error_raygun_custom_data
@@ -461,6 +460,7 @@ class ClientTest < Raygun::UnitTest
     Raygun.configuration.filter_payload_with_whitelist = true
 
     post_body_env_hash = sample_env_hash.merge(
+      "CONTENT_TYPE" => 'application/x-www-form-urlencoded',
       "REQUEST_METHOD" => "POST",
       "rack.input"=>StringIO.new("a=b&c=4945438&password=swordfish")
     )
@@ -475,7 +475,7 @@ class ClientTest < Raygun::UnitTest
       queryString: { },
       headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Cookie"=>"cookieval" },
       form:        { "a" => "[FILTERED]", "c" => "[FILTERED]", "password" => "[FILTERED]" },
-      rawData:     nil
+      rawData:     {}
     }
 
     assert_equal expected_hash, details[:request]
@@ -506,7 +506,7 @@ class ClientTest < Raygun::UnitTest
       queryString: { },
       headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Cookie"=>"cookieval" },
       form:        { "username" => "foo", "password" => "[FILTERED]" },
-      rawData:     nil
+      rawData:     {}
     }
 
     assert_equal expected_hash, details[:request]

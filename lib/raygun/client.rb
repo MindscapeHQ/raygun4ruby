@@ -132,9 +132,21 @@ module Raygun
       end
 
       def raw_data(rack_env)
+        return unless Raygun.configuration.record_raw_data
+
         request = Rack::Request.new(rack_env)
-        unless request.form_data?
-          form_params(rack_env)
+        input = rack_env['rack.input']
+
+        if input && !request.form_data?
+          current_position = input.pos
+          input.rewind
+
+          body = (input.read || '').slice(0, 4096)
+          input.seek(current_position)
+
+          body
+        else
+          {}
         end
       end
 

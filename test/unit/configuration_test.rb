@@ -129,4 +129,8 @@ class ConfigurationTest < Raygun::UnitTest
   def test_api_url_default
     assert_equal "https://api.raygun.io/", Raygun.configuration.api_url
   end
+
+  def test_record_raw_data_default
+    assert_equal false, Raygun.configuration.record_raw_data
+  end
 end

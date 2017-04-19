@@ -155,4 +155,8 @@ class ConfigurationTest < Raygun::UnitTest
   def test_breadcrumb_level_default
     assert_equal :info, Raygun.configuration.breadcrumb_level
   end
+
+  def test_record_raw_data_default
+    assert_equal false, Raygun.configuration.record_raw_data
+  end
 end

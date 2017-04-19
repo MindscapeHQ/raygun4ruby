@@ -70,6 +70,10 @@ module Raygun
     # Override this if you wish to connect to a different Raygun API than the standard one
     config_option :api_url
 
+    # Should Raygun include the raw request body in the payload? This will not include
+    # form submissions and will not be filtered by the blacklist
+    config_option :record_raw_data
+
     # Exception classes to ignore by default
     IGNORE_DEFAULT = ['ActiveRecord::RecordNotFound',
                       'ActionController::RoutingError',
@@ -120,7 +124,8 @@ module Raygun
         proxy_settings:                {},
         debug:                         false,
         api_url:                       'https://api.raygun.io/',
-        breadcrumb_level:              :info
+        breadcrumb_level:              :info,
+        record_raw_data:               false
       })
     end
 

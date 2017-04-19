@@ -132,6 +132,8 @@ module Raygun
       end
 
       def raw_data(rack_env)
+        return unless Raygun.configuration.record_raw_data
+
         request = Rack::Request.new(rack_env)
 
         if rack_env['rack.input'] && !request.form_data?

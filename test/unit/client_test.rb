@@ -29,6 +29,7 @@ class ClientTest < Raygun::UnitTest
   def setup
     super
     @client = Raygun::Client.new
+    Raygun.configuration.record_raw_data = true
     fake_successful_entry
 
     # Force NZ time zone for utcOffset tests
@@ -230,6 +231,17 @@ class ClientTest < Raygun::UnitTest
     })
 
     assert_equal '{"foo": "bar"}', @client.send(:request_information, env_hash)[:rawData]
+  end
+
+  def test_raw_post_body_with_config_disabled
+    Raygun.configuration.record_raw_data = false
+    env_hash = sample_env_hash.merge({
+      "CONTENT_TYPE" => "application/json",
+      "REQUEST_METHOD" => "POST",
+      "rack.input" => StringIO.new('{"foo": "bar"}')
+    })
+
+    assert_equal(nil, @client.send(:request_information, env_hash)[:rawData])
   end
 
   def test_error_raygun_custom_data

@@ -1,9 +1,15 @@
+## 2.1.0
+
+Features
+  - Ability to record breadcrumbs in your code that will be sent to Raygun along with a raised exception ([#113](https://github.com/MindscapeHQ/raygun4ruby/pull/113))
+
 ## 2.0.0 (20/04/2017)
 
 Bugfixes:
   - Fix broken handling of raw request body reading in Rack applications ([#116](https://github.com/MindscapeHQ/raygun4ruby/pull/116))
     - This is a breaking change to how raw data was being read before so it requires a major version bump
     - Raw request data reading is now disabled by default and can be enabled via the `record_raw_data` configuration option
+
 ## 1.5.0 (16/03/2017)
 
 Features

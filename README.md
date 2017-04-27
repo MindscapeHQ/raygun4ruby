@@ -98,6 +98,49 @@ Raygun.setup do |config|
 end
 ```
 
+### Recording Breadcrumbs
+
+Breadcrumbs let you provide logging points in your code that will be collected and sent along with any exception sent to Raygun. This lets you have a better understanding of the events that happened in the system that lead up to the exception.
+
+1. Include it as a module in your class
+```ruby
+class SomeClass
+  include Raygun::Breadcrumbs
+
+  def some_method
+    record_breadcrumb(
+      message: "<log message goes here>",
+      category: "some category to group them by, maybe authentication or external-apis for example",
+      level: :info, # or debug or warning etc, you can configure what level will get sent
+      metadata: {custom_data: 'can go here'},
+    )
+  end
+end
+```
+This has the added benefit of recording the class the breadcrumb was recorded from automatically
+
+2. Call the `record_breadcrumb` method manually
+```ruby
+def some_method
+  Raygun.record_breadcrumb(
+    message: "<log message goes here>",
+    category: "some category to group them by, maybe authentication or external-apis for example",
+    level: :info, # or debug or warning etc, you can configure what level will get sent
+    metadata: {custom_data: 'can go here'},
+
+    # You can also set the class the breadcrumb was logged from
+    # It will only be set automatically using the included module approach
+    # Method and line number will get added automatically
+    class_name: self.class.name
+  )
+end
+```
+
+If you are using Sinatra or another rack framework you will need to include the Breadcrumbs middleware, this is used for storing the breadcrumbs during a request
+`use Raygun::Middleware::BreadcrumbsStoreInitializer`
+
+If you are using a non web based Ruby application you will have to call `Raygun::Breadcrumbs::Store.initialize` during your applications boot process. The store is per thread, but I have not tested it in a multi threaded application.
+
 ### Filtering the payload by whitelist
 
 As an alternative to the above, you can also opt-in to the keys/values to be sent to Raygun by providing a specific whitelist of the keys you want to transmit.

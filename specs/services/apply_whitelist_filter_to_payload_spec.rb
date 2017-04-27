@@ -1,6 +1,4 @@
-require "minitest/autorun"
-require "minitest/pride"
-require_relative "../../lib/raygun"
+require_relative "../spec_helper"
 
 module Raygun
   module Services

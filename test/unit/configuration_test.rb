@@ -130,6 +130,32 @@ class ConfigurationTest < Raygun::UnitTest
     assert_equal "https://api.raygun.io/", Raygun.configuration.api_url
   end
 
+  def test_setting_breadcrumb_level
+    Raygun.setup do |config|
+      config.breadcrumb_level = :info
+    end
+
+    assert_equal :info, Raygun.configuration.breadcrumb_level
+  end
+
+  def test_setting_breadcrumb_level_to_bad_value
+    logger = setup_logging
+
+    Raygun.setup do |config|
+      config.breadcrumb_level = :invalid
+    end
+
+    assert_equal :info, Raygun.configuration.breadcrumb_level
+    assert(
+      logger.get.include?("unknown breadcrumb level"),
+      "unknown breadcrumb level message was not logged"
+    )
+  end
+
+  def test_breadcrumb_level_default
+    assert_equal :info, Raygun.configuration.breadcrumb_level
+  end
+
   def test_record_raw_data_default
     assert_equal false, Raygun.configuration.record_raw_data
   end

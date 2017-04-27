@@ -5,6 +5,25 @@ require "minitest/pride"
 require "fakeweb"
 require "timecop"
 require "mocha/mini_test"
+require 'stringio'
+
+class FakeLogger
+  def initialize
+    @logger = StringIO.new
+  end
+
+  def info(message)
+    @logger.write(message)
+  end
+
+  def reset
+    @logger.string = ""
+  end
+
+  def get
+    @logger.string
+  end
+end
 
 class NoApiKey < StandardError; end
 
@@ -46,4 +65,11 @@ class Raygun::UnitTest < MiniTest::Unit::TestCase
     Raygun.configuration = Raygun::Configuration.new
   end
 
+  def setup_logging
+    logger = FakeLogger.new
+    Raygun.configuration.debug = true
+    Raygun.configuration.logger = logger
+
+    logger
+  end
 end

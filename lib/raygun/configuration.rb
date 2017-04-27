@@ -112,19 +112,20 @@ module Raygun
 
       # set default attribute values
       @defaults = OpenStruct.new({
-        ignore:                           IGNORE_DEFAULT,
-        custom_data:                      {},
-        tags:                             [],
-        enable_reporting:                 true,
-        affected_user_method:             :current_user,
-        affected_user_mapping:            AffectedUser::DEFAULT_MAPPING,
-        filter_parameters:                DEFAULT_FILTER_PARAMETERS,
-        filter_payload_with_whitelist:    false,
-        whitelist_payload_shape:          DEFAULT_WHITELIST_PAYLOAD_SHAPE,
-        proxy_settings:                   {},
-        debug:                            false,
-        api_url:                          'https://api.raygun.io/',
-        record_raw_data:                  false
+        ignore:                        IGNORE_DEFAULT,
+        custom_data:                   {},
+        tags:                          [],
+        enable_reporting:              true,
+        affected_user_method:          :current_user,
+        affected_user_mapping:         AffectedUser::DEFAULT_MAPPING,
+        filter_parameters:             DEFAULT_FILTER_PARAMETERS,
+        filter_payload_with_whitelist: false,
+        whitelist_payload_shape:       DEFAULT_WHITELIST_PAYLOAD_SHAPE,
+        proxy_settings:                {},
+        debug:                         false,
+        api_url:                       'https://api.raygun.io/',
+        breadcrumb_level:              :info,
+        record_raw_data:               false
       })
     end
 
@@ -142,6 +143,18 @@ module Raygun
 
     def silence_reporting=(value)
       self.enable_reporting = !value
+    end
+
+    def breadcrumb_level
+      read_value(:breadcrumb_level)
+    end
+
+    def breadcrumb_level=(value)
+      if Raygun::Breadcrumbs::BREADCRUMB_LEVELS.include?(value)
+        set_value(:breadcrumb_level, value)
+      elsif read_value(:debug)
+        Raygun.log("[Raygun.configuration] unknown breadcrumb level: #{value} not setting")
+      end
     end
 
     def affected_user_identifier_methods

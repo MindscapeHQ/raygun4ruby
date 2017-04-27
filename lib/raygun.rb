@@ -14,10 +14,14 @@ require "raygun/version"
 require "raygun/configuration"
 require "raygun/client"
 require "raygun/middleware/rack_exception_interceptor"
+require "raygun/middleware/breadcrumbs_store_initializer"
 require "raygun/testable"
 require "raygun/error"
 require "raygun/affected_user"
 require "raygun/services/apply_whitelist_filter_to_payload"
+require "raygun/breadcrumbs/breadcrumb"
+require "raygun/breadcrumbs/store"
+require "raygun/breadcrumbs"
 require "raygun/railtie" if defined?(Rails)
 
 module Raygun
@@ -76,6 +80,28 @@ module Raygun
       yield
     rescue => e
       track_exception(e)
+    end
+
+    def record_breadcrumb(
+        message: nil,
+        category: '',
+        level: :info,
+        timestamp: Time.now.utc,
+        metadata: {},
+        class_name: nil,
+        method_name: nil,
+        line_number: nil
+    )
+      Raygun::Breadcrumbs::Store.record(
+        message: message,
+        category: category,
+        level: level,
+        timestamp: timestamp,
+        metadata: metadata,
+        class_name: class_name,
+        method_name: method_name,
+        line_number: line_number,
+      )
     end
 
     def log(message)

@@ -20,7 +20,7 @@ class SidekiqFailureTest < Raygun::UnitTest
     assert Raygun::SidekiqReporter.call(
       StandardError.new("Oh no! Your Sidekiq has failed!"),
       sidekick_name: "robin"
-    ).success?
+    ).tap{|x| x.wait!}.instance_variable_get("@value").success?
   end
 
   def test_we_are_in_sidekiqs_list_of_error_handlers

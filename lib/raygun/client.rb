@@ -136,8 +136,11 @@ module Raygun
 
         request = Rack::Request.new(rack_env)
         input = rack_env['rack.input']
+        return if request.get?
 
-        if input && !request.form_data?
+        # If size is 0 the buffer is at best empty and at worst
+        # something like the Puma::NullIO buffer which is missing methods
+        if input && input.size && !request.form_data?
           current_position = input.pos
           input.rewind
 

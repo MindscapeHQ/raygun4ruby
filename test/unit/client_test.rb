@@ -213,7 +213,7 @@ class ClientTest < Raygun::UnitTest
       queryString: { "a" => "b", "c" => "4945438" },
       headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Cookie"=>"cookieval" },
       form:        {},
-      rawData:     {}
+      rawData:     nil
     }
 
     assert_equal expected_hash, @client.send(:request_information, env_hash)
@@ -550,7 +550,7 @@ class ClientTest < Raygun::UnitTest
       queryString: { "a" => "b", "c" => "4945438" },
       headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Cookie"=>"cookieval" },
       form:        {},
-      rawData:     {}
+      rawData:     nil
     }
 
     details = @client.send(:build_payload_hash, test_exception, env_hash)[:details]
@@ -574,7 +574,7 @@ class ClientTest < Raygun::UnitTest
       queryString: "[FILTERED]",
       headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Cookie"=>"cookieval" },
       form:        {},
-      rawData:     {}
+      rawData:     nil
     }
 
     details = @client.send(:build_payload_hash, test_exception, sample_env_hash)[:details]
@@ -597,7 +597,7 @@ class ClientTest < Raygun::UnitTest
       queryString: { "a" => "b", "c" => "4945438" },
       headers:     { "Version"=>"HTTP/1.1", "Host"=>"localhost:3000", "Cookie"=>"cookieval" },
       form:        {},
-      rawData:     {}
+      rawData:     nil
     }
 
     details = @client.send(:build_payload_hash, test_exception, env_hash)[:details]

@@ -1,3 +1,4 @@
+require "concurrent"
 require "httparty"
 require "logger"
 require "json"
@@ -54,25 +55,10 @@ module Raygun
     end
 
     def track_exception(exception_instance, env = {}, user = nil, retry_count = 1)
-      if should_report?(exception_instance)
-        log("[Raygun] Tracking Exception...")
-        Client.new.track_exception(exception_instance, env, user)
-      end
-    rescue Exception => e
-      if configuration.failsafe_logger
-        failsafe_log("Problem reporting exception to Raygun: #{e.class}: #{e.message}\n\n#{e.backtrace.join("\n")}")
-      end
-
-      if retry_count > 0
-        new_exception = e.exception("raygun4ruby encountered an exception processing your exception")
-        new_exception.set_backtrace(e.backtrace)
-
-        env[:custom_data] ||= {}
-        env[:custom_data].merge!(original_stacktrace: exception_instance.backtrace)
-
-        track_exception(new_exception, env, user, retry_count - 1)
+      if configuration.send_in_background
+        track_exception_async(exception_instance, env, user, retry_count)
       else
-        raise e
+        track_exception_sync(exception_instance, env, user, retry_count)
       end
     end
 
@@ -121,6 +107,39 @@ module Raygun
     end
 
     private
+
+    def track_exception_async(*args)
+      future = Concurrent::Future.execute { track_exception_sync(*args) }
+      future.add_observer(lambda do |_, value, reason|
+        if value == nil || value.response.code != "202"
+          log("[Raygun] unexpected response from Raygun, could indicate error: #{value.inspect}")
+        end
+      end, :call)
+    end
+
+    def track_exception_sync(exception_instance, env, user, retry_count)
+      if should_report?(exception_instance)
+        log("[Raygun] Tracking Exception...")
+        Client.new.track_exception(exception_instance, env, user)
+      end
+    rescue Exception => e
+      if configuration.failsafe_logger
+        failsafe_log("Problem reporting exception to Raygun: #{e.class}: #{e.message}\n\n#{e.backtrace.join("\n")}")
+      end
+
+      if retry_count > 0
+        new_exception = e.exception("raygun4ruby encountered an exception processing your exception")
+        new_exception.set_backtrace(e.backtrace)
+
+        env[:custom_data] ||= {}
+        env[:custom_data].merge!(original_stacktrace: exception_instance.backtrace)
+
+        track_exception(new_exception, env, user, retry_count - 1)
+      else
+        raise e
+      end
+    end
+
 
     def print_api_key_warning
       $stderr.puts(NO_API_KEY_MESSAGE)

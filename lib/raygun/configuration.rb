@@ -74,6 +74,9 @@ module Raygun
     # form submissions and will not be filtered by the blacklist
     config_option :record_raw_data
 
+    # Should the exceptions to Raygun be sent asynchronously?
+    config_option :send_in_background
+
     # Exception classes to ignore by default
     IGNORE_DEFAULT = ['ActiveRecord::RecordNotFound',
                       'ActionController::RoutingError',
@@ -111,7 +114,7 @@ module Raygun
       @config_values = {}
 
       # set default attribute values
-      @defaults = OpenStruct.new({
+      @defaults = OpenStruct.new(
         ignore:                        IGNORE_DEFAULT,
         custom_data:                   {},
         tags:                          [],
@@ -125,8 +128,9 @@ module Raygun
         debug:                         false,
         api_url:                       'https://api.raygun.io/',
         breadcrumb_level:              :info,
-        record_raw_data:               false
-      })
+        record_raw_data:               false,
+        send_in_background:            false
+      )
     end
 
     def [](key)

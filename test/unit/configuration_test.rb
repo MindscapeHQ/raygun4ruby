@@ -159,4 +159,8 @@ class ConfigurationTest < Raygun::UnitTest
   def test_record_raw_data_default
     assert_equal false, Raygun.configuration.record_raw_data
   end
+
+  def test_send_in_background_default
+    assert_equal false, Raygun.configuration.send_in_background
+  end
 end

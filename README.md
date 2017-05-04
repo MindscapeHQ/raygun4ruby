@@ -33,7 +33,7 @@ You can then test your Raygun integration by running:
 
 You should see an "ItWorksException" appear in your Raygun dashboard. You're ready to zap those errors!
 
-NB: Raygun4Ruby currently requires Ruby >= 1.9
+NB: Raygun4Ruby currently requires Ruby >= 2.0
 
 Note that the generator will create a file in `config/initializers` called "raygun.rb". If you need to do any further configuration or customization of Raygun, that's the place to do it!
 

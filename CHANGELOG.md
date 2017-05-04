@@ -1,3 +1,11 @@
+## 2.2.0
+
+Features
+  - Opt in support for sending exceptions in a background thread to not block web request thread during IO ([#117](https://github.com/MindscapeHQ/raygun4ruby/pull/117))
+
+Bugfixes
+ - Don't attempt to read raw data during GET requests or if rack.input buffer is empty
+
 ## 2.1.0
 
 Features

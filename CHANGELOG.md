@@ -1,4 +1,9 @@
-## 2.2.0
+## 2.3.0 (09/05/2017)
+
+Bugfixes
+  - Fix issue preventing affected users for a crash report from showing up in the affected users page ([#119](https://github.com/MindscapeHQ/raygun4ruby/pull/119))
+
+## 2.2.0 (05/05/2017)
 
 Features
   - Opt in support for sending exceptions in a background thread to not block web request thread during IO ([#117](https://github.com/MindscapeHQ/raygun4ruby/pull/117))
@@ -6,7 +11,7 @@ Features
 Bugfixes
  - Don't attempt to read raw data during GET requests or if rack.input buffer is empty
 
-## 2.1.0
+## 2.1.0 (27/04/2017)
 
 Features
   - Ability to record breadcrumbs in your code that will be sent to Raygun along with a raised exception ([#113](https://github.com/MindscapeHQ/raygun4ruby/pull/113))

@@ -10,11 +10,11 @@ module Raygun
     }.freeze
     SUPPORTED_ATTRIBUTES = DEFAULT_MAPPING.keys.freeze
     NAME_TO_RAYGUN_NAME_MAPPING = {
-      identifier: :Identifier,
-      email: :Email,
-      full_name: :FullName,
-      first_name: :FirstName,
-      uuid: :UUID
+      identifier: :identifier,
+      email: :email,
+      full_name: :fullName,
+      first_name: :firstName,
+      uuid: :uuid
     }.freeze
 
     class << self
@@ -29,13 +29,13 @@ module Raygun
       private
 
       def handle_anonymous_user(user_object)
-        result = { IsAnonymous: true }
-        result[:Identifier] = user_object unless user_object.nil?
+        result = { isAnonymous: true }
+        result[:identifier] = user_object unless user_object.nil?
         result
       end
 
       def handle_known_user(user_object)
-        SUPPORTED_ATTRIBUTES.reduce({ IsAnonymous: false }) do |result, attribute|
+        SUPPORTED_ATTRIBUTES.reduce({ isAnonymous: false }) do |result, attribute|
           mapping = Raygun.configuration.affected_user_mapping
           method = mapping[attribute]
 

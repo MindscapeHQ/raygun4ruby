@@ -634,10 +634,10 @@ class ClientTest < Raygun::UnitTest
   def test_build_payload_hash_adds_affected_user_details_when_supplied_with_user
     user = OpenStruct.new(id: '123', email: 'test@email.com', first_name: 'Taylor')
     expected_details = {
-      :IsAnonymous => false,
-      :Identifier => '123',
-      :Email => 'test@email.com',
-      :FirstName => 'Taylor',
+      :isAnonymous => false,
+      :identifier => '123',
+      :email => 'test@email.com',
+      :firstName => 'Taylor',
     }
 
     user_details = @client.send(:build_payload_hash, test_exception, sample_env_hash, user)[:details][:user]

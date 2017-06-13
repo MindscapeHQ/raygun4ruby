@@ -163,7 +163,7 @@ module Raygun
 
     def affected_user_identifier_methods
       Raygun.deprecation_warning("Please note: You should now user config.affected_user_method_mapping.Identifier instead of config.affected_user_identifier_methods")
-      read_value(:affected_user_mapping).Identifier
+      read_value(:affected_user_mapping)[:identifier]
     end
 
     private

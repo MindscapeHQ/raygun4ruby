@@ -46,7 +46,7 @@ module Raygun
 
       if !job.nil?
         affected_user_method = Raygun.configuration.affected_user_method
-        worker_class = Module.const_get(job['class']) unless job['class'].nil? 
+        worker_class = Module.const_get(job['class']) unless job['class'].nil?
         args = job['args'] unless job['args'].nil?
 
         if worker_class.respond_to?(affected_user_method)
@@ -55,7 +55,7 @@ module Raygun
               worker_class.send(affected_user_method, args)
             rescue => e
               # swallow all exceptions since `affected_user` is non-critical info
-              if configuration.failsafe_logger
+              if Raygun.configuration.failsafe_logger
                 failsafe_log("Problem in #{affected_user_method}: #{e.class}: #{e.message}\n\n#{e.backtrace.join("\n")}")
               end
 

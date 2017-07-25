@@ -19,12 +19,38 @@ module Raygun
 
   class SidekiqReporter
     def self.call(exception, context_hash)
-      ::Raygun.track_exception(exception,
-          custom_data: {
-            sidekiq_context: context_hash
-          }
+      user = affected_user(context_hash)
+      data =  {
+        custom_data: {
+          sidekiq_context: context_hash
+        }
+      }
+      ::Raygun.track_exception(
+          exception,
+          data,
+          user
         )
     end
+
+    def self.affected_user(context_hash)
+      affected_user_method = Raygun.configuration.affected_user_method
+      if context_hash[:job].present?
+        worker_class = Module.const_get(context_hash[:job]['class'])
+        args = context_hash[:job]['args']
+
+        if worker_class.respond_to?(affected_user_method)
+          affected_user = begin
+              worker_class.send(affected_user_method, args)
+            rescue => e
+              puts "Error in affected user method: #{e}"
+            end
+
+          affected_user
+        end
+      end
+
+    end
+
   end
 end
 

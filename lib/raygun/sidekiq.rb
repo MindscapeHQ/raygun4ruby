@@ -42,11 +42,12 @@ module Raygun
     #
     # Their affected_user_method should take the original worker arguments as an array
     def self.affected_user(context_hash)
+      job = context_hash[:job]
 
-      if context_hash[:job].present?
+      if !job.nil?
         affected_user_method = Raygun.configuration.affected_user_method
-        worker_class = Module.const_get(context_hash[:job]['class'])
-        args = context_hash[:job]['args']
+        worker_class = Module.const_get(job['class']) unless job['class'].nil? 
+        args = job['args'] unless job['args'].nil?
 
         if worker_class.respond_to?(affected_user_method)
           affected_user =

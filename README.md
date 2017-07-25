@@ -232,7 +232,7 @@ Raygun.setup do |config|
 end
 ```
 
-The following exceptions are ignored by default:
+The following exceptions are ignored by default: 
 
 ```
 ActiveRecord::RecordNotFound
@@ -361,7 +361,7 @@ If you do not have an `affected_user_method` specified, name the method `current
 ```ruby
 class FailingWorker
   include Sidekiq::Worker
-  
+
   def perform(arg1, arg2)
   end
 

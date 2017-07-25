@@ -232,7 +232,7 @@ Raygun.setup do |config|
 end
 ```
 
-The following exceptions are ignored by default: 
+The following exceptions are ignored by default:
 
 ```
 ActiveRecord::RecordNotFound
@@ -351,6 +351,30 @@ Raygun4Ruby can track errors from Sidekiq (2.x or 3+). All you need to do is add
 ```
 
 Either in your Raygun initializer or wherever else takes your fancy :)
+
+#### Affected User Tracking in Sidekiq
+
+To track affected users, simply define a class method on your worker that returns a user object.
+Make sure you name this method the same as whatever is defined as the `affected_user_method` in your Raygun configuration
+If you do not have an `affected_user_method` specified, name the method `current_user`, as Raygun will try this by default.
+
+```ruby
+class FailingWorker
+  def perform(arg1, arg2)
+  end
+
+  # Your method must accept an array of arguments
+  # These will be in the same order as passed into `perform`
+  def self.current_user(args)
+    arg1 = args[0]
+    arg2 = args[1]
+
+    user = User.find_by(name: arg1)
+
+    # Your method must return a user object
+    user
+  end
+```
 
 ### Other Configuration options
 

@@ -43,6 +43,7 @@ module Raygun
               worker_class.send(affected_user_method, args)
             rescue => e
               puts "Error in affected user method: #{e}"
+              nil
             end
 
           affected_user

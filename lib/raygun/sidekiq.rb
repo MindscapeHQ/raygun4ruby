@@ -32,22 +32,37 @@ module Raygun
         )
     end
 
+    # Adds functionality to report affected user in Sidekiq workers
+    #
+    # Requires the user to implement a class method in the worker that returns affected_user as an object.
+    # This method has the same name as the one defined in their config.affected_user_method.
+    #
+    # If they don't have config.affected_user_method defined, they should implement a class method `current_user`
+    # that returns a user object based on the arguments orginially pased to the worker.
+    #
+    # Their affected_user_method should take the original worker arguments as an array
     def self.affected_user(context_hash)
-      affected_user_method = Raygun.configuration.affected_user_method
+
       if context_hash[:job].present?
+        affected_user_method = Raygun.configuration.affected_user_method
         worker_class = Module.const_get(context_hash[:job]['class'])
         args = context_hash[:job]['args']
 
         if worker_class.respond_to?(affected_user_method)
-          affected_user = begin
+          affected_user =
+            begin
               worker_class.send(affected_user_method, args)
             rescue => e
-              puts "Error in affected user method: #{e}"
+              # swallow all exceptions since `affected_user` is non-critical info
+              if configuration.failsafe_logger
+                failsafe_log("Problem in #{affected_user_method}: #{e.class}: #{e.message}\n\n#{e.backtrace.join("\n")}")
+              end
+
               nil
             end
-
           affected_user
         end
+
       end
 
     end

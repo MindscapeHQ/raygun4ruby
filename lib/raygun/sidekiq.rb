@@ -44,27 +44,21 @@ module Raygun
     def self.affected_user(context_hash)
       job = context_hash[:job]
 
-      if !job.nil?
-        affected_user_method = Raygun.configuration.affected_user_method
-        worker_class = Module.const_get(job['class']) unless job['class'].nil?
-        args = job['args'] unless job['args'].nil?
+      return if job.nil? || job['class'].nil? || !Module.const_defined?(job['class'])
 
-        if worker_class.respond_to?(affected_user_method)
-          begin
-            worker_class.send(affected_user_method, args)
-          rescue => e
-            # swallow all exceptions since `affected_user` is non-critical info
-            if Raygun.configuration.failsafe_logger
-              failsafe_log("Problem in #{affected_user_method}: #{e.class}: #{e.message}\n\n#{e.backtrace.join("\n")}")
-            end
-            nil
-          end
-        end
+      worker_class = Module.const_get(job['class'])
+      affected_user_method = Raygun.configuration.affected_user_method
 
-      end
+      return if worker_class.nil?
 
+      worker_class.send(affected_user_method, job['args'])
+    rescue => e
+      return unless Raygun.configuration.failsafe_logger
+
+      failsafe_log("Problem in sidekiq affected user tracking: #{e.class}: #{e.message}\n\n#{e.backtrace.join("\n")}")
+
+      nil
     end
-
   end
 end
 

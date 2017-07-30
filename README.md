@@ -354,9 +354,9 @@ Either in your Raygun initializer or wherever else takes your fancy :)
 
 #### Affected User Tracking in Sidekiq
 
-To track affected users, simply define a class method on your worker that returns a user object.
-Make sure you name this method the same as whatever is defined as the `affected_user_method` in your Raygun configuration
-If you do not have an `affected_user_method` specified, name the method `current_user`, as Raygun will try this by default.
+To track affected users, define a class method on your worker class that returns a user object.
+Make sure the name of this method is the same as whatever you have defined as the `affected_user_method` in your Raygun configuration and that it returns an object that fits the mappings defined in `affected_user_mapping`
+If you have not changed these, refer to [Affected user tracking](#affected-user-tracking) for the defaults
 
 ```ruby
 class FailingWorker
@@ -366,7 +366,7 @@ class FailingWorker
   end
 
   # Your method must accept an array of arguments
-  # These will be in the same order as passed into `perform`
+  # These will be the same as those passed to `perform`
   def self.current_user(args)
     arg1 = args[0]
     arg2 = args[1]

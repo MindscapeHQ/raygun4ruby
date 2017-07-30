@@ -19,11 +19,37 @@ module Raygun
 
   class SidekiqReporter
     def self.call(exception, context_hash)
-      ::Raygun.track_exception(exception,
-          custom_data: {
-            sidekiq_context: context_hash
-          }
+      user = affected_user(context_hash)
+      data =  {
+        custom_data: {
+          sidekiq_context: context_hash
+        }
+      }
+      ::Raygun.track_exception(
+          exception,
+          data,
+          user
         )
+    end
+
+    # Extracts affected user information out of a Sidekiq worker class
+    def self.affected_user(context_hash)
+      job = context_hash[:job]
+
+      return if job.nil? || job['class'].nil? || !Module.const_defined?(job['class'])
+
+      worker_class = Module.const_get(job['class'])
+      affected_user_method = Raygun.configuration.affected_user_method
+
+      return if worker_class.nil? || !worker_class.respond_to?(affected_user_method)
+
+      worker_class.send(affected_user_method, job['args'])
+    rescue => e
+      return unless Raygun.configuration.failsafe_logger
+
+      failsafe_log("Problem in sidekiq affected user tracking: #{e.class}: #{e.message}\n\n#{e.backtrace.join("\n")}")
+
+      nil
     end
   end
 end

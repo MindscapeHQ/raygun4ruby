@@ -352,6 +352,32 @@ Raygun4Ruby can track errors from Sidekiq (2.x or 3+). All you need to do is add
 
 Either in your Raygun initializer or wherever else takes your fancy :)
 
+#### Affected User Tracking in Sidekiq
+
+To track affected users, define a class method on your worker class that returns a user object.
+Make sure the name of this method is the same as whatever you have defined as the `affected_user_method` in your Raygun configuration and that it returns an object that fits the mappings defined in `affected_user_mapping`
+If you have not changed these, refer to [Affected user tracking](#affected-user-tracking) for the defaults
+
+```ruby
+class FailingWorker
+  include Sidekiq::Worker
+
+  def perform(arg1, arg2)
+  end
+
+  # Your method must accept an array of arguments
+  # These will be the same as those passed to `perform`
+  def self.current_user(args)
+    arg1 = args[0]
+    arg2 = args[1]
+
+    user = User.find_by(name: arg1)
+
+    # Your method must return a user object
+    user
+  end
+```
+
 ### Other Configuration options
 
 For a complete list of configuration options see the [configuration.rb](https://github.com/MindscapeHQ/raygun4ruby/blob/master/lib/raygun/configuration.rb) file

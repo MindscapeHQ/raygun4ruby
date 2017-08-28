@@ -1,7 +1,8 @@
 ## 2.4.0 (31/07/2017)
 
 Features
-  - Add functionality to track affected user in Sidekiq jobs, refer to the README for more information, under the "Affected User Tracking in Sidekiq" heading
+  - Add functionality to track affected user in Sidekiq jobs, refer to the README for more information, under the "Affected User Tracking in Sidekiq" heading ([#121](https://github.com/MindscapeHQ/raygun4ruby/pull/121))
+
 ## 2.3.0 (09/05/2017)"
 
 Bugfixes

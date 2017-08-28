@@ -1,3 +1,8 @@
+## 2.4.1 (29/08/2017)
+
+Bugfixes
+  - Fix crash in `Client#raw_data` method when `rack.input` buffer is missing `pos` method
+
 ## 2.4.0 (31/07/2017)
 
 Features

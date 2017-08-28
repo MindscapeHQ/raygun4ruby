@@ -140,7 +140,7 @@ module Raygun
 
         # If size is 0 the buffer is at best empty and at worst
         # something like the Puma::NullIO buffer which is missing methods
-        if input && input.size && !request.form_data?
+        if input && input.size && input.respond_to?(:pos) && !request.form_data?
           current_position = input.pos
           input.rewind
 

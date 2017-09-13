@@ -138,6 +138,7 @@ end
 
 If you are using Sinatra or another rack framework you will need to include the Breadcrumbs middleware, this is used for storing the breadcrumbs during a request
 `use Raygun::Middleware::BreadcrumbsStoreInitializer`
+(this must be before you `use` the `Raygun::Middleware::RackExceptionInterceptor`)
 
 If you are using a non web based Ruby application you will have to call `Raygun::Breadcrumbs::Store.initialize` during your applications boot process. The store is per thread, but I have not tested it in a multi threaded application.
 

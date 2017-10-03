@@ -147,6 +147,23 @@ class ClientTest < Raygun::UnitTest
     assert_equal expected_tags, @client.send(:build_payload_hash, test_exception, test_env)[:details][:tags]
   end
 
+  def test_tags_with_proc
+    configuration_tags = %w{bar}
+    explicit_env_tags  = %w{one two three four}
+    rack_env_tag       = %w{test}
+
+    Raygun.setup do |config|
+      config.tags = ->(exception, env) {
+        [env[:foo]]
+      }
+    end
+
+    test_env      = { tags: explicit_env_tags, foo: 'bar' }
+    expected_tags =  configuration_tags + explicit_env_tags + rack_env_tag
+
+    assert_equal expected_tags, @client.send(:build_payload_hash, test_exception, test_env)[:details][:tags]
+  end
+
   def test_hostname
     assert_equal Socket.gethostname, @client.send(:hostname)
   end

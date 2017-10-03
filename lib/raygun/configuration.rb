@@ -35,7 +35,7 @@ module Raygun
     proc_config_option :custom_data
 
     # Tags to send with each exception
-    config_option :tags
+    proc_config_option :tags
 
     # Logger to use when we find an exception :)
     config_option :logger

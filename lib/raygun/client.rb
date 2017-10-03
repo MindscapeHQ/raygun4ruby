@@ -173,6 +173,13 @@ module Raygun
           tags << rack_env
         end
 
+        configuration_tags = []
+        if Raygun.configuration.tags.is_a?(Proc)
+          configuration_tags = Raygun.configuration.tags.call(exception_instance, env)
+        else
+          configuration_tags = Raygun.configuration.tags
+        end
+
         grouping_key = env.delete(:grouping_key)
 
         configuration_custom_data = Raygun.configuration.custom_data
@@ -188,7 +195,7 @@ module Raygun
             client:         client_details,
             error:          error_details(exception_instance),
             userCustomData: exception_custom_data.merge(custom_data).merge(configured_custom_data),
-            tags:           Raygun.configuration.tags.concat(tags).compact.uniq,
+            tags:           configuration_tags.concat(tags).compact.uniq,
             request:        request_information(env),
             environment:    {
               utcOffset: Time.now.utc_offset / 3600

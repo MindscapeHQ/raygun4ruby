@@ -126,6 +126,22 @@ class ConfigurationTest < Raygun::UnitTest
       Raygun.configuration.custom_data = nil
   end
 
+  def test_setting_tags_to_array
+    Raygun.setup do |c|
+      c.tags = ['test']
+    end
+
+    assert_equal Raygun.configuration.tags, ['test']
+  end
+
+  def test_setting_tags_to_proc
+    Raygun.setup do |c|
+      c.tags = ->(exception, env) {}
+    end
+
+    assert Raygun.configuration.tags.is_a?(Proc)
+  end
+
   def test_api_url_default
     assert_equal "https://api.raygun.io/", Raygun.configuration.api_url
   end

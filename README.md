@@ -193,13 +193,11 @@ end
 Custom data can be added to `track_exception` by passing a custom_data key in the second parameter hash.
 
 ```ruby
-
 begin
   # more lovely code
 rescue Exception => e
   Raygun.track_exception(e, custom_data: {my: 'custom data', goes: 'here'})
 end
-
 ```
 
 Custom data can also be specified globally either by setting `config.custom_data` to a hash
@@ -321,12 +319,32 @@ end
 
 ### Tags
 
-Raygun allows you to tag error reports with any number of tags. In your Raygun.setup block, set `tags` to an array of strings to have those
-set on any error reports sent by the gem.
+Tags can be added to `track_exception` by passing a tags key in the second parameter hash.
+
+```ruby
+begin
+  # more lovely code
+rescue Exception => e
+  Raygun.track_exception(e, tags: ['my', 'tags', 'go here')
+end
+```
+
+Tags can also be specified globally either by setting `config.custom_data` to an array
 
 ```ruby
 Raygun.setup do |config|
   config.tags = ['heroku']
+end
+```
+
+or to a proc, which gets passed the exception and environment hash. This proc _must_ return an array of strings
+
+```ruby
+Raygun.setup do |config|
+  config.api_key = "YOUR_RAYGUN_API_KEY"
+  config.tags do |e, env|
+    [env["SERVER_NAME"]]
+  end
 end
 ```
 

@@ -656,21 +656,6 @@ class ClientTest < Raygun::UnitTest
     assert breadcrumbs[0].is_a? Hash
   end
 
-  def test_raw_data_rewinds_and_restores_correctly
-    buffer = StringIO.new('123456789')
-    rack_env = {
-      REQUEST_METHOD: 'POST',
-      'rack.input' => buffer
-    }
-
-    buffer.seek(2)
-
-    raw_data = @client.send(:raw_data, rack_env)
-
-    assert_equal '123456789', raw_data
-    assert_equal buffer.pos, 2
-  end
-
   def test_raw_data_does_not_crash_on_buffer_without_pos
     buffer = StringIO.new('123456789')
     rack_env = {
@@ -682,7 +667,7 @@ class ClientTest < Raygun::UnitTest
 
     raw_data = @client.send(:raw_data, rack_env)
 
-    assert_equal({}, raw_data)
+    assert_equal('123456789', raw_data)
   end
 
   private

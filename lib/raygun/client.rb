@@ -132,23 +132,22 @@ module Raygun
       end
 
       def raw_data(rack_env)
-        return unless Raygun.configuration.record_raw_data
-
         request = Rack::Request.new(rack_env)
-        input = rack_env['rack.input']
+
+        return unless Raygun.configuration.record_raw_data
         return if request.get?
 
-        # If size is 0 the buffer is at best empty and at worst
-        # something like the Puma::NullIO buffer which is missing methods
-        if input && input.size && input.respond_to?(:pos) && !request.form_data?
-          current_position = input.pos
+        input = rack_env['rack.input']
+
+        if input && !request.form_data?
           input.rewind
 
-          body = (input.read || '').slice(0, 4096)
-          input.seek(current_position)
+          body = input.read(4096) || ''
+          input.rewind
 
           body
         else
+          # Should this be nil? What happens
           {}
         end
       end

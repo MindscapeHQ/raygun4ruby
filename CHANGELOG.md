@@ -1,3 +1,13 @@
+## 2.5.0 (04/10/2017)
+
+Features
+  - Teach tags configuration how to handle a proc to allow dynamically settings tags ([#127](https://github.com/MindscapeHQ/raygun4ruby/pull/127))
+
+Bugfixes
+  - Fix crash when recording breadcrumb with uninitialized store ([#126](https://github.com/MindscapeHQ/raygun4ruby/pull/126))
+  - Make raw data handling more robus and fix in unicorn ([#125](https://github.com/MindscapeHQ/raygun4ruby/pull/125))
+  - Backwards compatible affected_user_identifier_methods ([#120](https://github.com/MindscapeHQ/raygun4ruby/pull/120))
+
 ## 2.4.1 (29/08/2017)
 
 Bugfixes

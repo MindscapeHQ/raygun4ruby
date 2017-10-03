@@ -36,6 +36,14 @@ class ClientTest < Raygun::UnitTest
     ENV['TZ'] = 'UTC-13'
   end
 
+  def test_record_breadcrumb_does_not_crash_without_initialized_store
+    Raygun.record_breadcrumb(
+      message: 'aliens',
+      category: 'exceptions',
+      level: :info
+    )
+  end
+
   def test_api_key_required_message
     Raygun.configuration.api_key = nil
 

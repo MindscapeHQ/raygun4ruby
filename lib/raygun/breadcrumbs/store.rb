@@ -50,6 +50,8 @@ module Raygun
       private
 
       def self.should_record?(crumb)
+        return false if stored.nil?
+
         levels = Raygun::Breadcrumbs::BREADCRUMB_LEVELS
 
         active_level = levels.index(Raygun.configuration.breadcrumb_level)

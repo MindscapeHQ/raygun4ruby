@@ -50,6 +50,14 @@ module Raygun
       private
 
       def self.should_record?(crumb)
+        if stored.nil?
+          if Raygun.configuration.debug
+            Raygun.log('[Raygun.breadcrumbs] store is uninitialized while breadcrumb is being recorded, discarding breadcrumb')
+          end
+
+          return false
+        end
+
         levels = Raygun::Breadcrumbs::BREADCRUMB_LEVELS
 
         active_level = levels.index(Raygun.configuration.breadcrumb_level)

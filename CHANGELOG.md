@@ -1,3 +1,8 @@
+## 2.6.0 (25/10/2017)
+
+Features
+  - Enhanced debug logging to assist in resolving issues from support requests ([#128](https://github.com/MindscapeHQ/raygun4ruby/pull/128))
+
 ## 2.5.0 (04/10/2017)
 
 Features

@@ -90,6 +90,8 @@ module Raygun
       end
 
       def request_information(env)
+        Raygun.log('retrieving request information')
+
         return {} if env.nil? || env.empty?
         {
           hostName:    env["SERVER_NAME"],
@@ -118,6 +120,8 @@ module Raygun
       end
 
       def form_params(env)
+        Raygun.log('retrieving form params')
+
         params = action_dispatch_params(env) || rack_params(env) || {}
         filter_params_with_blacklist(params, env["action_dispatch.parameter_filter"])
       end
@@ -132,10 +136,12 @@ module Raygun
       end
 
       def raw_data(rack_env)
+        Raygun.log('retrieving raw data')
         request = Rack::Request.new(rack_env)
 
         return unless Raygun.configuration.record_raw_data
         return if request.get?
+        Raygun.log('passed raw_data checks')
 
         input = rack_env['rack.input']
 
@@ -158,6 +164,7 @@ module Raygun
 
       # see http://raygun.io/raygun-providers/rest-json-api?v=1
       def build_payload_hash(exception_instance, env = {}, user = nil)
+        Raygun.log('building payload hash')
         custom_data = filter_custom_data(env) || {}
         exception_custom_data = if exception_instance.respond_to?(:raygun_custom_data)
                                   exception_instance.raygun_custom_data
@@ -180,6 +187,8 @@ module Raygun
           configuration_tags = Raygun.configuration.tags
         end
 
+        Raygun.log('set tags')
+
         grouping_key = env.delete(:grouping_key)
 
         configuration_custom_data = Raygun.configuration.custom_data
@@ -188,6 +197,8 @@ module Raygun
                                  else
                                   configuration_custom_data
                                  end
+
+        Raygun.log('set custom data')
 
         error_details = {
             machineName:    hostname,
@@ -204,6 +215,8 @@ module Raygun
         store = ::Raygun::Breadcrumbs::Store
         error_details[:breadcrumbs] = store.stored.map(&:build_payload) if store.any?
 
+        Raygun.log('set details and breadcrumbs')
+
         error_details.merge!(groupingKey: grouping_key) if grouping_key
 
         user_details = if affected_user_present?(env)
@@ -213,7 +226,10 @@ module Raygun
                        end
         error_details.merge!(user: user_details) unless user_details == nil
 
+        Raygun.log('set user details')
+
         if Raygun.configuration.filter_payload_with_whitelist
+          Raygun.log('filtering payload with whitelist')
           error_details = filter_payload_with_whitelist(error_details)
         end
 
@@ -224,6 +240,8 @@ module Raygun
       end
 
       def create_entry(payload_hash)
+        Raygun.log('sending payload to api')
+
         self.class.post("/entries", verify_peer: true, verify: true, headers: @headers, body: JSON.generate(payload_hash))
       end
 

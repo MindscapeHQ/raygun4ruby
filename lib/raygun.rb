@@ -32,7 +32,6 @@ module Raygun
   CLIENT_NAME = "Raygun4Ruby Gem"
 
   class << self
-
     include Testable
 
     # Configuration Object (instance of Raygun::Configuration)
@@ -40,6 +39,8 @@ module Raygun
 
     def setup
       yield(configuration)
+
+      log("configuration settings: #{configuration.inspect}")
     end
 
     def configuration
@@ -55,6 +56,8 @@ module Raygun
     end
 
     def track_exception(exception_instance, env = {}, user = nil, retry_count = 1)
+      log('tracking exception')
+
       if configuration.send_in_background
         track_exception_async(exception_instance, env, user, retry_count)
       else
@@ -78,6 +81,8 @@ module Raygun
         method_name: nil,
         line_number: nil
     )
+      log('recording breadcrumb')
+
       Raygun::Breadcrumbs::Store.record(
         message: message,
         category: category,
@@ -91,7 +96,9 @@ module Raygun
     end
 
     def log(message)
-      configuration.logger.info(message) if configuration.logger
+      return unless configuration.debug
+
+      configuration.logger.info("[Raygun] #{message}") if configuration.logger
     end
 
     def failsafe_log(message)
@@ -112,17 +119,19 @@ module Raygun
       future = Concurrent::Future.execute { track_exception_sync(*args) }
       future.add_observer(lambda do |_, value, reason|
         if value == nil || value.response.code != "202"
-          log("[Raygun] unexpected response from Raygun, could indicate error: #{value.inspect}")
+          log("unexpected response from Raygun, could indicate error: #{value.inspect}")
         end
       end, :call)
     end
 
     def track_exception_sync(exception_instance, env, user, retry_count)
       if should_report?(exception_instance)
-        log("[Raygun] Tracking Exception...")
+        log('attempting to send exception')
         Client.new.track_exception(exception_instance, env, user)
       end
     rescue Exception => e
+      log('error sending exception to raygun, see failsafe logger for more information')
+
       if configuration.failsafe_logger
         failsafe_log("Problem reporting exception to Raygun: #{e.class}: #{e.message}\n\n#{e.backtrace.join("\n")}")
       end
@@ -147,17 +156,13 @@ module Raygun
 
     def should_report?(exception)
       if configuration.silence_reporting
-        if configuration.debug
-          log('[Raygun] skipping reporting because Configuration.silence_reporting is enabled')
-        end
+        log('skipping reporting because Configuration.silence_reporting is enabled')
 
         return false
       end
 
       if configuration.ignore.flatten.include?(exception.class.to_s)
-        if configuration.debug
-          log("[Raygun] skipping reporting of exception #{exception.class} because it is in the ignore list")
-        end
+        log("skipping reporting of exception #{exception.class} because it is in the ignore list")
 
         return false
       end

@@ -5,5 +5,6 @@ require "minitest/pride"
 require "fakeweb"
 require "timecop"
 require "mocha/mini_test"
+require "webmock/minitest"
 
 alias :context :describe

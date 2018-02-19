@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "concurrent-ruby"
 
   spec.add_development_dependency "bundler", ">= 1.1"
-  spec.add_development_dependency "rake", "0.9.6"
+  spec.add_development_dependency "rake", "~> 11"
   spec.add_development_dependency "fakeweb", ["~> 1.3"]
   spec.add_development_dependency "timecop"
   spec.add_development_dependency "minitest", "~> 4.2"
@@ -34,4 +34,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "sidekiq", [">= 3", "< 3.2.2"]
   spec.add_development_dependency "mocha"
   spec.add_development_dependency "pry"
+  spec.add_development_dependency "webmock"
 end

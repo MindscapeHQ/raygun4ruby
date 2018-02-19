@@ -1,3 +1,8 @@
+## 2.7.0 (19/02/2018)
+
+Features
+ - Add configuration option to control network timeouts when sending error reports, default value is 10 seconds ([#129](https://github.com/MindscapeHQ/raygun4ruby/pull/129))
+
 ## 2.6.0 (25/10/2017)
 
 Features

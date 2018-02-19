@@ -51,6 +51,10 @@ module Raygun
       configuration.defaults
     end
 
+    def reset_configuration
+      @configuration = Configuration.new
+    end
+
     def configured?
       !!configuration.api_key
     end
@@ -118,7 +122,7 @@ module Raygun
     def track_exception_async(*args)
       future = Concurrent::Future.execute { track_exception_sync(*args) }
       future.add_observer(lambda do |_, value, reason|
-        if value == nil || value.response.code != "202"
+        if value == nil || !value.responds_to?(:response) || value.response.code != "202"
           log("unexpected response from Raygun, could indicate error: #{value.inspect}")
         end
       end, :call)
@@ -127,7 +131,10 @@ module Raygun
     def track_exception_sync(exception_instance, env, user, retry_count)
       if should_report?(exception_instance)
         log('attempting to send exception')
-        Client.new.track_exception(exception_instance, env, user)
+        resp = Client.new.track_exception(exception_instance, env, user)
+        log('sent payload to api')
+
+        resp
       end
     rescue Exception => e
       log('error sending exception to raygun, see failsafe logger for more information')

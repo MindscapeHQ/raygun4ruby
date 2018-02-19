@@ -16,6 +16,7 @@ module Raygun
 
       enable_http_proxy if Raygun.configuration.proxy_settings[:address]
       self.class.base_uri Raygun.configuration.api_url
+      self.class.default_timeout(Raygun.configuration.error_report_send_timeout)
     end
 
     def require_api_key
@@ -242,7 +243,13 @@ module Raygun
       def create_entry(payload_hash)
         Raygun.log('sending payload to api')
 
-        self.class.post("/entries", verify_peer: true, verify: true, headers: @headers, body: JSON.generate(payload_hash))
+        self.class.post(
+          "/entries",
+          verify_peer: true,
+          verify: true,
+          headers: @headers,
+          body: JSON.generate(payload_hash),
+        )
       end
 
       def filter_params_with_blacklist(params_hash = {}, extra_filter_keys = nil)

@@ -131,8 +131,10 @@ module Raygun
     def track_exception_sync(exception_instance, env, user, retry_count)
       if should_report?(exception_instance)
         log('attempting to send exception')
-        Client.new.track_exception(exception_instance, env, user)
+        resp = Client.new.track_exception(exception_instance, env, user)
         log('sent payload to api')
+
+        resp
       end
     rescue Exception => e
       log('error sending exception to raygun, see failsafe logger for more information')

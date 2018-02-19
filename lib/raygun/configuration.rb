@@ -77,6 +77,9 @@ module Raygun
     # Should the exceptions to Raygun be sent asynchronously?
     config_option :send_in_background
 
+    # How long to wait for the POST request to the API server before timing out
+    config_option :error_report_send_timeout
+
     # Exception classes to ignore by default
     IGNORE_DEFAULT = ['ActiveRecord::RecordNotFound',
                       'ActionController::RoutingError',
@@ -129,7 +132,8 @@ module Raygun
         api_url:                       'https://api.raygun.io/',
         breadcrumb_level:              :info,
         record_raw_data:               false,
-        send_in_background:            false
+        send_in_background:            false,
+        error_report_send_timeout:     3000
       )
     end
 

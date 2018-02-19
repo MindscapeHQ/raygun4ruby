@@ -179,4 +179,8 @@ class ConfigurationTest < Raygun::UnitTest
   def test_send_in_background_default
     assert_equal false, Raygun.configuration.send_in_background
   end
+
+  def test_error_report_send_timeout_default
+    assert_equal 3000, Raygun.configuration.error_report_send_timeout
+  end
 end

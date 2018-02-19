@@ -12,6 +12,10 @@ class ConfigurationTest < Raygun::UnitTest
     end
   end
 
+  def teardown
+    Raygun.reset_configuration
+  end
+
   def test_setting_api_key_and_version
     assert_equal 9.9,              Raygun.configuration.version
     assert_equal "a test api key", Raygun.configuration.api_key
@@ -182,5 +186,9 @@ class ConfigurationTest < Raygun::UnitTest
 
   def test_error_report_send_timeout_default
     assert_equal 3000, Raygun.configuration.error_report_send_timeout
+  end
+
+  def test_enable_reporting_default
+    assert_equal true, Raygun.configuration.enable_reporting
   end
 end

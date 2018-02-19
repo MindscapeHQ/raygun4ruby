@@ -31,4 +31,18 @@ describe Raygun do
       end
     end
   end
+
+  describe '#reset_configuration' do
+    it 'clears any customized configuration options' do
+      Raygun.setup do |c|
+        c.api_url = 'http://test.api'
+      end
+
+      Raygun.configuration.api_url.must_equal 'http://test.api'
+
+      Raygun.reset_configuration
+
+      Raygun.configuration.api_url.must_equal Raygun.default_configuration.api_url
+    end
+  end
 end

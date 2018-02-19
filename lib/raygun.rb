@@ -51,6 +51,10 @@ module Raygun
       configuration.defaults
     end
 
+    def reset_configuration
+      @configuration = Configuration.new
+    end
+
     def configured?
       !!configuration.api_key
     end

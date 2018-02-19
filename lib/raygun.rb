@@ -118,7 +118,7 @@ module Raygun
     def track_exception_async(*args)
       future = Concurrent::Future.execute { track_exception_sync(*args) }
       future.add_observer(lambda do |_, value, reason|
-        if value == nil || value.response.code != "202"
+        if value == nil || !value.responds_to?(:response) || value.response.code != "202"
           log("unexpected response from Raygun, could indicate error: #{value.inspect}")
         end
       end, :call)

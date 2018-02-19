@@ -133,7 +133,7 @@ module Raygun
         breadcrumb_level:              :info,
         record_raw_data:               false,
         send_in_background:            false,
-        error_report_send_timeout:     3000
+        error_report_send_timeout:     10
       )
     end
 

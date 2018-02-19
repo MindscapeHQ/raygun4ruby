@@ -185,7 +185,7 @@ class ConfigurationTest < Raygun::UnitTest
   end
 
   def test_error_report_send_timeout_default
-    assert_equal 3000, Raygun.configuration.error_report_send_timeout
+    assert_equal 10, Raygun.configuration.error_report_send_timeout
   end
 
   def test_enable_reporting_default

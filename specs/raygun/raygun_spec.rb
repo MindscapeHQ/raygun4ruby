@@ -26,6 +26,8 @@ describe Raygun do
 
           Raygun.track_exception(error)
 
+          # Occasionally doesn't write to the failsafe logger, add small timeout to add some safety
+          sleep 0.1
           failsafe_logger.get.must_match /Problem reporting exception to Raygun/
         end
       end

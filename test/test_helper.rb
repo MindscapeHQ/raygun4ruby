@@ -2,7 +2,6 @@ ENV['RACK_ENV'] = 'test'
 require_relative "../lib/raygun.rb"
 require "minitest/autorun"
 require "minitest/pride"
-require "fakeweb"
 require "timecop"
 require "mocha/mini_test"
 require 'stringio'
@@ -47,18 +46,15 @@ end
 class Raygun::UnitTest < MiniTest::Unit::TestCase
 
   def setup
-    FakeWeb.allow_net_connect = false
     Raygun.configuration.api_key = "test api key"
   end
 
-  def fake_successful_entry
-    FakeWeb.register_uri(:post, "https://api.raygun.io/entries", body: "", status: 202)
+  def teardown
+    reset_configuration
   end
 
-  def teardown
-    FakeWeb.clean_registry
-    FakeWeb.allow_net_connect = true
-    reset_configuration
+  def fake_successful_entry
+    stub_request(:post, 'https://api.raygun.io/entries').to_return(status: 202)
   end
 
   def reset_configuration

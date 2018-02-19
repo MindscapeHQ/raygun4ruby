@@ -34,8 +34,6 @@ class ClientTest < Raygun::UnitTest
 
     # Force NZ time zone for utcOffset tests
     ENV['TZ'] = 'UTC-13'
-
-    stub_request(:post, 'https://api.raygun.io/entries').to_return(status: 202)
   end
 
   def test_record_breadcrumb_does_not_crash_without_initialized_store

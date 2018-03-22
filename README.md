@@ -325,7 +325,7 @@ Tags can be added to `track_exception` by passing a tags key in the second param
 begin
   # more lovely code
 rescue Exception => e
-  Raygun.track_exception(e, tags: ['my', 'tags', 'go here')
+  Raygun.track_exception(e, tags: ['my', 'tags', 'go here'])
 end
 ```
 

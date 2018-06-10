@@ -1,3 +1,6 @@
+## 2.7.1 (11/06/2018)
+  This is a patch release to update the required ruby version to correctly be 2.0 or greater
+
 ## 2.7.0 (19/02/2018)
 
 Features

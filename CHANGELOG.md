@@ -52,6 +52,8 @@ Bugfixes:
   - Fix broken handling of raw request body reading in Rack applications ([#116](https://github.com/MindscapeHQ/raygun4ruby/pull/116))
     - This is a breaking change to how raw data was being read before so it requires a major version bump
     - Raw request data reading is now disabled by default and can be enabled via the `record_raw_data` configuration option
+    
+Since this is a major version bump this release also deprecates ruby versions < 2.0
 
 ## 1.5.0 (16/03/2017)
 

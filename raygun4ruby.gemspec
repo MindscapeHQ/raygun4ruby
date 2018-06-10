@@ -12,6 +12,7 @@ Gem::Specification.new do |spec|
   spec.summary       = %q{This gem provides support for Ruby and Ruby on Rails for the Raygun.io error reporter}
   spec.homepage      = "http://raygun.io"
   spec.license       = "MIT"
+  spec.required_ruby_version = '>= 2.0'
 
   spec.files         = `git ls-files | grep -Ev '^(test)'`.split("\n")
   spec.test_files    = `git ls-files -- test/*`.split("\n")

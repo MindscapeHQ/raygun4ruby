@@ -14,6 +14,7 @@ end
 require "raygun/version"
 require "raygun/configuration"
 require "raygun/client"
+require "raygun/js_tracker"
 require "raygun/middleware/rack_exception_interceptor"
 require "raygun/middleware/breadcrumbs_store_initializer"
 require "raygun/testable"

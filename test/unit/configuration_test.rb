@@ -25,6 +25,12 @@ class ConfigurationTest < Raygun::UnitTest
     assert_equal 9.9, Raygun.configuration[:version]
   end
 
+  def test_set_js_api_key
+    Raygun.configuration.js_api_key = "a test js api key"
+
+    assert_equal "a test js api key", Raygun.configuration.js_api_key
+  end
+
   def test_enable_reporting
     Raygun.configuration.enable_reporting = false
 

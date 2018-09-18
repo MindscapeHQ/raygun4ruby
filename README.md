@@ -70,14 +70,14 @@ end
 
 begin
   # your lovely code here
-rescue Exception => e
+rescue => e
   Raygun.track_exception(e)
 end
 
 # You may also pass a user object as the third argument to allow affected user tracking, like so
 begin
   # your lovely code here
-rescue Exception => e
+rescue => e
   # The second argument is the request environment variables
   Raygun.track_exception(e, {}, user)
 end

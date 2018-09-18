@@ -135,7 +135,7 @@ module Raygun
         end
 
         it "does not record the breadcrumb if should_record? is false" do
-          allow(subject).to receive(:should_record?).and_return(false)
+          expect(subject).to receive(:should_record?).and_return(false)
           Foo.new.bar
 
           expect(subject.stored.length).to eq(0)

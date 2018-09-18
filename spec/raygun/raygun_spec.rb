@@ -7,6 +7,7 @@ describe Raygun do
     context 'send in background' do
       before do
         Raygun.setup do |c|
+          c.silence_reporting = false
           c.send_in_background = true
           c.api_url = 'http://example.api'
           c.api_key = 'foo'

@@ -1,4 +1,4 @@
-require 'rubygems'
+#require 'rubygems'
 
 require 'timecop'
 require 'webmock/rspec'
@@ -11,6 +11,7 @@ require 'webmock/rspec'
 
 require 'support/fake_logger'
 
+# require 'raygun'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

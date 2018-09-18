@@ -1,4 +1,4 @@
-require_relative "../../spec_helper"
+require "spec_helper"
 
 module Raygun
   module Breadcrumbs
@@ -10,7 +10,7 @@ module Raygun
 
           subject.message = message
 
-          subject.message.must_equal(message)
+          expect(subject.message).to eq(message)
         end
 
         it 'has a category' do
@@ -18,7 +18,7 @@ module Raygun
 
           subject.category = category
 
-          subject.category.must_equal(category)
+          expect(subject.category).to eq(category)
         end
 
         it 'has a level' do
@@ -26,7 +26,7 @@ module Raygun
 
           subject.level = level
 
-          subject.level.must_equal(level)
+          expect(subject.level).to eq(level)
         end
 
         it 'has a timestamp' do
@@ -34,7 +34,7 @@ module Raygun
 
           subject.timestamp = timestamp
 
-          subject.timestamp.must_equal(timestamp)
+          expect(subject.timestamp).to eq(timestamp)
         end
 
         it 'has metadata' do
@@ -42,7 +42,7 @@ module Raygun
 
           subject.metadata = metadata
 
-          subject.metadata.must_equal(metadata)
+          expect(subject.metadata).to eq(metadata)
         end
 
         it 'has a class_name' do
@@ -50,7 +50,7 @@ module Raygun
 
           subject.class_name = class_name
 
-          subject.class_name.must_equal(class_name)
+          expect(subject.class_name).to eq(class_name)
         end
 
         it 'has a method_name' do
@@ -58,7 +58,7 @@ module Raygun
 
           subject.method_name = method_name
 
-          subject.method_name.must_equal(method_name)
+          expect(subject.method_name).to eq(method_name)
         end
 
         it 'has a line_number' do
@@ -66,7 +66,7 @@ module Raygun
 
           subject.line_number = line_number
 
-          subject.line_number.must_equal(line_number)
+          expect(subject.line_number).to eq(line_number)
         end
       end
 
@@ -98,35 +98,35 @@ module Raygun
         let(:payload) { breadcrumb.build_payload }
 
         it "joins the class name, method name and line number together" do
-          payload[:location].must_equal("HomeController:index:17")
+          expect(payload[:location]).to eq("HomeController:index:17")
         end
 
         it "does not include the method name and line number if the class name is missing" do
           breadcrumb.class_name = nil
 
-          payload.has_key?(:location).must_equal(false)
+          expect(payload.has_key?(:location)).to eq(false)
         end
 
         it "does not inlcude the line number if is it missing" do
           breadcrumb.line_number = nil
 
-          payload[:location].must_equal("HomeController:index")
+          expect(payload[:location]).to eq("HomeController:index")
         end
 
         it "does not include keys in payload with nil values" do
           breadcrumb.metadata = nil
           breadcrumb.category = nil
 
-          payload.key?(:CustomData).must_equal(false)
-          payload.key?(:category).must_equal(false)
+          expect(payload.key?(:CustomData)).to eq(false)
+          expect(payload.key?(:category)).to eq(false)
         end
 
         it 'includes the rest of the fields' do
-          payload[:message].must_equal('test')
-          payload[:category].must_equal('test')
-          payload[:level].must_equal(1)
-          payload[:timestamp].wont_be_nil
-          payload[:CustomData].must_equal(foo: 'bar')
+          expect(payload[:message]).to eq('test')
+          expect(payload[:category]).to eq('test')
+          expect(payload[:level]).to eq(1)
+          expect(payload[:timestamp]).to_not eq(nil)
+          expect(payload[:CustomData]).to eq(foo: 'bar')
         end
       end
     end

@@ -20,7 +20,7 @@ module Raygun
 
           new_payload = service.call(shape, payload)
 
-          new_payload.must_equal(expected)
+          expect(new_payload).to eq(expected)
         end
 
         it "filters out keys that are set to false" do
@@ -31,7 +31,7 @@ module Raygun
 
           new_payload = service.call(shape, payload)
 
-          new_payload.must_equal(expected)
+          expect(new_payload).to eq(expected)
         end
       end
 
@@ -61,7 +61,7 @@ module Raygun
 
           new_payload = service.call(shape, payload)
 
-          new_payload.must_equal(expected)
+          expect(new_payload).to eq(expected)
         end
 
         it "filters out a nested hash if the whitelist does not contain it" do
@@ -72,7 +72,7 @@ module Raygun
 
           new_payload = service.call(shape, payload)
 
-          new_payload.must_equal(expected)
+          expect(new_payload).to eq(expected)
         end
 
         it "handles nested hashes when the whitelist is set to allow the whole hash" do
@@ -89,7 +89,7 @@ module Raygun
 
           new_payload = service.call(shape, payload)
 
-          new_payload.must_equal(expected)
+          expect(new_payload).to eq(expected)
         end
 
         it "handles nested hashes when the whitelist is set to not allow the whole hash" do
@@ -104,7 +104,7 @@ module Raygun
 
           new_payload = service.call(shape, payload)
 
-          new_payload.must_equal(expected)
+          expect(new_payload).to eq(expected)
         end
       end
 
@@ -124,7 +124,7 @@ module Raygun
 
           new_payload = service.call(shape, payload)
 
-          new_payload.must_equal(expected)
+          expect(new_payload).to eq(expected)
         end
       end
 
@@ -244,7 +244,7 @@ module Raygun
 
         new_payload = service.call(shape, payload)
 
-        new_payload.must_equal(expected)
+        expect(new_payload).to eq(expected)
       end
     end
   end

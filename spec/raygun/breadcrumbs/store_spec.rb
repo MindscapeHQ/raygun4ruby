@@ -1,6 +1,4 @@
-require "minitest/autorun"
-require "minitest/pride"
-require_relative "../../spec_helper"
+require "spec_helper"
 
 module Raygun
   module Breadcrumbs
@@ -10,18 +8,18 @@ module Raygun
 
       describe "#initialize" do
         before do
-          subject.stored.must_equal(nil)
+          expect(subject.stored).to eq(nil)
 
           subject.initialize
         end
 
         it "creates the store on the current Thread" do
-          subject.stored.must_equal([])
+          expect(subject.stored).to eq([])
         end
 
         it "does not effect other threads" do
           Thread.new do
-            subject.stored.must_equal(nil)
+            expect(subject.stored).to eq(nil)
           end.join
         end
       end
@@ -32,17 +30,17 @@ module Raygun
 
           subject.record(message: "test")
 
-          subject.any?.must_equal(true)
+          expect(subject.any?).to eq(true)
         end
 
         it "returns false if none have been logged" do
           subject.initialize
 
-          subject.any?.must_equal(false)
+          expect(subject.any?).to eq(false)
         end
 
         it "returns false if the store is uninitialized" do
-          subject.any?.must_equal(false)
+          expect(subject.any?).to eq(false)
         end
       end
 
@@ -54,18 +52,18 @@ module Raygun
         it "resets the store back to nil" do
           subject.clear
 
-          subject.stored.must_equal(nil)
+          expect(subject.stored).to eq(nil)
         end
       end
 
       describe "#should_record?" do
         it "returns false when the log level is above the breadcrumbs level" do
-          Raygun.configuration.stubs(:breadcrumb_level).returns(:error)
+          allow(Raygun.configuration).to receive(:breadcrumb_level).and_return(:error)
 
           crumb = Breadcrumb.new
           crumb.level = :warning
 
-          assert_equal false, subject.send(:should_record?, crumb)
+          expect(subject.send(:should_record?, crumb)).to eq(false)
         end
       end
 
@@ -86,28 +84,28 @@ module Raygun
         it "gets stored" do
           subject.record(message: "test")
 
-          subject.stored.length.must_equal(1)
-          subject.stored[0].message.must_equal("test")
+          expect(subject.stored.length).to eq(1)
+          expect(subject.stored[0].message).to eq("test")
         end
 
         it "automatically sets the class name" do
           Foo.new.bar
 
           bc = subject.stored[0]
-          bc.class_name.must_equal("Raygun::Breadcrumbs::Foo")
+          expect(bc.class_name).to eq("Raygun::Breadcrumbs::Foo")
         end
 
         it "automatically sets the method name" do
           Foo.new.bar
 
           bc = subject.stored[0]
-          bc.method_name.must_equal("bar")
+          expect(bc.method_name).to eq("bar")
         end
 
         it "does not set the method name if it is already set" do
           subject.record(message: 'test', method_name: "foo")
 
-          subject.stored[0].method_name.must_equal("foo")
+          expect(subject.stored[0].method_name).to eq("foo")
         end
 
 
@@ -116,7 +114,7 @@ module Raygun
             Foo.new.bar
 
             bc = subject.stored[0]
-            bc.timestamp.must_equal(Time.now.utc.to_i)
+            expect(bc.timestamp).to eq(Time.now.utc.to_i)
           end
         end
 
@@ -126,21 +124,21 @@ module Raygun
           Timecop.freeze do
             subject.record(message: 'test', timestamp: time)
 
-            subject.stored[0].timestamp.wont_equal(Time.now.utc)
+            expect(subject.stored[0].timestamp).to_not eq(Time.now.utc)
           end
         end
 
         it "sets the log level to :info if one is not supplied" do
           Foo.new.bar
 
-          subject.stored[0].level.must_equal(:info)
+          expect(subject.stored[0].level).to eq(:info)
         end
 
         it "does not record the breadcrumb if should_record? is false" do
-          subject.stubs(:should_record?).returns(false)
+          allow(subject).to receive(:should_record?).and_return(false)
           Foo.new.bar
 
-          subject.stored.length.must_equal(0)
+          expect(subject.stored.length).to eq(0)
         end
       end
     end

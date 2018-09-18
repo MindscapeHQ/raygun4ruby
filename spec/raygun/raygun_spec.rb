@@ -1,5 +1,4 @@
-require_relative '../spec_helper'
-require 'stringio'
+require 'spec_helper'
 
 describe Raygun do
   let(:failsafe_logger) { FakeLogger.new }
@@ -28,7 +27,7 @@ describe Raygun do
 
           # Occasionally doesn't write to the failsafe logger, add small timeout to add some safety
           sleep 0.1
-          failsafe_logger.get.must_match /Problem reporting exception to Raygun/
+          expect(failsafe_logger.get).to match /Problem reporting exception to Raygun/
         end
       end
     end
@@ -40,11 +39,11 @@ describe Raygun do
         c.api_url = 'http://test.api'
       end
 
-      Raygun.configuration.api_url.must_equal 'http://test.api'
+      expect(Raygun.configuration.api_url).to eq('http://test.api')
 
       Raygun.reset_configuration
 
-      Raygun.configuration.api_url.must_equal Raygun.default_configuration.api_url
+      expect(Raygun.configuration.api_url).to eq(Raygun.default_configuration.api_url)
     end
   end
 end

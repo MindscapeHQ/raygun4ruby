@@ -14,6 +14,7 @@ module Raygun
     end
 
     def head_html
+      return if Raygun.configuration.js_api_key.nil?
       [
         '<script type="text/javascript">',
         '!function(a,b,c,d,e,f,g,h){a.RaygunObject=e,a[e]=a[e]||function(){',
@@ -26,6 +27,7 @@ module Raygun
     end
 
     def body_html
+      return if Raygun.configuration.js_api_key.nil?
       [
         '<script type="text/javascript">',
         "rg4js('apiKey', '#{@js_api_key}');",

@@ -21,16 +21,18 @@ module Raygun
         '<script type="text/javascript">',
         "rg4js('apiKey', '#{js_api_key}');",
         "rg4js('enableCrashReporting', true);",
-        user_tracking,
+        user_context,
         '</script>'
       ].join('').html_safe
     end
 
     private
 
-    def user_tracking
+    def user_context
       # TODO, Pull in user data from somewhere.
-      "rg4js('setUser', { identifier: '1' });"
+      # Maybe from: ENV["raygun.affected_user"]
+      # Like "rg4js('setUser', { identifier: '1' });"
+      ''
     end
 
     def js_api_key

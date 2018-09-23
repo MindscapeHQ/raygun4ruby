@@ -1,5 +1,5 @@
 module Raygun::Middleware
-  class Javascript
+  class JavascriptExceptionTracking
     def initialize(app)
       @app = app
     end
@@ -24,7 +24,7 @@ module Raygun::Middleware
 
     private
     def js_tracker
-      @js_tracker = Raygun::JsTracker.new
+      @js_tracker = Raygun::JavaScriptTracker.new
     end
   end
 end

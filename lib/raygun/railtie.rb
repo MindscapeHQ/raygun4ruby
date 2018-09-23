@@ -20,7 +20,7 @@ class Raygun::Railtie < Rails::Railtie
       Raygun::Middleware::RailsInsertAffectedUser,
       Raygun::Middleware::RackExceptionInterceptor,
       Raygun::Middleware::BreadcrumbsStoreInitializer,
-      Raygun::Middleware::Javascript
+      Raygun::Middleware::JavascriptExceptionTracking
     ]
     raygun_middleware = raygun_middleware.map(&:to_s) unless Rails::VERSION::STRING >= "5"
     raygun_middleware.each do |m|

@@ -1,7 +1,7 @@
 # Client for injecting JavaScript code for tracking front end exceptions
 # https://raygun.com/docs/languages/javascript
 module Raygun
-  class JsTracker
+  class JavaScriptTracker
     def head_html
       return unless js_api_key?
       [

@@ -5,7 +5,7 @@ feature 'JavaScript Tracking', feature: true do
   after { Raygun.configuration.js_api_key = nil }
 
   it "Includes the Raygun Javascript Middleware" do
-    expect(Rails.application.config.middleware).to include(Raygun::Middleware::Javascript)
+    expect(Rails.application.config.middleware).to include(Raygun::Middleware::JavascriptExceptionTracking)
   end
 
   it "No JS snippet is injected" do

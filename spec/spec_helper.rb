@@ -4,10 +4,10 @@ require 'timecop'
 require 'webmock/rspec'
 
 # Coverage
-#require 'simplecov'
-#SimpleCov.start do
-  #add_filter '/spec/'
-#end
+require 'simplecov'
+SimpleCov.start do
+  add_filter '/spec/'
+end
 
 require 'support/fake_logger'
 

@@ -253,8 +253,6 @@ module Raygun
       end
 
       def filter_params_with_blacklist(params_hash = {}, extra_filter_keys = nil)
-        return params_hash if Raygun.configuration.filter_payload_with_whitelist
-
         filter_parameters = Raygun.configuration.filter_parameters
 
         if filter_parameters.is_a? Proc

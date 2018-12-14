@@ -656,6 +656,44 @@ class ClientTest < Raygun::UnitTest
     assert_equal expected_hash, details[:request]
   end
 
+
+  def test_filter_payload_with_whitelist_and_filter_parameters_applies_both
+    Raygun.configuration.filter_parameters = [:password]
+    Raygun.configuration.filter_payload_with_whitelist = true
+    Raygun.configuration.whitelist_payload_shape = proc do |payload|
+      payload[:request][:headers]["Cookie"] = "[FILTERED]"
+      payload
+    end
+
+    parameters = {
+      "something_normal" => "hello",
+      "password" => "wouldntyouliketoknow"
+    }
+
+    post_body_env_hash = sample_env_hash.merge(
+      "REQUEST_METHOD" => "POST",
+      "rack.input" => StringIO.new(URI.encode_www_form(parameters))
+    )
+
+    payload = @client.send(:build_payload_hash, test_exception, post_body_env_hash)
+    request_payload = payload[:details][:request]
+
+    expected_form = {
+      "something_normal" => "hello",
+      "password" => "[FILTERED]"
+    }
+
+    assert_equal expected_form, request_payload[:form]
+
+    expected_headers = {
+      "Version" => "HTTP/1.1",
+      "Host" => "localhost:3000",
+      "Cookie" => "[FILTERED]"
+    }
+
+    assert_equal expected_headers, request_payload[:headers]
+  end
+
   def test_build_payload_hash_adds_affected_user_details_when_supplied_with_user
     user = OpenStruct.new(id: '123', email: 'test@email.com', first_name: 'Taylor')
     expected_details = {

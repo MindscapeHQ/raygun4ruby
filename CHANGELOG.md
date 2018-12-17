@@ -1,3 +1,7 @@
+## 3.0.0 (18/12/2018):
+  Breaking changes:
+    Parameter filters are now applied if you are using the `filter_payload_with_whitelist` functionality. Previously if this was set to true the parameter filtering was bailed out of ([#136](https://github.com/MindscapeHQ/raygun4ruby/pull/136/files))
+
 ## 2.7.1 (11/06/2018)
   This is a patch release to update the required ruby version to correctly be 2.0 or greater
 

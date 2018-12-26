@@ -12,6 +12,7 @@ feature 'JavaScript Tracking', feature: true do
     visit root_path
 
     expect(page.html).to_not include('cdn.raygun.io/raygun4js/1.14.0/raygun.min.js')
+    expect(page.html).to_not include('rg4js(')
   end
 
   context 'With a JS API Key' do
@@ -21,12 +22,14 @@ feature 'JavaScript Tracking', feature: true do
       visit root_path
 
       expect(page.html).to include('cdn.raygun.io/raygun4js/1.14.0/raygun.min.js')
+      expect(page.html).to include('rg4js(')
     end
 
     it "Does not inject the JS snippet" do
       visit root_path(format: :json)
 
       expect(page.html).to_not include('cdn.raygun.io/raygun4js/1.14.0/raygun.min.js')
+      expect(page.html).to_not include('rg4js(')
     end
   end
 end

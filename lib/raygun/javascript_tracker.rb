@@ -10,7 +10,7 @@ module Raygun
         '(a[e].o=a[e].o||[]).push(arguments)},f=b.createElement(c),g=b.getElementsByTagName(c)[0],',
         'f.async=1,f.src=d,g.parentNode.insertBefore(f,g),h=a.onerror,a.onerror=function(b,c,d,f,g){',
         'h&&h(b,c,d,f,g),g||(g=new Error(b)),a[e].q=a[e].q||[],a[e].q.push({',
-        'e:g})}}(window,document,"script","//cdn.raygun.io/raygun4js/raygun.min.js","rg4js");',
+        'e:g})}}(window,document,"script","//cdn.raygun.io/raygun4js/' + js_api_version + '/raygun.js","rg4js");',
         '</script>'
       ].join('').html_safe
     end
@@ -29,6 +29,10 @@ module Raygun
 
     def js_api_key
       @js_api_key ||= Raygun.configuration.js_api_key
+    end
+
+    def js_api_version
+      @js_api_version ||= Raygun.configuration.js_api_version || '2.13.2'
     end
 
     def js_api_key?

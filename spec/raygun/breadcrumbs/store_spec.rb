@@ -24,7 +24,7 @@ module Raygun
         end
       end
 
-      describe "any?" do
+      describe "#any?" do
         it "returns true if any breadcrumbs have been logged" do
           subject.initialize
 

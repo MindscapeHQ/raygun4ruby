@@ -35,16 +35,13 @@ describe Raygun do
   end
 
   describe '#reset_configuration' do
+    subject { Raygun.reset_configuration }
     it 'clears any customized configuration options' do
       Raygun.setup do |c|
         c.api_url = 'http://test.api'
       end
 
-      expect(Raygun.configuration.api_url).to eq('http://test.api')
-
-      Raygun.reset_configuration
-
-      expect(Raygun.configuration.api_url).to eq(Raygun.default_configuration.api_url)
+      expect { subject }.to change { Raygun.configuration.api_url }.from('http://test.api').to(Raygun.default_configuration.api_url)
     end
   end
 end

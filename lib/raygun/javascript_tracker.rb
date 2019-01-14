@@ -32,7 +32,7 @@ module Raygun
     end
 
     def js_api_version
-      @js_api_version ||= Raygun.configuration.js_api_version || '1.14.0'
+      @js_api_version ||= Raygun.configuration.js_api_version || ''
     end
 
     def js_api_key?

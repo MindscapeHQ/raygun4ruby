@@ -1,3 +1,8 @@
+## 3.1.0 (15/01/2019):
+
+  Feature:
+    - Ability to automatically configure Raygun4JS on the client side by injecting it into outbound HTML pages. Thanks @MikeRogers0 for this ([#138](https://github.com/MindscapeHQ/raygun4ruby/pull/138)])
+
 ## 3.0.0 (18/12/2018):
   Breaking changes:
     Parameter filters are now applied if you are using the `filter_payload_with_whitelist` functionality. Previously if this was set to true the parameter filtering was bailed out of ([#136](https://github.com/MindscapeHQ/raygun4ruby/pull/136/files))

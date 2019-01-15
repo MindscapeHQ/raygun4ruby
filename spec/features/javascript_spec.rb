@@ -11,7 +11,7 @@ feature 'JavaScript Tracking', feature: true do
   it "Does not inject the JS snippet" do
     visit root_path
 
-    expect(page.html).to_not include('cdn.raygun.io/raygun4js//raygun.min.js')
+    expect(page.html).to_not include('cdn.raygun.io/raygun4js/raygun.min.js')
     expect(page.html).to_not include('rg4js(')
   end
 
@@ -21,15 +21,28 @@ feature 'JavaScript Tracking', feature: true do
     it "Injects the JS snippet" do
       visit root_path
 
-      expect(page.html).to include('cdn.raygun.io/raygun4js//raygun.min.js')
+      expect(page.html).to include('cdn.raygun.io/raygun4js/raygun.min.js')
       expect(page.html).to include('rg4js(')
     end
 
     it "Does not inject the JS snippet" do
       visit root_path(format: :json)
 
-      expect(page.html).to_not include('cdn.raygun.io/raygun4js//raygun.min.js')
+      expect(page.html).to_not include('cdn.raygun.io/raygun4js/raygun.min.js')
       expect(page.html).to_not include('rg4js(')
+    end
+  end
+
+  context "With JS version overriden" do
+    before do
+      Raygun.configuration.js_api_version = "2.14.1"
+      Raygun.configuration.js_api_key = "Sample key"
+    end
+
+    it "Uses the overriden version" do
+      visit root_path
+
+      expect(page.html).to include('cdn.raygun.io/raygun4js/2.14.1/raygun.min.js')
     end
   end
 end

@@ -1,6 +1,6 @@
 ## 3.1.0 (15/01/2019):
 
-  Feature:
+Feature:  
     - Ability to automatically configure Raygun4JS on the client side by injecting it into outbound HTML pages. Thanks @MikeRogers0 for this ([#138](https://github.com/MindscapeHQ/raygun4ruby/pull/138))
 
 ## 3.0.0 (18/12/2018):

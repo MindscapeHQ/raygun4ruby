@@ -25,6 +25,12 @@ module Raygun
     # Your Raygun API Key - this can be found on your dashboard at Raygun.io
     config_option :api_key
 
+    # Your JS Raygun API Key - Should be different to your api_key, it's best practice to separate your errors between front end and back end.
+    config_option :js_api_key
+
+    # Your JS Raygun API Version, defaults to latest as found on https://raygun.com/raygun-providers/javascript
+    config_option :js_api_version
+
     # Array of exception classes to ignore
     config_option :ignore
 

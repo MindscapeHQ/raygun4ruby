@@ -28,11 +28,18 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", ">= 1.1"
   spec.add_development_dependency "rake", "~> 11"
   spec.add_development_dependency "timecop"
-  spec.add_development_dependency "minitest", "~> 4.2"
+  spec.add_development_dependency "minitest", "~> 5.11"
   spec.add_development_dependency "redis-namespace", ">= 1.3.1"
   spec.add_development_dependency "resque"
   spec.add_development_dependency "sidekiq", [">= 3", "< 3.2.2"]
   spec.add_development_dependency "mocha"
   spec.add_development_dependency "pry"
   spec.add_development_dependency "webmock"
+
+  spec.add_development_dependency 'rails', "= 5.2"
+  spec.add_development_dependency 'sqlite3'
+  spec.add_development_dependency 'capybara'
+  spec.add_development_dependency "rspec-rails"
+  spec.add_development_dependency "launchy"
+  spec.add_development_dependency "simplecov"
 end

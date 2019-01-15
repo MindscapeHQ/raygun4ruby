@@ -5,6 +5,7 @@ require "minitest/pride"
 require "timecop"
 require "mocha/mini_test"
 require 'stringio'
+require 'webmock/minitest'
 
 class FakeLogger
   def initialize

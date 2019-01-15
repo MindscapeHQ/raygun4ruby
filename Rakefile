@@ -15,6 +15,13 @@ namespace :test do
     t.test_files = FileList["test/integration/*_test.rb"]
   end
 
+  begin
+    require 'rspec/core/rake_task'
+
+    RSpec::Core::RakeTask.new(:spec)
+
+  rescue LoadError
+  end
 end
 
-task default: "test:units"
+task default: ["test:units", "test:spec"]

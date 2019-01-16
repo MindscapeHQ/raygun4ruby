@@ -1,3 +1,9 @@
+## 3.1.1 (16/01/2019):
+Bugfix:
+  - Don't attempt to modify response unless JS api key is present
+  - Don't attempt to modify response unless it responds to indexing ([])
+  - See PR ([#140](https://github.com/MindscapeHQ/raygun4ruby/pull/140))
+
 ## 3.1.0 (15/01/2019):
 
 Feature:  

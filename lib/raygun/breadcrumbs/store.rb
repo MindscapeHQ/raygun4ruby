@@ -11,6 +11,10 @@ module Raygun
         Thread.current[:breadcrumbs] = nil
       end
 
+      def self.replace(array)
+        Thread.current[:breadcrumbs] = array
+      end
+
       def self.stored
         Thread.current[:breadcrumbs]
       end

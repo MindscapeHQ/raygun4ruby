@@ -146,15 +146,19 @@ module Raygun
       end
 
       if retry_count > 0
-        new_exception = e.exception("raygun4ruby encountered an exception processing your exception")
-        new_exception.set_backtrace(e.backtrace)
 
         env[:custom_data] ||= {}
         env[:custom_data].merge!(original_stacktrace: exception_instance.backtrace)
 
-        ::Raygun::Breadcrumbs::Store.clear
+        ::Raygun::Breadcrumbs::Store.replace([])
 
-        track_exception(new_exception, env, user, retry_count - 1)
+        ::Raygun.record_breadcrumb(
+          :message => "Payload modified:\n\n We have stripped the breadcrumb information as this payload exceeded maximum payload size of 128KB. \n",
+          :category => "Notification",
+          :level => :info,
+        )
+
+        track_exception(exception_instance, env, user, retry_count - 1)
       else
         raise e
       end

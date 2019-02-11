@@ -19,7 +19,7 @@ Or install it yourself as:
 
 ## Usage
 
-### Rails 3/4
+### Rails 3/4/5
 
 Run:
 

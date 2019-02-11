@@ -83,7 +83,7 @@ rescue => e
 end
 ```
 
-You can also pass a Hash as the second parameter to `track_exception`. It should look like a [Rack Env Hash](http://rack.rubyforge.org/doc/SPEC.html)
+You can also pass a Hash as the second parameter to `track_exception`. It should look like a [Rack Env Hash](https://www.rubydoc.info/github/rack/rack/master/file/SPEC)
 
 ### Customizing The Parameter Filtering
 

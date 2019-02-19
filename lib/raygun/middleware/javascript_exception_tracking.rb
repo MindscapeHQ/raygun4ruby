@@ -8,7 +8,7 @@ module Raygun::Middleware
       status, headers, response = @app.call(env)
 
       # It's a html file, inject our JS
-      if headers['Content-Type'].include?('text/html')
+      if headers['Content-Type']&.include?('text/html')
         response = inject_javascript_to_response(response)
       end
 

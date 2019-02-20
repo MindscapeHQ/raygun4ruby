@@ -5,6 +5,7 @@ module Raygun
 
     ENV_IP_ADDRESS_KEYS = %w(action_dispatch.remote_ip raygun.remote_ip REMOTE_ADDR)
     NO_API_KEY_MESSAGE  = "[RAYGUN] Just a note, you've got no API Key configured, which means we can't report exceptions. Specify your Raygun API key using Raygun#setup (find yours at https://app.raygun.io)"
+    MAX_BREADCRUMBS_SIZE = 100_000
 
     include HTTParty
 
@@ -214,7 +215,13 @@ module Raygun
             }
         }
         store = ::Raygun::Breadcrumbs::Store
-        error_details[:breadcrumbs] = store.stored.map(&:build_payload) if store.any?
+        breadcrumb_size = 0
+        breadcrumbs_to_keep = store.stored.reverse.take_while do |crumb|
+          breadcrumb_size += crumb.size
+
+          breadcrumb_size < MAX_BREADCRUMBS_SIZE
+        end.reverse
+        error_details[:breadcrumbs] = breadcrumbs_to_keep.map(&:build_payload) if store.any?
 
         Raygun.log('set details and breadcrumbs')
 

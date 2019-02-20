@@ -25,6 +25,10 @@ module Raygun
           v != nil
         end]
       end
+
+      def size
+        return message.length + 100
+      end
     end
   end
 end

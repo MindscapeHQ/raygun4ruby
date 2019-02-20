@@ -129,6 +129,43 @@ module Raygun
           expect(payload[:CustomData]).to eq(foo: 'bar')
         end
       end
+
+      describe "#size" do
+        before do
+          Timecop.freeze
+          Store.initialize
+        end
+        after do
+          Timecop.return
+          Store.clear
+        end
+
+        let(:message) { "This is a breadcrumb message" }
+
+        let(:breadcrumb) do
+          Store.record(
+            message: message,
+            category: "test",
+            level: :info,
+            class_name: "HomeController",
+            method_name: "index",
+            line_number: 17,
+            metadata: {
+              foo: 'bar'
+            }
+          )
+
+          Store.stored[0]
+        end
+
+        let(:size) { breadcrumb.size }
+
+        it "returns the estimated size of the breadcrumb" do
+          # Can't check all the fields but message so assume a standard 100 length for all of them
+          # The message should be the bulk of large breadcrumbs anyway
+          expect(size).to eq(message.length + 100)
+        end
+      end
     end
   end
 end

@@ -47,6 +47,16 @@ module Raygun
         stored != nil && stored.length > 0
       end
 
+      def self.take_until_size(size)
+        breadcrumb_size = 0
+
+        stored.reverse.take_while do |crumb|
+          breadcrumb_size += crumb.size
+
+          breadcrumb_size < size
+        end.reverse
+      end
+
       private
 
       def self.should_record?(crumb)

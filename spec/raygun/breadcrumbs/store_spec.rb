@@ -67,6 +67,30 @@ module Raygun
         end
       end
 
+      describe "#take_until_size" do
+        before do
+          subject.initialize
+        end
+
+        it "takes the most recent breadcrumbs until the size limit is reached" do
+          subject.record(message: '1' * 100)
+          subject.record(message: '2' * 100)
+          subject.record(message: '3' * 100)
+
+          crumbs = subject.take_until_size(500)
+
+          expect(crumbs.length).to eq(2)
+          expect(crumbs[0].message).to eq('2' * 100)
+          expect(crumbs[1].message).to eq('3' * 100)
+        end
+
+        it "does not crash with no recorded breadcrumbs" do
+          crumbs = subject.take_until_size(500)
+
+          expect(crumbs).to eq([])
+        end
+      end
+
       context "adding a breadcrumb" do
         class Foo
           include ::Raygun::Breadcrumbs

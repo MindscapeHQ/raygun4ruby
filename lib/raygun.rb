@@ -6,11 +6,6 @@ require "socket"
 require "rack"
 require "ostruct"
 
-begin
-  require "pry"
-rescue LoadError
-end
-
 require "raygun/version"
 require "raygun/configuration"
 require "raygun/client"

@@ -215,13 +215,7 @@ module Raygun
             }
         }
         store = ::Raygun::Breadcrumbs::Store
-        breadcrumb_size = 0
-        breadcrumbs_to_keep = store.stored.reverse.take_while do |crumb|
-          breadcrumb_size += crumb.size
-
-          breadcrumb_size < MAX_BREADCRUMBS_SIZE
-        end.reverse
-        error_details[:breadcrumbs] = breadcrumbs_to_keep.map(&:build_payload) if store.any?
+        error_details[:breadcrumbs] = store.take_until_size(MAX_BREADCRUMBS_SIZE).map(&:build_payload) if store.any?
 
         Raygun.log('set details and breadcrumbs')
 

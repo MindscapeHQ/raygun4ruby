@@ -1,3 +1,11 @@
+## 3.2.0 (21/02/2019):
+Bugfix:
+  - Fix NoMethodError Exception: undefined method `include?' for nil:NilClass in `JavascriptExceptionTracking` class. Thanks @yamanaltereh for this ([#141](https://github.com/MindscapeHQ/raygun4ruby/pull/141))
+  - Fix ([#145](https://github.com/MindscapeHQ/raygun4ruby/issues/145)), "raygun4ruby will load pry if it is in the gem bundle". Thanks to @eoinkelly for reporting this
+
+Feature:
+  - If you have recorded a large number of Breadcrumbs, or just very large ones, Raygun4Ruby will now only send up to 100KB of them instead of all of them, potentially going over the 128KB payload limit Raygun accepts ([#147](https://github.com/MindscapeHQ/raygun4ruby/pull/147))
+
 ## 3.1.1 (16/01/2019):
 Bugfix:
   - Don't attempt to modify response unless JS api key is present
@@ -6,7 +14,7 @@ Bugfix:
 
 ## 3.1.0 (15/01/2019):
 
-Feature:  
+Feature:
     - Ability to automatically configure Raygun4JS on the client side by injecting it into outbound HTML pages. Thanks @MikeRogers0 for this ([#138](https://github.com/MindscapeHQ/raygun4ruby/pull/138))
 
 ## 3.0.0 (18/12/2018):

@@ -6,11 +6,6 @@ require "socket"
 require "rack"
 require "ostruct"
 
-begin
-  require "pry"
-rescue LoadError
-end
-
 require "raygun/version"
 require "raygun/configuration"
 require "raygun/client"
@@ -151,6 +146,8 @@ module Raygun
 
         env[:custom_data] ||= {}
         env[:custom_data].merge!(original_stacktrace: exception_instance.backtrace)
+
+        ::Raygun::Breadcrumbs::Store.clear
 
         track_exception(new_exception, env, user, retry_count - 1)
       else

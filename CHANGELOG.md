@@ -1,3 +1,7 @@
+## 3.2.1 (25/02/2019):
+Bugfix:
+  - Remove Ruby 2.3 syntax to retain support for Ruby >= 2.0 ([#148](https://github.com/MindscapeHQ/raygun4ruby/pull/148))
+
 ## 3.2.0 (21/02/2019):
 Bugfix:
   - Fix NoMethodError Exception: undefined method `include?' for nil:NilClass in `JavascriptExceptionTracking` class. Thanks @yamanaltereh for this ([#141](https://github.com/MindscapeHQ/raygun4ruby/pull/141))

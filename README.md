@@ -182,7 +182,7 @@ Raygun.setup do |config|
   config.api_key = "YOUR_RAYGUN_API_KEY"
   config.filter_payload_with_whitelist = true
 
-  config.whitelist_payload_keys do |payload|
+  config.whitelist_payload_shape do |payload|
     # Return the payload mutated into your desired form
     payload
   end

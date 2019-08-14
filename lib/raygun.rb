@@ -61,6 +61,8 @@ module Raygun
 
     def track_exception(exception_instance, env = {}, user = nil, retry_count = 1)
       log('tracking exception')
+      
+      exception_instance.set_backtrace(caller) if exception_instance.is_a?(Exception) && exception_instance.backtrace.nil?
 
       if configuration.send_in_background
         track_exception_async(exception_instance, env, user, retry_count)

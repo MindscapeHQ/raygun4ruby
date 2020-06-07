@@ -198,6 +198,7 @@ class ClientTest < Raygun::UnitTest
     Timecop.freeze do
       Raygun.configuration.version = 123
       grouping_key = "my custom group"
+      correlation_id = "my correlation id"
 
       expected_hash = {
         occurredOn: Time.now.utc.iso8601,
@@ -214,13 +215,14 @@ class ClientTest < Raygun::UnitTest
           tags:           ["test"],
           request:        {},
           groupingKey:    grouping_key,
+          correlationId:  correlation_id,
           environment: {
             utcOffset: 13
           }
         }
       }
 
-      assert_equal expected_hash, @client.send(:build_payload_hash, test_exception, { grouping_key: grouping_key })
+      assert_equal expected_hash, @client.send(:build_payload_hash, test_exception, { grouping_key: grouping_key, correlation_id: correlation_id })
     end
   end
 

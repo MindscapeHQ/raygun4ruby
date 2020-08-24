@@ -3,7 +3,7 @@ require_relative "../lib/raygun.rb"
 require "minitest/autorun"
 require "minitest/pride"
 require "timecop"
-require "mocha/mini_test"
+require "mocha/minitest"
 require 'stringio'
 require 'webmock/minitest'
 

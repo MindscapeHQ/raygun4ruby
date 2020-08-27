@@ -1,3 +1,6 @@
+## 3.2.2 (10/06/2020):
+  - Introduce support for Raygun APM exceptions correlation ([#154](https://github.com/MindscapeHQ/raygun4ruby/pull/154))
+
 ## 3.2.1 (25/02/2019):
 Bugfix:
   - Remove Ruby 2.3 syntax to retain support for Ruby >= 2.0 ([#148](https://github.com/MindscapeHQ/raygun4ruby/pull/148))

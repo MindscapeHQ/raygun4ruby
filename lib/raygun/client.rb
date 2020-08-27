@@ -192,6 +192,7 @@ module Raygun
         Raygun.log('set tags')
 
         grouping_key = env.delete(:grouping_key)
+        correlation_id = env.delete(:correlation_id)
 
         configuration_custom_data = Raygun.configuration.custom_data
         configured_custom_data = if configuration_custom_data.is_a?(Proc)
@@ -220,6 +221,7 @@ module Raygun
         Raygun.log('set details and breadcrumbs')
 
         error_details.merge!(groupingKey: grouping_key) if grouping_key
+        error_details.merge!(correlationId: correlation_id) if correlation_id
 
         user_details = if affected_user_present?(env)
                          user_information(env)

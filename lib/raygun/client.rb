@@ -1,10 +1,10 @@
 module Raygun
   # client for the Raygun REST APIv1
-  # as per http://raygun.io/raygun-providers/rest-json-api?v=1
+  # as per https://raygun.com/documentation/product-guides/crash-reporting/api/
   class Client
 
     ENV_IP_ADDRESS_KEYS = %w(action_dispatch.remote_ip raygun.remote_ip REMOTE_ADDR)
-    NO_API_KEY_MESSAGE  = "[RAYGUN] Just a note, you've got no API Key configured, which means we can't report exceptions. Specify your Raygun API key using Raygun#setup (find yours at https://app.raygun.io)"
+    NO_API_KEY_MESSAGE  = "[RAYGUN] Just a note, you've got no API Key configured, which means we can't report exceptions. Specify your Raygun API key using Raygun#setup (find yours at https://app.raygun.com)"
     MAX_BREADCRUMBS_SIZE = 100_000
 
     include HTTParty
@@ -164,7 +164,7 @@ module Raygun
         filter_params_with_blacklist(params, env["action_dispatch.parameter_filter"])
       end
 
-      # see http://raygun.io/raygun-providers/rest-json-api?v=1
+      # see https://raygun.com/documentation/product-guides/crash-reporting/api/
       def build_payload_hash(exception_instance, env = {}, user = nil)
         Raygun.log('building payload hash')
         custom_data = filter_custom_data(env) || {}

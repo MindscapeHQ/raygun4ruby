@@ -8,7 +8,7 @@ class ResqueFailureTest < Raygun::UnitTest
   def setup
     super
 
-    stub_request(:post, 'https://api.raygun.io/entries').to_return(status: 202)
+    stub_request(:post, 'https://api.raygun.com/entries').to_return(status: 202)
     fake_successful_entry
   end
 

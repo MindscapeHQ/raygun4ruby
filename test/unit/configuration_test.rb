@@ -159,7 +159,7 @@ class ConfigurationTest < Raygun::UnitTest
   end
 
   def test_api_url_default
-    assert_equal "https://api.raygun.io/", Raygun.configuration.api_url
+    assert_equal "https://api.raygun.com/", Raygun.configuration.api_url
   end
 
   def test_setting_breadcrumb_level

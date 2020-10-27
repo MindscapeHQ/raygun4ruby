@@ -22,13 +22,13 @@ module Raygun
       end
     end
 
-    # Your Raygun API Key - this can be found on your dashboard at Raygun.io
+    # Your Raygun API Key - this can be found on your dashboard at https://app.raygun.com
     config_option :api_key
 
     # Your JS Raygun API Key - Should be different to your api_key, it's best practice to separate your errors between front end and back end.
     config_option :js_api_key
 
-    # Your JS Raygun API Version, defaults to latest as found on https://raygun.com/raygun-providers/javascript
+    # Your JS Raygun API Version, defaults to latest as found on https://raygun.com/documentation/language-guides/javascript/crash-reporting/installation/
     config_option :js_api_version
 
     # Array of exception classes to ignore
@@ -135,7 +135,7 @@ module Raygun
         whitelist_payload_shape:       DEFAULT_WHITELIST_PAYLOAD_SHAPE,
         proxy_settings:                {},
         debug:                         false,
-        api_url:                       'https://api.raygun.io/',
+        api_url:                       'https://api.raygun.com/',
         breadcrumb_level:              :info,
         record_raw_data:               false,
         send_in_background:            false,

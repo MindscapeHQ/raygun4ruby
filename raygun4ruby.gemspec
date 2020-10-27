@@ -7,10 +7,10 @@ Gem::Specification.new do |spec|
   spec.name          = "raygun4ruby"
   spec.version       = Raygun::VERSION
   spec.authors       = ["Mindscape", "Nik Wakelin"]
-  spec.email         = ["hello@raygun.io"]
-  spec.description   = %q{Ruby Adapter for Raygun.io}
-  spec.summary       = %q{This gem provides support for Ruby and Ruby on Rails for the Raygun.io error reporter}
-  spec.homepage      = "http://raygun.io"
+  spec.email         = ["hello@raygun.com"]
+  spec.description   = %q{Ruby Adapter for Raygun}
+  spec.summary       = %q{This gem provides support for Ruby and Ruby on Rails for the Raygun error reporter}
+  spec.homepage      = "https://raygun.com"
   spec.license       = "MIT"
   spec.required_ruby_version = '>= 2.0'
 

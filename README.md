@@ -1,6 +1,6 @@
 # Raygun 4 Ruby [![Build Status](https://travis-ci.org/MindscapeHQ/raygun4ruby.png?branch=master)](https://travis-ci.org/MindscapeHQ/raygun4ruby) [![Gem Version](https://badge.fury.io/rb/raygun4ruby.svg)](https://badge.fury.io/rb/raygun4ruby)
 
-This is the Ruby adapter for the Raygun error reporter, http://raygun.io.
+This is the Ruby adapter for the Raygun error reporter, https://raygun.com.
 
 
 ## Installation
@@ -25,7 +25,7 @@ Run:
 
     rails g raygun:install YOUR_API_KEY_HERE
 
-You can find your API key on your [Raygun Dashboard](https://app.raygun.io/dashboard/)
+You can find your API key on your [Raygun Dashboard](https://app.raygun.com/dashboard/)
 
 You can then test your Raygun integration by running:
 
@@ -41,7 +41,7 @@ By default the Rails integration is set to only report Exceptions in Production.
 
 ### Rails 2
 
-Raygun4Ruby doesn't currently support Rails 2. If you'd like Rails 2 support, [drop us a line](http://raygun.io/forums).
+Raygun4Ruby doesn't currently support Rails 2. If you'd like Rails 2 support, [drop us a line](https://raygun.com/forums).
 
 ### Sinatra
 

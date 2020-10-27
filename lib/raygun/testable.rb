@@ -11,7 +11,7 @@ module Raygun
       response = Raygun.track_exception(e)
 
       if response.success?
-        puts "Success! Now go check your Raygun.io Dashboard"
+        puts "Success! Now go check your Raygun Dashboard"
       else
         puts "Oh-oh, something went wrong - double check your API key"
         puts "API Key - " << Raygun.configuration.api_key << ")"

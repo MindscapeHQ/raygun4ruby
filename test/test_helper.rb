@@ -55,7 +55,7 @@ class Raygun::UnitTest < MiniTest::Unit::TestCase
   end
 
   def fake_successful_entry
-    stub_request(:post, 'https://api.raygun.io/entries').to_return(status: 202)
+    stub_request(:post, 'https://api.raygun.com/entries').to_return(status: 202)
   end
 
   def reset_configuration

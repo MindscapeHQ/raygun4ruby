@@ -1,6 +1,6 @@
 # Raygun 4 Ruby [![Build Status](https://travis-ci.org/MindscapeHQ/raygun4ruby.png?branch=master)](https://travis-ci.org/MindscapeHQ/raygun4ruby) [![Gem Version](https://badge.fury.io/rb/raygun4ruby.svg)](https://badge.fury.io/rb/raygun4ruby)
 
-This is the Ruby adapter for the Raygun error reporter, http://raygun.io.
+This is the Ruby adapter for the Raygun error reporter, https://raygun.com.
 
 
 ## Installation
@@ -11,7 +11,7 @@ Add this line to your application's Gemfile:
 
 And then execute:
 
-    $ bundle
+    $ bundle install
 
 Or install it yourself as:
 
@@ -25,7 +25,7 @@ Run:
 
     rails g raygun:install YOUR_API_KEY_HERE
 
-You can find your API key on your [Raygun Dashboard](https://app.raygun.io/dashboard/)
+You can find your API key in the [Raygun app](https://app.raygun.com/)
 
 You can then test your Raygun integration by running:
 
@@ -41,7 +41,7 @@ By default the Rails integration is set to only report Exceptions in Production.
 
 ### Rails 2
 
-Raygun4Ruby doesn't currently support Rails 2. If you'd like Rails 2 support, [drop us a line](http://raygun.io/forums).
+Raygun4Ruby doesn't currently support Rails 2. If you'd like Rails 2 support, [drop us a line](https://raygun.com/forums).
 
 ### Sinatra
 
@@ -83,7 +83,7 @@ rescue => e
 end
 ```
 
-You can also pass a Hash as the second parameter to `track_exception`. It should look like a [Rack Env Hash](https://www.rubydoc.info/github/rack/rack/master/file/SPEC)
+You can also pass a Hash as the second parameter to `track_exception`. It should look like a [Rack Env Hash](https://github.com/rack/rack/blob/master/SPEC.rdoc#label-The+Environment)
 
 ### Customizing The Parameter Filtering
 
@@ -244,7 +244,7 @@ AbstractController::ActionNotFound
 Mongoid::Errors::DocumentNotFound
 ```
 
- [You can see this here](https://github.com/MindscapeHQ/raygun4ruby/blob/master/lib/raygun/configuration.rb#L51) and unignore them if needed by doing the following:
+ [You can see this here](https://github.com/MindscapeHQ/raygun4ruby/blob/master/lib/raygun/configuration.rb#L90) and unignore them if needed by doing the following:
 
 ```ruby
 Raygun.setup do |config|

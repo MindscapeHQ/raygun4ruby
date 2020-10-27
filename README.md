@@ -11,7 +11,7 @@ Add this line to your application's Gemfile:
 
 And then execute:
 
-    $ bundle
+    $ bundle install
 
 Or install it yourself as:
 
@@ -25,7 +25,7 @@ Run:
 
     rails g raygun:install YOUR_API_KEY_HERE
 
-You can find your API key on your [Raygun Dashboard](https://app.raygun.com/dashboard/)
+You can find your API key in the [Raygun app](https://app.raygun.com/)
 
 You can then test your Raygun integration by running:
 

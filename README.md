@@ -83,7 +83,7 @@ rescue => e
 end
 ```
 
-You can also pass a Hash as the second parameter to `track_exception`. It should look like a [Rack Env Hash](https://www.rubydoc.info/github/rack/rack/master/file/SPEC)
+You can also pass a Hash as the second parameter to `track_exception`. It should look like a [Rack Env Hash](https://github.com/rack/rack/blob/master/SPEC.rdoc#label-The+Environment)
 
 ### Customizing The Parameter Filtering
 
@@ -244,7 +244,7 @@ AbstractController::ActionNotFound
 Mongoid::Errors::DocumentNotFound
 ```
 
- [You can see this here](https://github.com/MindscapeHQ/raygun4ruby/blob/master/lib/raygun/configuration.rb#L51) and unignore them if needed by doing the following:
+ [You can see this here](https://github.com/MindscapeHQ/raygun4ruby/blob/master/lib/raygun/configuration.rb#L90) and unignore them if needed by doing the following:
 
 ```ruby
 Raygun.setup do |config|

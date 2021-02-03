@@ -59,12 +59,12 @@ Bugfixes
 ## 2.4.0 (31/07/2017)
 
 Features
-  - Add functionality to track affected user in Sidekiq jobs, refer to the README for more information, under the "Affected User Tracking in Sidekiq" heading ([#121](https://github.com/MindscapeHQ/raygun4ruby/pull/121))
+  - Add functionality to track affected user/customer in Sidekiq jobs, refer to the README for more information, under the "Affected User Tracking/Customers in Sidekiq" heading ([#121](https://github.com/MindscapeHQ/raygun4ruby/pull/121))
 
 ## 2.3.0 (09/05/2017)"
 
 Bugfixes
-  - Fix issue preventing affected users for a crash report from showing up in the affected users page ([#119](https://github.com/MindscapeHQ/raygun4ruby/pull/119))
+  - Fix issue preventing affected users/customers for a crash report from showing up in the affected users/customers page ([#119](https://github.com/MindscapeHQ/raygun4ruby/pull/119))
 
 ## 2.2.0 (05/05/2017)
 
@@ -103,7 +103,7 @@ Features:
 
 Features:
   - Improve affected user handling to let you specify all Raygun parameters, identifier, email, first name, full name and uuid. See [README.md](https://github.com/MindscapeHQ/raygun4ruby#affected-user-tracking) for details ([#34](https://github.com/MindscapeHQ/raygun4ruby/pull/34))
-  - Pass a user object as the third parameter to `Raygun.track_exception` to have affected user tracking for manually tracked exceptions, see the above link for more information on configuring this ([#106](https://github.com/MindscapeHQ/raygun4ruby/pull/106))
+  - Pass a user object as the third parameter to `Raygun.track_exception` to have affected user tracking/customers for manually tracked exceptions, see the above link for more information on configuring this ([#106](https://github.com/MindscapeHQ/raygun4ruby/pull/106))
   - If the exception instance responds to `:raygun_custom_data` that method will be called and the return value merged into the `custom_data` hash sent to Raygun. For convenience a `Raygun::Error` class is provided that takes this custom data as a second argument ([#101](https://github.com/MindscapeHQ/raygun4ruby/pull/101))
   - Allowed `Configuration.custom_data` to be set to a proc to allow a global custom data hook for all exceptions. It is passed as arguments the exception and the environment hash ([#108](https://github.com/MindscapeHQ/raygun4ruby/pull/108))
   - Added `Configuration.debug` to enable logging the reason why an exception was not reported ([#109](https://github.com/MindscapeHQ/raygun4ruby/pull/109))

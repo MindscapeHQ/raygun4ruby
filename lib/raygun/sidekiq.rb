@@ -23,7 +23,8 @@ module Raygun
       data =  {
         custom_data: {
           sidekiq_context: context_hash
-        }
+        },
+        tags: ['sidekiq']
       }
       if correlation_id = exception.instance_variable_get(:@__raygun_correlation_id)
         data.merge!(correlation_id: correlation_id)

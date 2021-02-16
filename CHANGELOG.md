@@ -1,3 +1,6 @@
+## 3.2.4 (11/02/2021):
+  - Set sidekiq tag on sidekiq errors ([#161](https://github.com/MindscapeHQ/raygun4ruby/pull/161))
+
 ## 3.2.2 (10/06/2020):
   - Introduce support for Raygun APM exceptions correlation ([#154](https://github.com/MindscapeHQ/raygun4ruby/pull/154))
 

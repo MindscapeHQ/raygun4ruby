@@ -74,7 +74,7 @@ rescue => e
   Raygun.track_exception(e)
 end
 
-# You may also pass a user object as the third argument to allow affected user tracking, like so
+# You may also pass a user object as the third argument to allow affected customers, like so
 begin
   # your lovely code here
 rescue => e
@@ -264,13 +264,13 @@ Raygun.setup do |config|
 end
 ```
 
-### Affected User Tracking
+### Affected Customers
 
-Raygun can now track how many users have been affected by an error.
+Raygun can now track how many customers have been affected by an error.
 
-By default, Raygun looks for a method called `current_user` on your controller, and it will populate the user's information based on a default method name mapping.
+By default, Raygun looks for a method called `current_user` on your controller, and it will populate the customer's information based on a default method name mapping.
 
-(e.g Raygun will call `email` to populate the user's email, and `first_name` for the user's first name)
+(e.g Raygun will call `email` to populate the customer's email, and `first_name` for the customer's first name)
 
 You can inspect and customize this mapping using `config.affected_user_mapping`, like so:
 
@@ -291,7 +291,7 @@ To see the defaults check out [affected_user.rb](https://github.com/MindscapeHQ/
 
 If you're using Rails, most authentication systems will have this method set and you should be good to go.
 
-The count of unique affected users will appear on the error group in the Raygun dashboard. If your user has an `Email` attribute, and that email has a Gravatar associated with that address, you will also see your user's avatar.
+The count of unique affected customers will appear on the error group in the Raygun dashboard. If your customer has an `Email` attribute, and that email has a Gravatar associated with that address, you will also see your customer's avatar.
 
 If you wish to keep it anonymous, you could set this identifier to something like `SecureRandom.uuid` and store that in a cookie, like so:
 
@@ -371,11 +371,11 @@ Raygun4Ruby can track errors from Sidekiq (2.x or 3+). All you need to do is add
 
 Either in your Raygun initializer or wherever else takes your fancy :)
 
-#### Affected User Tracking in Sidekiq
+#### Affected Customers in Sidekiq
 
-To track affected users, define a class method on your worker class that returns a user object.
+To track affected customers, define a class method on your worker class that returns a user object.
 Make sure the name of this method is the same as whatever you have defined as the `affected_user_method` in your Raygun configuration and that it returns an object that fits the mappings defined in `affected_user_mapping`
-If you have not changed these, refer to [Affected user tracking](#affected-user-tracking) for the defaults
+If you have not changed these, refer to [Affected customers](#affected-customers) for the defaults
 
 ```ruby
 class FailingWorker

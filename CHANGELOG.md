@@ -1,3 +1,6 @@
+## 3.2.5 (15/03/2021):
+  - Bug fix: Ensure tags passed into track_exception are not persisted ([#164](https://github.com/MindscapeHQ/raygun4ruby/pull/164))
+
 ## 3.2.4 (11/02/2021):
   - Set sidekiq tag on sidekiq errors ([#161](https://github.com/MindscapeHQ/raygun4ruby/pull/161))
 

@@ -27,7 +27,7 @@ end
 
 class NoApiKey < StandardError; end
 
-class Raygun::IntegrationTest < Minitest::Unit::TestCase
+class Raygun::IntegrationTest < Minitest::Test
 
   def setup
     Raygun.setup do |config|
@@ -44,7 +44,7 @@ class Raygun::IntegrationTest < Minitest::Unit::TestCase
 
 end
 
-class Raygun::UnitTest < MiniTest::Unit::TestCase
+class Raygun::UnitTest < MiniTest::Test
 
   def setup
     Raygun.configuration.api_key = "test api key"

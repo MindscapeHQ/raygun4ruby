@@ -133,9 +133,9 @@ class ClientTest < Raygun::UnitTest
   end
 
   def test_tags
-    configuration_tags = %w{alpha beta gaga}
-    explicit_env_tags  = %w{one two three four}
-    rack_env_tag       = %w{test}
+    configuration_tags = %w[alpha beta gaga]
+    explicit_env_tags  = %w[one two three four]
+    rack_env_tag       = %w[test]
 
     Raygun.setup do |config|
       config.tags = configuration_tags
@@ -148,9 +148,9 @@ class ClientTest < Raygun::UnitTest
   end
 
   def test_tags_with_proc
-    configuration_tags = %w{bar}
-    explicit_env_tags  = %w{one two three four}
-    rack_env_tag       = %w{test}
+    configuration_tags = %w[bar]
+    explicit_env_tags  = %w[one two three four]
+    rack_env_tag       = %w[test]
 
     Raygun.setup do |config|
       config.tags = ->(exception, env) {
@@ -162,6 +162,26 @@ class ClientTest < Raygun::UnitTest
     expected_tags =  configuration_tags + explicit_env_tags + rack_env_tag
 
     assert_equal expected_tags, @client.send(:build_payload_hash, test_exception, test_env)[:details][:tags]
+  end
+
+  def test_tags_with_multiple_send_calls
+    configuration_tags = %w[config-tag]
+    explicit_env_tags  = %w[explicit-env-tag]
+    rack_env_tag       = %w[test]
+
+    Raygun.setup do |config|
+      config.tags = configuration_tags
+    end
+
+    test_env      = { tags: explicit_env_tags }
+    expected_tags_1 = configuration_tags + explicit_env_tags + rack_env_tag
+
+    assert_equal expected_tags_1, @client.send(:build_payload_hash, test_exception, test_env)[:details][:tags]
+
+    # Tags passed in via the `env` parameter should not persist once the crash report has been sent
+    expected_tags_2 = configuration_tags + rack_env_tag
+
+    assert_equal expected_tags_2, @client.send(:build_payload_hash, test_exception)[:details][:tags]
   end
 
   def test_hostname

@@ -1,3 +1,6 @@
+## 3.2.6 (17/03/2021):
+  - Bug fix: Rename Testable class to DemoException to ensure it is added to the bundle ([#166](https://github.com/MindscapeHQ/raygun4ruby/pull/166))
+
 ## 3.2.5 (15/03/2021):
   - Bug fix: Ensure tags passed into track_exception are not persisted ([#164](https://github.com/MindscapeHQ/raygun4ruby/pull/164))
 

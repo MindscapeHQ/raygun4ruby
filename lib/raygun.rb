@@ -13,7 +13,7 @@ require "raygun/javascript_tracker"
 require "raygun/middleware/rack_exception_interceptor"
 require "raygun/middleware/breadcrumbs_store_initializer"
 require "raygun/middleware/javascript_exception_tracking"
-require "raygun/testable"
+require "raygun/demo_exception"
 require "raygun/error"
 require "raygun/affected_user"
 require "raygun/services/apply_whitelist_filter_to_payload"
@@ -29,7 +29,7 @@ module Raygun
   CLIENT_NAME = "Raygun4Ruby Gem"
 
   class << self
-    include Testable
+    include DemoException
 
     # Configuration Object (instance of Raygun::Configuration)
     attr_writer :configuration

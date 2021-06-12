@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "rack"
   spec.add_runtime_dependency "concurrent-ruby"
 
-  spec.add_development_dependency "bundler", ">= 1.1"
+  spec.add_development_dependency "bundler", ">= 2.2.15"
   spec.add_development_dependency "rake", ">= 12.3.3"
   spec.add_development_dependency "timecop"
   spec.add_development_dependency "minitest", "~> 5.11"
@@ -36,8 +36,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry"
   spec.add_development_dependency "webmock"
 
-  spec.add_development_dependency 'rails', "= 4.2.11"
-  spec.add_development_dependency 'sqlite3', '~> 1.3.6'
+  spec.add_development_dependency 'rails', ">= 4.2.11"
+  spec.add_development_dependency 'sqlite3', '~> 1.4.2'
   spec.add_development_dependency 'capybara'
   spec.add_development_dependency "rspec-rails", '~> 3.9'
   spec.add_development_dependency "launchy"

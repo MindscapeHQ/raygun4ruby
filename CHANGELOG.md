@@ -1,3 +1,7 @@
+## 3.2.7 (12/06/2021):
+  - Ruby 3 support ([#166](https://github.com/MindscapeHQ/raygun4ruby/pull/166))
+
+
 ## 3.2.6 (17/03/2021):
   - Bug fix: Rename Testable class to DemoException to ensure it is added to the bundle ([#166](https://github.com/MindscapeHQ/raygun4ruby/pull/166))
 

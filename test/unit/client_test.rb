@@ -299,7 +299,7 @@ class ClientTest < Raygun::UnitTest
       "rack.input" => StringIO.new('{"foo": "bar"}')
     })
 
-    assert_equal(nil, @client.send(:request_information, env_hash)[:rawData])
+    assert_nil(@client.send(:request_information, env_hash)[:rawData])
   end
 
   def test_error_raygun_custom_data

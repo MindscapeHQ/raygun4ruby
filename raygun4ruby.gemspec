@@ -36,8 +36,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry"
   spec.add_development_dependency "webmock"
 
-  spec.add_development_dependency 'rails', "= 4.2.11"
-  spec.add_development_dependency 'sqlite3', '~> 1.3.6'
+  spec.add_development_dependency 'rails', "= #{ENV.fetch("TESTING_RAILS_VERSION", "4.2.11")}"
+  spec.add_development_dependency 'sqlite3', "~> #{ENV.fetch("TESTING_RAILS_VERSION", "4.2.11").split('.').first.to_i <= 5 ? '1.3.13' : '1.4'}"
   spec.add_development_dependency 'capybara'
   spec.add_development_dependency "rspec-rails", '~> 3.9'
   spec.add_development_dependency "launchy"

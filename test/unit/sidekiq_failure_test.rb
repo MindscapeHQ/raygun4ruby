@@ -3,8 +3,11 @@ require_relative "../test_helper.rb"
 require "sidekiq"
 # Convince Sidekiq it's on a server :)
 module Sidekiq
-  def self.server?
-    true
+  class << self
+    undef server?
+    def server?
+      true
+    end
   end
 end
 require "raygun/sidekiq"

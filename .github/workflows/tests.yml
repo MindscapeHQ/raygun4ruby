@@ -10,6 +10,8 @@ jobs:
         ruby: [2.1, 2.2, 2.3, 2.4, 2.5, 2.6]
         rails: [4.2.11]
         include:
+          - ruby: 2.1
+            rails: 3.2.22.5
           - ruby: 2.5
             rails: 6.1.4
           - ruby: 2.7

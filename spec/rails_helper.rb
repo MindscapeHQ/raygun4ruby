@@ -1,4 +1,4 @@
 ENV['RAILS_ENV'] ||= 'test'
-require 'dummy/config/environment'
+require 'rails_applications/4.2.11/config/environment'
 
 require 'rspec/rails'

@@ -48,7 +48,7 @@ class ClientTest < Raygun::UnitTest
     Raygun.configuration.api_key = nil
 
     $stderr.expects(:puts).with(Raygun::Client::NO_API_KEY_MESSAGE).once
-    second_client = Raygun::Client.new
+    Raygun::Client.new
   end
 
   def test_track_exception

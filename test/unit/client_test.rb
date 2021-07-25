@@ -48,7 +48,7 @@ class ClientTest < Raygun::UnitTest
     Raygun.configuration.api_key = nil
 
     $stderr.expects(:puts).with(Raygun::Client::NO_API_KEY_MESSAGE).once
-    second_client = Raygun::Client.new
+    Raygun::Client.new
   end
 
   def test_track_exception
@@ -299,7 +299,7 @@ class ClientTest < Raygun::UnitTest
       "rack.input" => StringIO.new('{"foo": "bar"}')
     })
 
-    assert_equal(nil, @client.send(:request_information, env_hash)[:rawData])
+    assert_nil(@client.send(:request_information, env_hash)[:rawData])
   end
 
   def test_error_raygun_custom_data

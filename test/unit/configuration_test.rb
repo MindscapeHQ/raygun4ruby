@@ -116,8 +116,8 @@ class ConfigurationTest < Raygun::UnitTest
     end
 
     assert Raygun.configuration.whitelist_payload_shape.is_a?(Proc)
-    ensure
-      Raygun.configuration.whitelist_payload_shape = nil
+  ensure
+    Raygun.configuration.whitelist_payload_shape = nil
   end
 
   def test_setting_custom_data_to_proc

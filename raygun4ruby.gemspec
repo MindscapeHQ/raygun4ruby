@@ -3,6 +3,9 @@ lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'raygun/version'
 
+TESTING_RAILS_VERSION = ENV.fetch("TESTING_RAILS_VERSION", "4.2.11")
+TESTING_RAILS_MAJOR_VERSION = TESTING_RAILS_VERSION.split('.').first.to_i
+
 Gem::Specification.new do |spec|
   spec.name          = "raygun4ruby"
   spec.version       = Raygun::VERSION
@@ -36,8 +39,11 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry"
   spec.add_development_dependency "webmock"
 
-  spec.add_development_dependency 'rails', "= 4.2.11"
-  spec.add_development_dependency 'sqlite3', '~> 1.3.6'
+  spec.add_development_dependency 'rails', "= #{TESTING_RAILS_VERSION}"
+  spec.add_development_dependency 'sqlite3', "~> #{TESTING_RAILS_MAJOR_VERSION <= 5 ? '1.3.13' : '1.4'}"
+  if TESTING_RAILS_MAJOR_VERSION == 3
+    spec.add_development_dependency 'test-unit', '~> 3.0'
+  end
   spec.add_development_dependency 'capybara'
   spec.add_development_dependency "rspec-rails", '~> 3.9'
   spec.add_development_dependency "launchy"

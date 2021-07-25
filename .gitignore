@@ -15,7 +15,7 @@ spec/reports
 test/tmp
 test/version_tmp
 tmp
-spec/dummy/log
+spec/rails_applications/*/log
 
 # JetBrains
 .idea

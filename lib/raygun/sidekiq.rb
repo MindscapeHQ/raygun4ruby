@@ -26,7 +26,7 @@ module Raygun
         },
         tags: ['sidekiq']
       }
-      if correlation_id = exception.instance_variable_get(:@__raygun_correlation_id)
+      if exception.instance_variable_defined?(:@__raygun_correlation_id) && correlation_id = exception.instance_variable_get(:@__raygun_correlation_id)
         data.merge!(correlation_id: correlation_id)
       end
       ::Raygun.track_exception(

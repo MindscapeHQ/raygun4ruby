@@ -1,3 +1,6 @@
+## 3.2.7 (17/08/2021):
+  - Include additional test applications, use GitHub Actions, and fix warnings ([#170](https://github.com/MindscapeHQ/raygun4ruby/pull/170), [#171](https://github.com/MindscapeHQ/raygun4ruby/pull/171))
+
 ## 3.2.6 (17/03/2021):
   - Bug fix: Rename Testable class to DemoException to ensure it is added to the bundle ([#166](https://github.com/MindscapeHQ/raygun4ruby/pull/166))
 

@@ -44,7 +44,7 @@ class Raygun::IntegrationTest < Minitest::Test
 
 end
 
-class Raygun::UnitTest < MiniTest::Test
+class Raygun::UnitTest < Minitest::Test
 
   def setup
     Raygun.configuration.api_key = "test api key"

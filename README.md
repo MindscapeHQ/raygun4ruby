@@ -260,7 +260,7 @@ You can pass proxy settings using the `proxy_settings` config option.
 ```ruby
 Raygun.setup do |config|
   config.api_key = "MY_SWEET_API_KEY"
-  config.proxy_settings = { host: "localhost", port: 8888 }
+  config.proxy_settings = { address: "localhost", port: 8888 }
 end
 ```
 

@@ -3,16 +3,13 @@ lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "raygun/version"
 
-TESTING_RAILS_VERSION = ENV.fetch("TESTING_RAILS_VERSION", "6.1.4")
-TESTING_RAILS_MAJOR_VERSION = TESTING_RAILS_VERSION.split(".").first.to_i
-
 Gem::Specification.new do |spec|
   spec.name          = "raygun4ruby"
   spec.version       = Raygun::VERSION
   spec.authors       = ["Mindscape", "Nik Wakelin"]
   spec.email         = ["hello@raygun.com"]
   spec.description   = %q{Ruby Adapter for Raygun}
-  spec.summary       = %q{This gem provides support for Ruby and Ruby on Rails for the Raygun error reporter}
+  spec.summary       = %q{This gem provides support for Ruby and Ruby on Rails for the Raygun.com error reporter}
   spec.homepage      = "https://raygun.com"
   spec.license       = "MIT"
   spec.required_ruby_version = ">= 2.0"
@@ -30,6 +27,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", ">= 2.3"
   spec.add_development_dependency "rake", ">= 12.3.3"
+  spec.add_development_dependency "appraisal"
   spec.add_development_dependency "timecop"
   spec.add_development_dependency "minitest", "~> 5.11"
   spec.add_development_dependency "redis-namespace", ">= 1.3.1"
@@ -39,10 +37,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry"
   spec.add_development_dependency "webmock"
 
-  spec.add_development_dependency "rails", "= #{TESTING_RAILS_VERSION}"
-  spec.add_development_dependency "sqlite3", "~> #{TESTING_RAILS_MAJOR_VERSION <= 5 ? "1.3.13" : "1.4"}"
+  spec.add_development_dependency "sqlite3"
   spec.add_development_dependency "capybara"
-  spec.add_development_dependency "rspec-rails", "~> 3.9"
+  spec.add_development_dependency "rspec-rails"
   spec.add_development_dependency "launchy"
   spec.add_development_dependency "simplecov"
 end

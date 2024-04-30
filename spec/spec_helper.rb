@@ -1,15 +1,15 @@
-#require 'rubygems'
+require "bundler/setup"
 
-require 'timecop'
-require 'webmock/rspec'
+require "timecop"
+require "webmock/rspec"
 
 # Coverage
-require 'simplecov'
+require "simplecov"
 SimpleCov.start do
-  add_filter '/spec/'
+  add_filter "/spec/"
 end
 
-require 'support/fake_logger'
+require "support/fake_logger"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

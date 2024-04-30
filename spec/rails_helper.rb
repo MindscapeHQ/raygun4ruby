@@ -1,4 +1,6 @@
 ENV['RAILS_ENV'] ||= 'test'
-require "rails_applications/#{ENV.fetch('TESTING_RAILS_VERSION', '6.1.4')}/config/environment"
+require "rails"
 
-require 'rspec/rails'
+require "rails_applications/#{Rails::VERSION::STRING}/config/environment"
+
+require "rspec/rails"

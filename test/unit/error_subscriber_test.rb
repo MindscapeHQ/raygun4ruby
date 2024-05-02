@@ -3,8 +3,6 @@ require_relative "../test_helper.rb"
 class ErrorSubscriberTest < Raygun::UnitTest
 
   def test_tracking_exception_via_subscriber
-    WebMock.reset!
-
     body_matcher = lambda do |body|
       json = JSON.parse(body)
       details = json["details"]
@@ -31,6 +29,7 @@ class ErrorSubscriberTest < Raygun::UnitTest
       source: "application"
     )
 
+    Raygun.wait_for_futures
     assert_requested request_stub
   end
 

@@ -22,4 +22,85 @@ class RaygunTest < Raygun::UnitTest
 
     assert logger.get =~ /skipping reporting of.*Exception.*/, "ignored exception was not logged"
   end
+
+  class BackgroundSendTest < Raygun::UnitTest
+    def setup
+      @failsafe_logger = FakeLogger.new
+      Raygun.setup do |c|
+        c.silence_reporting = false
+        c.send_in_background = true
+        c.api_url = "http://example.api"
+        c.api_key = "foo"
+        c.debug = false
+        c.failsafe_logger = @failsafe_logger
+      end
+    end
+
+    def test_breadcrumb_context_passed
+      Raygun::Breadcrumbs::Store.initialize      
+      Raygun.record_breadcrumb(message: "mmm crumbly")
+      assert Raygun::Breadcrumbs::Store.any?
+
+      stub_request(:post, "http://example.api/entries")
+        .with(body: hash_including(breadcrumbs: [ hash_including(message: "mmm crumbly") ]))
+        .to_return(status: 202)
+
+      Raygun.track_exception(StandardError.new)
+      Raygun.wait_for_futures
+    ensure
+      Raygun::Breadcrumbs::Store.clear
+    end
+
+    def test_failsafe_reported_on_timeout
+      stub_request(:post, "http://example.api/entries").to_timeout
+
+      error = StandardError.new
+
+      Raygun.track_exception(error)
+
+      Raygun.wait_for_futures
+      assert_match(/Problem reporting exception to Raygun/, @failsafe_logger.get)
+    end
+
+  end
+
+  class ErrorSubscriberTest < Raygun::UnitTest
+    def setup
+      Raygun.setup do |c|
+        c.api_key = "test"
+        c.silence_reporting = false
+        c.debug = true
+        c.register_rails_error_handler = true
+      end
+
+      Raygun::Railtie.setup_error_subscriber
+    end
+
+    def test_registers_with_rails
+      if ::Rails.version.to_f >= 7.0
+        assert Rails.error.instance_variable_get("@subscribers").any? { |s| s.is_a?(Raygun::ErrorSubscriber) }
+      end
+    end
+
+    def test_reports_exceptions
+      if ::Rails.version.to_f >= 7.0
+        stub_request(:post, "https://api.raygun.com/entries").to_return(status: 202)
+
+        Rails.error.handle do
+          raise StandardError.new("test rails handling")
+        end
+      end
+    end
+  end
+
+  def test_reset_configuration
+    Raygun.setup do |c|
+      c.api_url = "http://test.api"
+    end
+
+    original_api_url = Raygun.configuration.api_url
+    Raygun.reset_configuration
+    assert_equal Raygun.default_configuration.api_url, Raygun.configuration.api_url
+    refute_equal original_api_url, Raygun.configuration.api_url
+  end
 end

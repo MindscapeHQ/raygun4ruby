@@ -1,6 +1,7 @@
-#!/usr/bin/env rake
+require "bundler/setup"
 require "bundler/gem_tasks"
 
+require "appraisal"
 require "rake/testtask"
 
 namespace :test do
@@ -24,4 +25,8 @@ namespace :test do
   end
 end
 
-task default: ["test:units", "test:spec"]
+if !ENV["APPRAISAL_INITIALIZED"] && !ENV["CI"]
+  task default: :appraisal
+else
+  task default: ["test:units", "test:spec"]
+end

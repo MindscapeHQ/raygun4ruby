@@ -1,11 +1,13 @@
 ENV['RACK_ENV'] = 'test'
-require_relative "../lib/raygun.rb"
 require "minitest/autorun"
 require "minitest/pride"
 require "timecop"
 require "mocha/minitest"
-require 'stringio'
-require 'webmock/minitest'
+require "stringio"
+require "webmock/minitest"
+
+require_relative "./rails_helper"
+require_relative "../lib/raygun.rb"
 
 class FakeLogger
   def initialize

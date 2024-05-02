@@ -24,12 +24,16 @@ class SidekiqFailureTest < Raygun::UnitTest
   def test_failure_backend_appears_to_work
     assert Raygun::SidekiqReporter.call(
       StandardError.new("Oh no! Your Sidekiq has failed!"),
-      sidekick_name: "robin"
+      { sidekick_name: "robin" }, 
+      {} # config
     ).success?
   end
 
   def test_we_are_in_sidekiqs_list_of_error_handlers
-    assert Sidekiq.error_handlers.include?(Raygun::SidekiqReporter)
+    # Sidekiq 7.x stores error handlers inside a configuration object, while 6.x and below stores them directly against the Sidekiq module
+    error_handlers = Sidekiq.respond_to?(:error_handlers) ? Sidekiq.error_handlers : Sidekiq.default_configuration.error_handlers
+
+    assert error_handlers.include?(Raygun::SidekiqReporter)
   end
 
 end

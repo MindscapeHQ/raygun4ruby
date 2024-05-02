@@ -218,7 +218,15 @@ module Raygun
               utcOffset: Time.now.utc_offset / 3600
             }
         }
-        store = ::Raygun::Breadcrumbs::Store
+
+        # If we have breadcrumbs passed to us as context from another thread, then include them
+        # Otherwise, use the default store (which is thread-local)
+        store = if env.key?(:rg_breadcrumb_store) 
+          ::Raygun::Breadcrumbs::Store.initialize(with: env.delete(:rg_breadcrumb_store))
+        else
+          ::Raygun::Breadcrumbs::Store
+        end
+
         error_details[:breadcrumbs] = store.take_until_size(MAX_BREADCRUMBS_SIZE).map(&:build_payload) if store.any?
 
         Raygun.log('set details and breadcrumbs')

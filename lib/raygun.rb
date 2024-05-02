@@ -35,6 +35,9 @@ module Raygun
     # Configuration Object (instance of Raygun::Configuration)
     attr_writer :configuration
 
+    # List of futures that are currently running
+    @@active_futures = []
+
     def setup
       yield(configuration)
 
@@ -117,15 +120,23 @@ module Raygun
       end
     end
 
+    def wait_for_futures
+      @@active_futures.each(&:value)
+    end
+
     private
 
-    def track_exception_async(*args)
-      future = Concurrent::Future.execute { track_exception_sync(*args) }
+    def track_exception_async(exception_instance, env, user, retry_count)
+      env[:rg_breadcrumb_store] = Raygun::Breadcrumbs::Store.take_until_size(Client::MAX_BREADCRUMBS_SIZE) if Raygun::Breadcrumbs::Store.any?
+
+      future = Concurrent::Future.execute { track_exception_sync(exception_instance, env, user, retry_count) }
       future.add_observer(lambda do |_, value, reason|
         if value == nil || !value.responds_to?(:response) || value.response.code != "202"
           log("unexpected response from Raygun, could indicate error: #{value.inspect}")
         end
+        @@active_futures.delete(future)
       end, :call)
+      @@active_futures << future
     end
 
     def track_exception_sync(exception_instance, env, user, retry_count)

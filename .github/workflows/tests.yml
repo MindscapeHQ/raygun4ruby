@@ -11,6 +11,7 @@ jobs:
         gemfile:
           - gemfiles/rails_6.gemfile
           - gemfiles/rails_7.gemfile
+          - gemfiles/rails_7_sidekiq_6.gemfile
         include:
           - ruby: "3.0"
             gemfile: gemfiles/rails_6.gemfile

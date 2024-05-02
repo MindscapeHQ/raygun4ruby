@@ -1,24 +1,12 @@
-# Adapted from Bugsnag code as per Sidekiq 2.x comment request
+# Adapted from Bugsnag code, and Sidekiq Erorr Handling instructions
 #
-# SideKiq 2.x: https://github.com/mperham/sidekiq/blob/2-x/lib/sidekiq/exception_handler.rb
+# SideKiq: https://github.com/sidekiq/sidekiq/wiki/Error-Handling
 # Bugsnag: https://github.com/bugsnag/bugsnag-ruby/blob/master/lib/bugsnag/sidekiq.rb
 
 module Raygun
 
-  class SidekiqMiddleware  # Used for Sidekiq 2.x only
-    def call(worker, message, queue)
-      begin
-        yield
-      rescue Exception => ex
-        raise ex if [Interrupt, SystemExit, SignalException].include?(ex.class)
-        SidekiqReporter.call(ex, worker: worker, message: message, queue: queue)
-        raise ex
-      end
-    end
-  end
-
   class SidekiqReporter
-    def self.call(exception, context_hash)
+    def self.call(exception, context_hash, config)
       user = affected_user(context_hash)
       data =  {
         custom_data: {
@@ -58,14 +46,6 @@ module Raygun
   end
 end
 
-if Sidekiq::VERSION < '3'
-  Sidekiq.configure_server do |config|
-    config.server_middleware do |chain|
-      chain.add Raygun::SidekiqMiddleware
-    end
-  end
-else
-  Sidekiq.configure_server do |config|
-    config.error_handlers << Raygun::SidekiqReporter
-  end
+Sidekiq.configure_server do |config|
+  config.error_handlers << Raygun::SidekiqReporter
 end

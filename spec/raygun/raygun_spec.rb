@@ -44,4 +44,31 @@ describe Raygun do
       expect { subject }.to change { Raygun.configuration.api_url }.from('http://test.api').to(Raygun.default_configuration.api_url)
     end
   end
+
+  describe "error subscriber" do
+    before do
+      Raygun.setup do |c|
+        c.api_key = "test"
+        c.silence_reporting = false
+        c.debug = true
+        c.register_rails_error_handler = true
+      end
+
+      Raygun::Railtie.setup_error_subscriber
+    end
+
+    if ::Rails.version.to_f >= 7.0
+      it "registers with rails" do
+        expect(Rails.error.instance_variable_get("@subscribers")).to include(a_kind_of(Raygun::ErrorSubscriber))
+      end
+
+      it "reports exceptions" do
+        stub_request(:post, "https://api.raygun.com/entries").to_return(status: 202)
+
+        Rails.error.handle do
+          raise StandardError.new("test rails handling")
+        end
+      end
+    end
+  end
 end

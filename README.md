@@ -2,46 +2,43 @@
 
 This is the Ruby adapter for the Raygun error reporter, https://raygun.com.
 
-
 ## Installation
 
-Add this line to your application's Gemfile:
+Add to your application's Gemfile:
 
-    gem 'raygun4ruby'
+    $ bundle add raygun4ruby
 
 And then execute:
 
     $ bundle install
 
-Or install it yourself as:
+Or, if you're not using Bundler, install the gem directly:
 
     $ gem install raygun4ruby
 
 ## Usage
 
-### Rails 3+
+### Rails 6+
 
 Run:
 
     rails g raygun:install YOUR_API_KEY_HERE
 
-You can find your API key in the [Raygun app](https://app.raygun.com/)
+You can find your API key in the [Raygun app](https://app.raygun.com/) under "Application Settings".
 
 You can then test your Raygun integration by running:
 
-    rake raygun:test
+    rails raygun:test
 
-You should see an "ItWorksException" appear in your Raygun dashboard. You're ready to zap those errors!
+You should see an "ItWorksException" appear in your Raygun dashboard. You're ready to zap those errors! :zap:
 
-NB: Raygun4Ruby currently requires Ruby >= 2.0
+The generator will create a file in `config/initializers` called "raygun.rb". If you need to do any further configuration or customization of Raygun, that's the place to do it!
 
-Note that the generator will create a file in `config/initializers` called "raygun.rb". If you need to do any further configuration or customization of Raygun, that's the place to do it!
+By default the Rails integration is set to only report Exceptions in the `production` environment. To change this behaviour, set `config.enable_reporting` to something else in `config/initializers/raygun.rb`.
 
-By default the Rails integration is set to only report Exceptions in Production. To change this behaviour, set `config.enable_reporting` to something else in `config/initializers/raygun.rb`.
+#### Version Support
 
-### Rails 2
-
-Raygun4Ruby doesn't currently support Rails 2. If you'd like Rails 2 support, [drop us a line](https://raygun.com/forums).
+Raygun4Ruby currently supports Rails 6 or later running on Ruby >= 3.0. If you're using an older version of Ruby or Rails please use an [older version of Raygun4Ruby](https://github.com/MindscapeHQ/raygun4ruby/releases)
 
 ### Sinatra
 
@@ -85,7 +82,7 @@ end
 
 You can also pass a Hash as the second parameter to `track_exception`. It should look like a [Rack Env Hash](https://github.com/rack/rack/blob/master/SPEC.rdoc#label-The+Environment)
 
-### Customizing The Parameter Filtering
+### Customizing Parameter Filtering
 
 If you'd like to customize how parameters are filtered, you can pass a `Proc` to `filter_parameters`. Raygun4Ruby will yield the params hash to the block, and the return value will be sent along with your error.
 
@@ -103,6 +100,7 @@ end
 Breadcrumbs let you provide logging points in your code that will be collected and sent along with any exception sent to Raygun. This lets you have a better understanding of the events that happened in the system that lead up to the exception.
 
 1. Include it as a module in your class
+
 ```ruby
 class SomeClass
   include Raygun::Breadcrumbs
@@ -117,9 +115,11 @@ class SomeClass
   end
 end
 ```
+
 This has the added benefit of recording the class the breadcrumb was recorded from automatically
 
 2. Call the `record_breadcrumb` method manually
+
 ```ruby
 def some_method
   Raygun.record_breadcrumb(
@@ -142,7 +142,7 @@ If you are using Sinatra or another rack framework you will need to include the 
 
 If you are using a non web based Ruby application you will have to call `Raygun::Breadcrumbs::Store.initialize` during your applications boot process. The store is per thread, but I have not tested it in a multi threaded application.
 
-### Filtering the payload by whitelist
+### Filtering the enire payload using a whitelist
 
 As an alternative to the above, you can also opt-in to the keys/values to be sent to Raygun by providing a specific whitelist of the keys you want to transmit.
 
@@ -190,6 +190,7 @@ end
 ```
 
 ### Custom User Data
+
 Custom data can be added to `track_exception` by passing a custom_data key in the second parameter hash.
 
 ```ruby
@@ -231,7 +232,7 @@ Raygun.setup do |config|
 end
 ```
 
-The following exceptions are ignored by default: 
+The following exceptions are ignored by default:
 
 ```
 ActiveRecord::RecordNotFound
@@ -244,7 +245,7 @@ AbstractController::ActionNotFound
 Mongoid::Errors::DocumentNotFound
 ```
 
- [You can see this here](https://github.com/MindscapeHQ/raygun4ruby/blob/master/lib/raygun/configuration.rb#L90) and unignore them if needed by doing the following:
+[You can see this here](https://github.com/MindscapeHQ/raygun4ruby/blob/master/lib/raygun/configuration.rb#L90) and unignore them if needed by doing the following:
 
 ```ruby
 Raygun.setup do |config|
@@ -266,7 +267,7 @@ end
 
 ### Affected Customers
 
-Raygun can now track how many customers have been affected by an error.
+Raygun can track how many customers have been affected by an error.
 
 By default, Raygun looks for a method called `current_user` on your controller, and it will populate the customer's information based on a default method name mapping.
 
@@ -291,7 +292,7 @@ To see the defaults check out [affected_user.rb](https://github.com/MindscapeHQ/
 
 If you're using Rails, most authentication systems will have this method set and you should be good to go.
 
-The count of unique affected customers will appear on the error group in the Raygun dashboard. If your customer has an `Email` attribute, and that email has a Gravatar associated with that address, you will also see your customer's avatar.
+The count of unique affected customers will appear on the error group in the Raygun dashboard. If your customer has an `email` attribute, and that email has a Gravatar associated with that address, you will also see your customer's avatar.
 
 If you wish to keep it anonymous, you could set this identifier to something like `SecureRandom.uuid` and store that in a cookie, like so:
 
@@ -307,7 +308,7 @@ end
 
 (Remember to set `affected_user_method` to `:raygun_user` in your config block...)
 
-### Version tracking
+### Version Tracking
 
 Raygun can attach the version of your application to its error reports. In your Raygun.setup block, set `version` to the current version of your app.
 
@@ -329,7 +330,7 @@ rescue Exception => e
 end
 ```
 
-Tags can also be specified globally either by setting `config.custom_data` to an array
+Tags can also be specified globally either by setting `config.tags` to an array
 
 ```ruby
 Raygun.setup do |config|
@@ -337,7 +338,7 @@ Raygun.setup do |config|
 end
 ```
 
-or to a proc, which gets passed the exception and environment hash. This proc _must_ return an array of strings
+or to a Proc, which gets passed the exception and environment hash. This proc _must_ return an array of strings
 
 ```ruby
 Raygun.setup do |config|
@@ -348,7 +349,9 @@ Raygun.setup do |config|
 end
 ```
 
-### Resque Error Tracking
+### Background Jobs
+
+#### Resque
 
 Raygun4Ruby also includes a Resque failure backend. You should include it inside your Resque initializer (usually something like `config/initializers/load_resque.rb`)
 
@@ -361,17 +364,17 @@ Resque::Failure::Multiple.classes = [Resque::Failure::Redis, Resque::Failure::Ra
 Resque::Failure.backend = Resque::Failure::Multiple
 ```
 
-### Sidekiq Error Tracking
+#### Sidekiq
 
-Raygun4Ruby can track errors from Sidekiq (2.x or 3+). All you need to do is add the line:
+Raygun4Ruby can track errors from Sidekiq (we test on 6+ but there's no reason it shouldn't work on older versions). All you need to do is add the line:
 
 ```ruby
   require 'raygun/sidekiq'
 ```
 
-Either in your Raygun initializer or wherever else takes your fancy :)
+Either in your Raygun initializer or wherever else takes your fancy :simple_smile:
 
-#### Affected Customers in Sidekiq
+##### Affected Customers in Sidekiq
 
 To track affected customers, define a class method on your worker class that returns a user object.
 Make sure the name of this method is the same as whatever you have defined as the `affected_user_method` in your Raygun configuration and that it returns an object that fits the mappings defined in `affected_user_mapping`
@@ -407,14 +410,15 @@ Oops! Just let us know by opening an Issue on Github.
 
 ## Contributing
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+1. Fork the repo, and install dependencies (`bundle install`)
+2. Create your feature branch and write your code (`git checkout -b my-new-feature`)
+3. Write some tests, and make them pass (`bundle exec rake`)
+4. Commit your changes (`git commit -am 'Add some feature'`)
+5. Push to the branch (`git push origin my-new-feature`)
+6. Create a new Pull Request. Thank you! :sparkles:
 
 ## Building
 
 1. Build the gem (`gem build raygun4ruby.gemspec`) - don't bother trying to build it on Windows,
-the resulting Gem won't work.
+   the resulting Gem won't work.
 2. Install the gem (`gem install raygun4ruby-VERSION.gem`)

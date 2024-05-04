@@ -64,6 +64,35 @@ class RaygunTest < Raygun::UnitTest
 
   end
 
+  class ErrorSubscriberTest < Raygun::UnitTest
+    def setup
+      Raygun.setup do |c|
+        c.api_key = "test"
+        c.silence_reporting = false
+        c.debug = true
+        c.register_rails_error_handler = true
+      end
+
+      Raygun::Railtie.setup_error_subscriber
+    end
+
+    def test_registers_with_rails
+      if ::Rails.version.to_f >= 7.0
+        assert Rails.error.instance_variable_get("@subscribers").any? { |s| s.is_a?(Raygun::ErrorSubscriber) }
+      end
+    end
+
+    def test_reports_exceptions
+      if ::Rails.version.to_f >= 7.0
+        stub_request(:post, "https://api.raygun.com/entries").to_return(status: 202)
+
+        Rails.error.handle do
+          raise StandardError.new("test rails handling")
+        end
+      end
+    end
+  end
+
   def test_reset_configuration
     Raygun.setup do |c|
       c.api_url = "http://test.api"

@@ -1,11 +1,16 @@
 ENV['RACK_ENV'] = 'test'
-require_relative "../lib/raygun.rb"
 require "minitest/autorun"
 require "minitest/pride"
 require "timecop"
 require "mocha/minitest"
-require 'stringio'
-require 'webmock/minitest'
+require "stringio"
+require "webmock/minitest"
+
+require_relative "./rails_helper"
+require_relative "../lib/raygun.rb"
+
+# Ensure we start with a known state
+Raygun.reset_configuration
 
 class FakeLogger
   def initialize
@@ -40,6 +45,8 @@ class Raygun::IntegrationTest < Minitest::Test
   end
 
   def teardown
+    Raygun.wait_for_futures
+    Raygun.reset_configuration
   end
 
 end
@@ -51,15 +58,12 @@ class Raygun::UnitTest < Minitest::Test
   end
 
   def teardown
-    reset_configuration
+    Raygun.wait_for_futures
+    Raygun.reset_configuration
   end
 
   def fake_successful_entry
     stub_request(:post, 'https://api.raygun.com/entries').to_return(status: 202)
-  end
-
-  def reset_configuration
-    Raygun.configuration = Raygun::Configuration.new
   end
 
   def setup_logging

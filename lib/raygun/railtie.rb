@@ -31,9 +31,17 @@ class Raygun::Railtie < Rails::Railtie
   config.to_prepare do
     Raygun.default_configuration.logger           = Rails.logger
     Raygun.default_configuration.enable_reporting = Rails.env.production?
+
+    Raygun::Railtie.setup_error_subscriber
   end
 
   rake_tasks do
     load "tasks/raygun.tasks"
+  end
+
+  def self.setup_error_subscriber
+    if ::Rails.version.to_f >= 7.0 && Raygun.configuration.register_rails_error_handler
+      Rails.error.subscribe(Raygun::ErrorSubscriber.new)
+    end
   end
 end

@@ -71,7 +71,6 @@ module Raygun
         levels = Raygun::Breadcrumbs::BREADCRUMB_LEVELS
 
         active_level = levels.index(Raygun.configuration.breadcrumb_level)
-        puts crumb.inspect if crumb.is_a?(Array)
         crumb_level = levels.index(crumb.level) || -1
 
         discard = crumb_level < active_level

@@ -86,6 +86,9 @@ module Raygun
     # How long to wait for the POST request to the API server before timing out
     config_option :error_report_send_timeout
 
+    # Should we register an error handler with [Rails' built in API](https://edgeguides.rubyonrails.org/error_reporting.html)
+    config_option :register_rails_error_handler
+
     # Exception classes to ignore by default
     IGNORE_DEFAULT = ['ActiveRecord::RecordNotFound',
                       'ActionController::RoutingError',

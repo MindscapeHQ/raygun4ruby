@@ -221,12 +221,9 @@ module Raygun
 
         # If we have breadcrumbs passed to us as context from another thread, then include them
         # Otherwise, use the default store (which is thread-local)
-        store = if env.key?(:rg_breadcrumb_store) 
-          ::Raygun::Breadcrumbs::Store.initialize(with: env.delete(:rg_breadcrumb_store))
-        else
-          ::Raygun::Breadcrumbs::Store
-        end
+        ::Raygun::Breadcrumbs::Store.initialize(with: env.delete(:rg_breadcrumb_store)) if env.key?(:rg_breadcrumb_store) 
 
+        store = ::Raygun::Breadcrumbs::Store
         error_details[:breadcrumbs] = store.take_until_size(MAX_BREADCRUMBS_SIZE).map(&:build_payload) if store.any?
 
         Raygun.log('set details and breadcrumbs')

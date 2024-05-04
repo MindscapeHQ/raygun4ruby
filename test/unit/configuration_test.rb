@@ -12,10 +12,6 @@ class ConfigurationTest < Raygun::UnitTest
     end
   end
 
-  def teardown
-    Raygun.reset_configuration
-  end
-
   def test_setting_api_key_and_version
     assert_equal 9.9,              Raygun.configuration.version
     assert_equal "a test api key", Raygun.configuration.api_key

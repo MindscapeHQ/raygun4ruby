@@ -65,11 +65,13 @@ module Raygun
       
       exception_instance.set_backtrace(caller) if exception_instance.is_a?(Exception) && exception_instance.backtrace.nil?
 
-      if configuration.send_in_background
+      result = if configuration.send_in_background
         track_exception_async(exception_instance, env, user, retry_count)
       else
         track_exception_sync(exception_instance, env, user, retry_count)
       end
+
+      result
     end
 
     def track_exceptions
@@ -137,6 +139,8 @@ module Raygun
         @@active_futures.delete(future)
       end, :call)
       @@active_futures << future
+
+      future
     end
 
     def track_exception_sync(exception_instance, env, user, retry_count)

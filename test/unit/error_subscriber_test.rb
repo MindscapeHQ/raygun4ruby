@@ -2,6 +2,12 @@ require_relative "../test_helper.rb"
 
 class ErrorSubscriberTest < Raygun::UnitTest
 
+  def setup
+    super
+    Raygun.configuration.send_in_background = false
+  end
+
+
   def test_tracking_exception_via_subscriber
     body_matcher = lambda do |body|
       json = JSON.parse(body)
@@ -19,7 +25,7 @@ class ErrorSubscriberTest < Raygun::UnitTest
       )
       .to_return(status: 202).times(1)
 
-    Raygun::ErrorSubscriber.new.report(
+    result = Raygun::ErrorSubscriber.new.report(
       StandardError.new("test error"),
       handled: true,
       severity: "warning",
@@ -29,7 +35,8 @@ class ErrorSubscriberTest < Raygun::UnitTest
       source: "application"
     )
 
-    Raygun.wait_for_futures
+    assert result && result.success?, "Expected success, got #{result.class}, #{result.inspect}"
+
     assert_requested request_stub
   end
 

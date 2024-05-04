@@ -16,17 +16,20 @@ class SidekiqFailureTest < Raygun::UnitTest
 
   def setup
     super
+    Raygun.configuration.send_in_background = false
 
     stub_request(:post, 'https://api.raygun.com/entries').to_return(status: 202)
     fake_successful_entry
   end
 
   def test_failure_backend_appears_to_work
-    assert Raygun::SidekiqReporter.call(
+    response = Raygun::SidekiqReporter.call(
       StandardError.new("Oh no! Your Sidekiq has failed!"),
       { sidekick_name: "robin" }, 
       {} # config
-    ).success?
+    )
+
+    assert response && response.success?, "Expected success, got #{response.class}: #{response.inspect}"
   end
 
   def test_we_are_in_sidekiqs_list_of_error_handlers

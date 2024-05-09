@@ -97,7 +97,8 @@ module Raygun
                       'CGI::Session::CookieStore::TamperedWithCookie',
                       'ActionController::UnknownAction',
                       'AbstractController::ActionNotFound',
-                      'Mongoid::Errors::DocumentNotFound']
+                      'Mongoid::Errors::DocumentNotFound',
+                      'Sidekiq::JobRetry::Skip']
 
     DEFAULT_FILTER_PARAMETERS = [ :password, :card_number, :cvv ]
 

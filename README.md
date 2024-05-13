@@ -12,13 +12,11 @@ And then execute:
 
     $ bundle install
 
-Or, if you're not using Bundler, install the gem directly:
-
-    $ gem install raygun4ruby
-
 ## Usage
 
 ### Rails 6+
+
+#### Step 1
 
 Run:
 
@@ -26,11 +24,15 @@ Run:
 
 You can find your API key in the [Raygun app](https://app.raygun.com/) under "Application Settings".
 
+#### Step 2
+
 You can then test your Raygun integration by running:
 
     rails raygun:test
 
-You should see an "ItWorksException" appear in your Raygun dashboard. You're ready to zap those errors! :zap:
+You should see an "ItWorksException" appear in your Raygun Crash Reporting dashboard. You're ready to zap those errors! :zap:
+
+#### Step 3 (optional)
 
 The generator will create a file in `config/initializers` called "raygun.rb". If you need to do any further configuration or customization of Raygun, that's the place to do it!
 
@@ -292,7 +294,7 @@ To see the defaults check out [affected_user.rb](https://github.com/MindscapeHQ/
 
 If you're using Rails, most authentication systems will have this method set and you should be good to go.
 
-The count of unique affected customers will appear on the error group in the Raygun dashboard. If your customer has an `email` attribute, and that email has a Gravatar associated with that address, you will also see your customer's avatar.
+The count of unique affected customers will appear on the error group in Raygun Crash Reporting. If your customer has an `email` attribute, and that email has a Gravatar associated with that address, you will also see your customer's avatar.
 
 If you wish to keep it anonymous, you could set this identifier to something like `SecureRandom.uuid` and store that in a cookie, like so:
 

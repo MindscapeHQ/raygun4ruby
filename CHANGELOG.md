@@ -1,4 +1,4 @@
-## 4.0.0.pre (prerelease):
+## 4.0.0 (20/05/2024):
 
 - BREAKING CHANGE: Remove support for end-of-life Ruby verisons and Rails versions prior to 6.0.0
 - Bug fix: Fix issue with breadcrumbs not being sent to Raygun when `send_in_background` is enabled (thanks to @jjb for the bug report)

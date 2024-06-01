@@ -6,7 +6,7 @@
 module Raygun
 
   class SidekiqReporter
-    def self.call(exception, context_hash, config)
+    def self.call(exception, context_hash = {}, config = nil)
       user = affected_user(context_hash)
       data =  {
         custom_data: {

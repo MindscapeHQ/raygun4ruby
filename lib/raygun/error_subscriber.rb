@@ -16,6 +16,10 @@ class Raygun::ErrorSubscriber
       tags: ["rails_error_reporter", *tags].compact
     }
 
-    Raygun.track_exception(error, data)
+    if source == "job.sidekiq" && defined?(Sidekiq)
+      Raygun::SidekiqReporter.call(error, data)
+    else
+      Raygun.track_exception(error, data)
+    end
   end
 end

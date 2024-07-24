@@ -97,4 +97,26 @@ class SidekiqFailureTest < Raygun::UnitTest
     assert error_handlers.include?(Raygun::SidekiqReporter)
   end
 
+  def test_rails_error_reporter_uses_sidekiq_reporter
+    WebMock.reset!
+
+    tagged_request = stub_request(:post, 'https://api.raygun.com/entries').
+      with(body: /"sidekiq"/). # should have a sidekiq tag!
+      to_return(status: 202)
+
+    error = StandardError.new("Oh no! Your Sidekiq has failed!")
+
+    response = Raygun::ErrorSubscriber.new.report(
+      error,
+      handled: true,
+      severity: "error",
+      context: { sidekick_name: "robin" },
+      source: "job.sidekiq"
+    )
+
+    assert response && response.success?, "Expected success, got #{response.class}: #{response.inspect}"
+
+    assert_requested tagged_request
+  end
+
 end

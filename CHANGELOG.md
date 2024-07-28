@@ -1,3 +1,7 @@
+## 4.0.1 (29/07/2024):
+
+- Adds the ability to unwrap `Sidekiq::JobRetry::Handled` exceptions (or ignore them entirely) ([#185](https://github.com/MindscapeHQ/raygun4ruby/pull/185))
+
 ## 4.0.0 (20/05/2024):
 
 - BREAKING CHANGE: Remove support for end-of-life Ruby verisons and Rails versions prior to 6.0.0

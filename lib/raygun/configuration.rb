@@ -89,6 +89,9 @@ module Raygun
     # Should we register an error handler with [Rails' built in API](https://edgeguides.rubyonrails.org/error_reporting.html)
     config_option :register_rails_error_handler
 
+    # Should we track jobs that are retried in Sidekiq (ones that raise Sidekiq::JobRetry::Handled). Set to "false" to ignore.
+    config_option :track_retried_sidekiq_jobs
+
     # Exception classes to ignore by default
     IGNORE_DEFAULT = ['ActiveRecord::RecordNotFound',
                       'ActionController::RoutingError',
@@ -143,7 +146,8 @@ module Raygun
         breadcrumb_level:              :info,
         record_raw_data:               false,
         send_in_background:            false,
-        error_report_send_timeout:     10
+        error_report_send_timeout:     10,
+        track_retried_sidekiq_jobs:    true
       )
     end
 

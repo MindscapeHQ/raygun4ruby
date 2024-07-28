@@ -14,6 +14,16 @@ module Raygun
         },
         tags: ['sidekiq']
       }
+
+      if exception.is_a?(Sidekiq::JobRetry::Handled) && exception.cause
+        if Raygun.configuration.track_retried_sidekiq_jobs
+          data.merge!(sidekiq_retried: true)
+          exception = exception.cause
+        else
+          return false
+        end
+      end
+
       if exception.instance_variable_defined?(:@__raygun_correlation_id) && correlation_id = exception.instance_variable_get(:@__raygun_correlation_id)
         data.merge!(correlation_id: correlation_id)
       end

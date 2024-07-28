@@ -402,6 +402,10 @@ class FailingWorker
   end
 ```
 
+##### Sidekiq Retries
+
+By default, Raygun4Ruby will unwrap `Sidekiq::JobRetry::Handled` exceptions and report the original error via `Exception#cause`. If you would prefer not to hear about retries, you can set `config.track_retried_sidekiq_jobs` to `false` in your Raygun configuration.
+
 ### Other Configuration options
 
 For a complete list of configuration options see the [configuration.rb](https://github.com/MindscapeHQ/raygun4ruby/blob/master/lib/raygun/configuration.rb) file

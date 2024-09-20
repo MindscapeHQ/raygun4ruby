@@ -60,15 +60,15 @@ module Raygun
       !!configuration.api_key
     end
 
-    def track_exception(exception_instance, env = {}, user = nil, retry_count = 1)
+    def track_exception(exception_instance, env = {}, user = nil, retries_remaining = configuration.error_report_max_attempts - 1)
       log('tracking exception')
       
       exception_instance.set_backtrace(caller) if exception_instance.is_a?(Exception) && exception_instance.backtrace.nil?
 
       result = if configuration.send_in_background
-        track_exception_async(exception_instance, env, user, retry_count)
+        track_exception_async(exception_instance, env, user, retries_remaining)
       else
-        track_exception_sync(exception_instance, env, user, retry_count)
+        track_exception_sync(exception_instance, env, user, retries_remaining)
       end
 
       result
@@ -128,10 +128,10 @@ module Raygun
 
     private
 
-    def track_exception_async(exception_instance, env, user, retry_count)
+    def track_exception_async(exception_instance, env, user, retries_remaining)
       env[:rg_breadcrumb_store] = Raygun::Breadcrumbs::Store.take_until_size(Client::MAX_BREADCRUMBS_SIZE) if Raygun::Breadcrumbs::Store.any?
 
-      future = Concurrent::Future.execute { track_exception_sync(exception_instance, env, user, retry_count) }
+      future = Concurrent::Future.execute { track_exception_sync(exception_instance, env, user, retries_remaining) }
       future.add_observer(lambda do |_, value, reason|
         if value == nil || !value.responds_to?(:response) || value.response.code != "202"
           log("unexpected response from Raygun, could indicate error: #{value.inspect}")
@@ -143,7 +143,7 @@ module Raygun
       future
     end
 
-    def track_exception_sync(exception_instance, env, user, retry_count)
+    def track_exception_sync(exception_instance, env, user, retries_remaining)
       if should_report?(exception_instance)
         log('attempting to send exception')
         resp = Client.new.track_exception(exception_instance, env, user)
@@ -158,18 +158,25 @@ module Raygun
         failsafe_log("Problem reporting exception to Raygun: #{e.class}: #{e.message}\n\n#{e.backtrace.join("\n")}")
       end
 
-      if retry_count > 0
+      if retries_remaining > 0
         new_exception = e.exception("raygun4ruby encountered an exception processing your exception")
         new_exception.set_backtrace(e.backtrace)
 
         env[:custom_data] ||= {}
-        env[:custom_data].merge!(original_stacktrace: exception_instance.backtrace)
+        env[:custom_data].merge!(original_stacktrace: exception_instance.backtrace, retries_remaining: retries_remaining)
 
         ::Raygun::Breadcrumbs::Store.clear
 
-        track_exception(new_exception, env, user, retry_count - 1)
+        track_exception(new_exception, env, user, retries_remaining - 1)
       else
-        raise e
+        if configuration.raise_on_failed_error_report
+          raise e
+        else
+          retries = configuration.error_report_max_attempts - retries_remaining
+          if configuration.failsafe_logger
+            failsafe_log("Gave up reporting exception to Raygun after #{retries} #{retries == 1 ? "retry" : "retries"}: #{e.class}: #{e.message}\n\n#{e.backtrace.join("\n")}")
+          end
+        end
       end
     end
 

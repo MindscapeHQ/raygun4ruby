@@ -103,4 +103,43 @@ class RaygunTest < Raygun::UnitTest
     assert_equal Raygun.default_configuration.api_url, Raygun.configuration.api_url
     refute_equal original_api_url, Raygun.configuration.api_url
   end
+
+  def test_retries 
+    failsafe_logger = FakeLogger.new
+    Raygun.setup do |c|
+      c.error_report_max_attempts = 3
+      c.failsafe_logger = failsafe_logger
+    end  
+
+    WebMock.reset!
+    report_request = stub_request(:post, "https://api.raygun.com/entries").to_timeout
+
+    error = StandardError.new
+    Raygun.track_exception(error)
+
+    assert_requested report_request, times: 3
+
+    assert_match(/Gave up reporting exception to Raygun after 3 retries/, failsafe_logger.get)
+  ensure
+    Raygun.reset_configuration
+  end
+
+  def test_raising_on_retry_failure
+    Raygun.setup do |c|
+      c.error_report_max_attempts = 1
+      c.raise_on_failed_error_report = true
+    end  
+
+    report_request = stub_request(:post, "https://api.raygun.com/entries").to_timeout
+
+    error = StandardError.new
+
+    assert_raises(StandardError) do
+      Raygun.track_exception(error)
+      assert_requested report_request
+    end
+
+  ensure
+    Raygun.reset_configuration
+  end
 end

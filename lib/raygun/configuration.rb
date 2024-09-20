@@ -86,6 +86,12 @@ module Raygun
     # How long to wait for the POST request to the API server before timing out
     config_option :error_report_send_timeout
 
+    # How many times to try sending to Raygun before giving up
+    config_option :error_report_max_attempts
+
+    # Whether or not we should raise an exception if the error reporting fails
+    config_option :raise_on_failed_error_report
+
     # Should we register an error handler with [Rails' built in API](https://edgeguides.rubyonrails.org/error_reporting.html)
     config_option :register_rails_error_handler
 
@@ -147,6 +153,8 @@ module Raygun
         record_raw_data:               false,
         send_in_background:            false,
         error_report_send_timeout:     10,
+        error_report_max_attempts:     1,
+        raise_on_failed_error_report:  false,
         track_retried_sidekiq_jobs:    true
       )
     end

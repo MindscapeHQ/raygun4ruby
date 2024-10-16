@@ -48,16 +48,16 @@ class SidekiqFailureTest < Raygun::UnitTest
       raise Sidekiq::JobRetry::Handled
     end
 
-    rescue Sidekiq::JobRetry::Handled => e
+  rescue Sidekiq::JobRetry::Handled => e
 
-      response = Raygun::SidekiqReporter.call(
-        e,
-        { sidekick_name: "robin" }, 
-        {} # config
-      )
+    response = Raygun::SidekiqReporter.call(
+      e,
+      { sidekick_name: "robin" }, 
+      {} # config
+    )
 
-      assert_requested unwrapped_stub
-      assert response && response.success?, "Expected success, got #{response.class}: #{response.inspect}"
+    assert_requested unwrapped_stub
+    assert response && response.success?, "Expected success, got #{response.class}: #{response.inspect}"
   end
 
   def test_failured_backend_ignores_retries_if_configured
@@ -69,12 +69,12 @@ class SidekiqFailureTest < Raygun::UnitTest
       raise Sidekiq::JobRetry::Handled
     end
 
-    rescue Sidekiq::JobRetry::Handled => e
+  rescue Sidekiq::JobRetry::Handled => e
 
-      refute Raygun::SidekiqReporter.call(e,
-        { sidekick_name: "robin" }, 
-        {} # config
-      )
+    refute Raygun::SidekiqReporter.call(e,
+      { sidekick_name: "robin" }, 
+      {} # config
+    )
   ensure
     Raygun.configuration.track_retried_sidekiq_jobs = true
   end
